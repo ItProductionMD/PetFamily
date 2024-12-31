@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" Version="3.4.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Aggregates\Volunteer\" />
+  </ItemGroup>
+
 </Project>
