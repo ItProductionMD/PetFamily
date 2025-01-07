@@ -10,6 +10,7 @@ namespace PetFamily.Domain.Shared.ValueObjects
         public string City { get; }
         public string Country { get; }
         public string Number { get; }
+        private Adress() { }//EF core need this
         private Adress(AdressDomainDTO adressDto)
         {
             Country = adressDto.Country!;

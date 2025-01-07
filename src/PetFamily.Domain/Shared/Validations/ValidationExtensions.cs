@@ -16,10 +16,8 @@ namespace PetFamily.Domain.Shared.Validations
             foreach (var nameValue in nameAndValue)
             {
                 var validationResult = ValidateIfStringNotEmpty(nameValue.Key, nameValue.Value);
-                if (!validationResult.IsValid)
-                {
-                    mainResult.AddError(validationResult.Errors[0]);
-                }
+                if (validationResult.IsFailure)
+                    mainResult.AddError(validationResult.Errors[0]);               
             }
             return mainResult;
         }

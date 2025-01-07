@@ -5,19 +5,19 @@ namespace PetFamily.Domain.Shared.ValueObjects
 {
     public record PetType
     {
-        public Species Species { get; }
-        public Breed Breed { get; }
+        public Guid SpeciesId { get; }
+        public Guid BreedId { get; }
 
-        private PetType(Breed breed,Species species)
+        private PetType() { }//EF core need this
+        private PetType(Guid breedId,Guid speciesId)
         {
-            Species = species;
-            Breed = breed;
+            SpeciesId = speciesId;
+            BreedId = breedId;
         }
-        public static Result<PetType> Create( Breed? breed,Species? species)
+        public static Result<PetType> Create(Guid breedId,Guid speciesId)
         {
-            if (species == null || breed == null)
-                return Result<PetType>.Failure("Species and Breed must not be null");
-            return Result<PetType>.Success(new PetType(breed,species));
+            //TODO add validations
+            return Result<PetType>.Success(new PetType(breedId,speciesId));
         }
     }
 }

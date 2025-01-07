@@ -1,4 +1,5 @@
 ﻿using PetFamily.Domain.DomainResult;
+using PetFamily.Domain.PetAggregates.Enums;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.DTO;
 using PetFamily.Domain.Shared.ValueObjects;
@@ -18,7 +19,7 @@ public class Pet : Entity<Guid>
     public double? Height { get; private set; }
     public string? Color { get; private set; }
     public PetType PetType { get; private set; } //Species and Breed
-    public PhoneNumber? OwnerPhone { get; private set; }
+    public Phone? OwnerPhone { get; private set; }
     public DonateDetails? DonateDetails { get; private set; }
     public string? HealthInfo { get; private set; }
     public Adress? Adress { get; private set; }

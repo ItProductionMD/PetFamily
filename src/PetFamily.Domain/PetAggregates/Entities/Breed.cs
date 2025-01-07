@@ -4,17 +4,17 @@ using PetFamily.Domain.Shared.Validations;
 
 namespace PetFamily.Domain.PetAggregates.Entities;
 
-public class Breed : Entity<int>
+public class Breed : Entity<Guid>
 {
     public string Name { get; private set; }
     public string? Description { get; private set; }
-    private Breed(int id) : base(id) { }//Ef core needs this
-    private Breed(int id,string name, string? description):base(id)
+    private Breed(Guid id) : base(id) { }//Ef core needs this
+    private Breed(Guid id,string name, string? description):base(id)
     {
         Name = name;
         Description = description;
     }
-    public static Result<Breed> Create(int id,string? name, string? description)
+    public static Result<Breed> Create(Guid id,string? name, string? description)
     {
         var validationResult = Validate(name, description);
         if (validationResult.IsFailure)
