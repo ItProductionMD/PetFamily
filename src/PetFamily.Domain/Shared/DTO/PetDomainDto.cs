@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.PetAggregates.Root;
+﻿using PetFamily.Domain.PetAggregates.Enums;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Domain.Shared.DTO
@@ -15,7 +15,7 @@ namespace PetFamily.Domain.Shared.DTO
         public double? Height { get; set; }
         public string? Color { get; set; }
         public PetType? PetType { get; set; }
-        public PhoneNumber? OwnerPhone { get; set; }
+        public Phone? OwnerPhone { get; set; }
         public DonateDetails? DonateDetails { get; set; }
         public string? HealthInfo { get; set; }
         public Adress? Adress { get; set; }

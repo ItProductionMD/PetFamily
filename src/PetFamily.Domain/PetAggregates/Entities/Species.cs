@@ -4,21 +4,21 @@ using PetFamily.Domain.Shared.Validations;
 
 namespace PetFamily.Domain.PetAggregates.Entities;
 
-public class Species : Entity<int>
+public class Species : Entity<Guid>
 {
     public string Name { get; private set; }
 
     private readonly List<Breed> _breeds = [];
     public IReadOnlyList<Breed> Breeds => _breeds;
 
-    private Species(int id) : base(id) { }//Ef core needs this
-    private Species(int id, string name) : base(id)
+    private Species(Guid id) : base(id) { }//Ef core needs this
+    private Species(Guid id, string name) : base(id)
     {
         Name = name;
     }
     public void AddBreed(Breed breed)=>_breeds.Add(breed);
     public int GetBreedCount()=>_breeds.Count;
-    public static Result<Species> Create(int id, string? name)
+    public static Result<Species> Create(Guid id, string? name)
     {
         var validationResult = Validate(name);
         if (validationResult.IsFailure)
