@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using PetFamily.Domain.PetAggregates.Entities;
-using static PetFamily.Domain.Shared.Constants;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.Configurations;
 public class BreedConfiguration : IEntityTypeConfiguration<Breed>

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.VolunteerAggregates.Root;
 using PetFamily.Domain.Shared;
-using static PetFamily.Domain.Shared.Constants;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.Configurations
 {

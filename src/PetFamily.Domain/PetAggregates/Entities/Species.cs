@@ -1,12 +1,15 @@
-﻿using PetFamily.Domain.DomainResult;
+﻿using PetFamily.Domain.Shared.DomainResult;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.Validations;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using PetFamily.Domain.PetAggregates.ValueObjects;
 
 namespace PetFamily.Domain.PetAggregates.Entities;
-
 public class Species : Entity<Guid>
 {
     public string Name { get; private set; }
+    private const string NAME = "Species name";
 
     private readonly List<Breed> _breeds = [];
     public IReadOnlyList<Breed> Breeds => _breeds;
@@ -18,20 +21,13 @@ public class Species : Entity<Guid>
     }
     public void AddBreed(Breed breed)=>_breeds.Add(breed);
     public int GetBreedCount()=>_breeds.Count;
-    public static Result<Species> Create(Guid id, string? name)
+    public static Result<Species> Create(SpeciesID id, string? name)
     {
         var validationResult = Validate(name);
         if (validationResult.IsFailure)
-            return Result<Species>.Failure(validationResult.Errors);
-        return Result<Species>.Success(new Species(id, name!));
+            return Result<Species>.Failure(validationResult.Error!);
+        return Result<Species>.Success(new Species(id.Value, name!));
     }
-    public static Result Validate(string? name)
-    {
-        var nullOrEmptyValidationResult = ValidationExtensions.ValidateIfStringNotEmpty("Name", name);
-        if(nullOrEmptyValidationResult.IsFailure)
-            return Result.Failure(nullOrEmptyValidationResult.Errors);
-        //TODO: Add more validations    
-        return Result.Success();
-    }
-
+    public static Result Validate(string? name) =>
+        ValidateRequiredField(name, NAME, MAX_LENGTH_SHORT_TEXT, NAME_PATTERN);
 }

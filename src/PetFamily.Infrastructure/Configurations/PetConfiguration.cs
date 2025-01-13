@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Domain.PetAggregates.Entities;
 using PetFamily.Domain.PetAggregates.Root;
-using static PetFamily.Domain.Shared.Constants;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.Configurations;
 
@@ -76,7 +75,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             address.Property(a => a.City)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
 
-            address.Property(a => a.Country)
+            address.Property(a => a.Region)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
         });
 

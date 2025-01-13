@@ -102,7 +102,7 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("health_info");
 
-                    b.Property<double?>("Height")
+                    b.Property<double>("Height")
                         .HasColumnType("double precision")
                         .HasColumnName("height");
 
@@ -111,11 +111,11 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("help_status");
 
-                    b.Property<bool?>("IsSterilized")
+                    b.Property<bool>("IsSterilized")
                         .HasColumnType("boolean")
                         .HasColumnName("is_sterilized");
 
-                    b.Property<bool?>("IsVaccinated")
+                    b.Property<bool>("IsVaccinated")
                         .HasColumnType("boolean")
                         .HasColumnName("is_vaccinated");
 
@@ -129,7 +129,7 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("volunteer_id");
 
-                    b.Property<double?>("Weight")
+                    b.Property<double>("Weight")
                         .HasColumnType("double precision")
                         .HasColumnName("weight");
 
@@ -257,11 +257,11 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasColumnType("character varying(100)")
                                 .HasColumnName("adress_city");
 
-                            b1.Property<string>("Country")
+                            b1.Property<string>("Region")
                                 .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("character varying(100)")
-                                .HasColumnName("adress_country");
+                                .HasColumnName("adress_region");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
