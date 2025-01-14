@@ -11,6 +11,7 @@ public static class Inject
         services
             .AddScoped<IVolunteerRepository, VolunteerRepository>()
             .AddScoped<AppDbContext>();
+
         return services;
     }
 }

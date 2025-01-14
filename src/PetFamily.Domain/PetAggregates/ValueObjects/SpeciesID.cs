@@ -1,10 +1,14 @@
-﻿namespace PetFamily.Domain.PetAggregates.ValueObjects;
-public record SpeciesID 
+﻿namespace PetFamily.Domain.PetAggregates.ValueObjects
 {
-    public Guid Value { get; }
-    private SpeciesID(Guid id)
+    public record SpeciesID
     {
-        Value = id;
+        public Guid Value { get; }
+
+        private SpeciesID(Guid id)
+        {
+            Value = id;
+        }
+
+        public static SpeciesID NewGuid() => new(Guid.NewGuid());
     }
-    public static SpeciesID NewGuid()=> new(Guid.NewGuid());
 }

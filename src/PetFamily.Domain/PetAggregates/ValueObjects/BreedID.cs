@@ -1,13 +1,15 @@
-﻿using PetFamily.Domain.PetAggregates.Entities;
-
-namespace PetFamily.Domain.PetAggregates.ValueObjects;
-public record BreedID 
+﻿namespace PetFamily.Domain.PetAggregates.ValueObjects
 {
-    public Guid Value;
-    private BreedID(Guid id)
+    public record BreedID
     {
-        Value = id;
-    }
-    public static BreedID NewGuid()=> new(Guid.NewGuid());
+        public Guid Value;
 
+        private BreedID(Guid id)
+        {
+            Value = id;
+        }
+
+        public static BreedID NewGuid() => new(Guid.NewGuid());
+
+    }
 }

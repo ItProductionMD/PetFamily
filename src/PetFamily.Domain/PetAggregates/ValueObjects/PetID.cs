@@ -1,12 +1,15 @@
-﻿using PetFamily.Domain.PetAggregates.Root;
-namespace PetFamily.Domain.PetAggregates.ValueObjects;
-public record PetID
+﻿namespace PetFamily.Domain.PetAggregates.ValueObjects
 {
-    public Guid Value { get; }
-    private PetID(Guid id)
+    public record PetID
     {
-        Value= id;
-    }
-    public static PetID NewGuid() => new(Guid.NewGuid());
+        public Guid Value { get; }
 
+        private PetID(Guid id)
+        {
+            Value = id;
+        }
+
+        public static PetID NewGuid() => new(Guid.NewGuid());
+
+    }
 }
