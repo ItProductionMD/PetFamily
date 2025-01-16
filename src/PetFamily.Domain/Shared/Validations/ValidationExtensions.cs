@@ -1,27 +1,49 @@
-﻿using PetFamily.Domain.DomainResult;
+﻿using System.Text.RegularExpressions;
+using PetFamily.Domain.Shared.DomainResult;
+using static PetFamily.Domain.Shared.Error;
 
-namespace PetFamily.Domain.Shared.Validations
+namespace PetFamily.Domain.Shared.Validations;
+
+public static class ValidationExtensions
 {
-    public static class ValidationExtensions
+    public static Result ValidateRequiredField(string? value,string valueName,int maxLength, string pattern)
     {
-        public static Result ValidateIfStringNotEmpty(string valueName, string? stringValue)
-        {
-            if (string.IsNullOrWhiteSpace(stringValue))
-                return Result.Failure($"{valueName} cannot be null, empty, or whitespace.");
-            return Result.Success();
-        }
-        public static Result ValidateIfStringsNotEmpty(Dictionary<string, string?> nameAndValue)
-        {
-            var mainResult = Result.Success();
-            foreach (var nameValue in nameAndValue)
-            {
-                var validationResult = ValidateIfStringNotEmpty(nameValue.Key, nameValue.Value);
-                if (!validationResult.IsValid)
-                {
-                    mainResult.AddError(validationResult.Errors[0]);
-                }
-            }
-            return mainResult;
-        }
+        if (string.IsNullOrWhiteSpace(value))
+            return Result.Failure(CreateErrorStringNullOrEmpty(valueName));
+
+        if (value.Length > maxLength)
+            return Result.Failure(CreateErrorInvalidLength(valueName));
+
+        if (!Regex.IsMatch(value, pattern))
+            return Result.Failure(CreateErrorInvalidFormat(valueName));
+
+        return Result.Success();
     }
+
+    public static Result ValidateRequiredField(string? value, string valueName, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Result.Failure(CreateErrorStringNullOrEmpty(valueName));
+
+        if (value.Length > maxLength)
+            return Result.Failure(CreateErrorInvalidLength(valueName));
+
+        return Result.Success();
+    }
+
+    public static Result ValidateNonRequiredField(string? value, string valueName, int maxLength)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+            ValidateRequiredField(value, valueName, maxLength);
+
+        return Result.Success();
+    }
+
+    public static Result ValidateRequiredObject<T>(this T? obj, string valueName) =>
+
+        obj != null ? Result.Success() : Result.Failure(CreateErrorValueRequired(valueName));
+   
+    public static bool HasOnlyEmptyStrings(params string?[] strings) =>
+
+         !strings.Any(s => !string.IsNullOrWhiteSpace(s));
 }
