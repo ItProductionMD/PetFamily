@@ -2,39 +2,59 @@
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using PetFamily.Domain.Shared.DTO;
 
-namespace PetFamily.Domain.Shared.ValueObjects
+namespace PetFamily.Domain.Shared.ValueObjects;
+
+
+public record SocialNetwork
 {
+    public string Name { get; }
+    public string Url { get; }
 
-    public record SocialNetwork
+    private SocialNetwork(string name, string url)
     {
-        public string Name { get; }
-        public string Url { get; }
+        Name = name;
+        Url = url;
+    }
 
-        private SocialNetwork(string name, string url)
-        {
-            Name = name;
-            Url = url;
-        }
+    public static Result<SocialNetwork?> Create(string? name, string? url)
+    {
+        if (IsSocialNetworkEmpty(name, url))
+            return Result<SocialNetwork?>.Success(null);
 
-        public static Result<SocialNetwork?> Create(string? name, string? url, bool isRequired)
-        {
-            var hasOnlyEmptyStrings = HasOnlyEmptyStrings(name, url);
-            if (hasOnlyEmptyStrings && !isRequired)
-                return Result<SocialNetwork?>.Success(null);
+        var validationResult = Validate(name, url);
 
-            var validationResult = Validate(name, url);
-            if (validationResult.IsFailure)
-                return Result<SocialNetwork?>.Failure(validationResult.Error!);
+        if (validationResult.IsFailure)
+            return Result<SocialNetwork?>.Failure(validationResult.Errors!);
 
-            return Result<SocialNetwork?>.Success(new SocialNetwork(name!, url!));
-        }
+        return Result<SocialNetwork?>.Success(new SocialNetwork(name!, url!));
+    }
 
-        private static Result Validate(string? name, string? url) =>
+    public static Result Validate(string? name, string? url)
+    {
+        if (IsSocialNetworkEmpty(name, url))
+            return Result.Success();
 
-            ValidateRequiredField(name, "SocialNetwork name ", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN)
+        return Result.ValidateCollection(
 
-            .OnFailure(() =>
-                ValidateRequiredField(url, "SocialNetwork url", MAX_LENGTH_SHORT_TEXT));
+            () => ValidateRequiredField(
+
+                valueToValidate: name,
+                valueName: "SocialNetwork name",
+                maxLength: MAX_LENGTH_SHORT_TEXT,
+                pattern: NAME_PATTERN),
+
+            () => ValidateRequiredField(
+
+                valueToValidate: url,
+                valueName: "SocialNetwork url",
+                maxLength: MAX_LENGTH_SHORT_TEXT));
+    }
+    public static Result Validate(SocialNetworkDTO dto) => Validate(dto.Name, dto.Url);
+
+    private static bool IsSocialNetworkEmpty(string? name, string? url)
+    {
+        return HasOnlyEmptyStrings(name, url);
     }
 }

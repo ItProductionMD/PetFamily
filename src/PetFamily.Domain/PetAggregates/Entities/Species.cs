@@ -29,7 +29,7 @@ namespace PetFamily.Domain.PetAggregates.Entities
         {
             var validationResult = Validate(name);
             if (validationResult.IsFailure)
-                return Result<Species>.Failure(validationResult.Error!);
+                return Result<Species>.Failure(validationResult.Errors!);
 
             return Result<Species>.Success(new Species(id.Value, name!));
         }

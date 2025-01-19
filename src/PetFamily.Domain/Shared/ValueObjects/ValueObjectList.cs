@@ -1,18 +1,16 @@
 ﻿
-namespace PetFamily.Domain.Shared.ValueObjects
+namespace PetFamily.Domain.Shared.ValueObjects;
+
+
+public record ValueObjectList<T> where T : class
 {
+    public IReadOnlyList<T> ObjectList { get; }
 
-    public record ValueObjectList<T> where T : class
+    protected ValueObjectList() { }//Ef core need this
+
+    public ValueObjectList(IReadOnlyList<T>? values)
     {
-        public IReadOnlyList<T>? ObjectList { get; }
-
-        protected ValueObjectList() { }//Ef core need this
-
-        public ValueObjectList(IReadOnlyList<T>? values)
-        {
-            ObjectList = values;
-
-        }
-
+        ObjectList = values ?? [];
     }
+
 }
