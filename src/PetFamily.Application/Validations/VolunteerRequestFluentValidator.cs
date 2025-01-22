@@ -16,8 +16,8 @@ public class VolunteerRequestFluentValidator : AbstractValidator<CreateVolunteer
             .NotEmpty()
             .MaximumLength(MAX_LENGTH_SHORT_TEXT)
             .EmailAddress()
-            .WithErrorCode("value.format.is.invalid");
-
+            .WithErrorCode("value.is.invalid");
+            
         RuleFor(c => new { c.PhoneNumber, c.PhoneRegionCode })
             .MustBeValueObject(phone => Phone.Validate(phone.PhoneNumber, phone.PhoneRegionCode));
 

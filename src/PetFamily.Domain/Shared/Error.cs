@@ -38,9 +38,9 @@ public record Error
 
         new("value.is.invalid", string.Format(INVALID_GUIDID_EMPTY, valueName), ErrorType.Validation, valueName);
 
-    public static Error CreateErrorConflict(string code, string message) =>
+    public static Error CreateErrorConflict(string valueName) =>
 
-      new(code, message, ErrorType.Conflict, valueName: null);
+      new( "data.is.conficted","" ,ErrorType.Conflict, valueName: null);
 
     public static Error CreateErrorNotFound(string code, string message) =>
 
@@ -54,6 +54,10 @@ public record Error
     {
         return new(code, message, errorType, valueName);
     }
+
+    public static Error CreateInternalServerError(string message) =>
+        new("internal.server.error", message, ErrorType.InternalServerError, string.Empty);
+    
 }
 
 public enum ErrorType
@@ -61,5 +65,6 @@ public enum ErrorType
     NotFound,
     Validation,
     Conflict,
-    Exception
+    Exception,
+    InternalServerError,
 }

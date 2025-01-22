@@ -10,6 +10,11 @@ namespace PetFamily.API.Controllers;
 [Route("[controller]")]
 public class VolunteerController : Controller
 {
+    private readonly ILogger<VolunteerController> _logger;
+    public VolunteerController(ILogger<VolunteerController> logger)
+    {
+        _logger = logger;   
+    }
     [HttpPost]
     public async Task<ActionResult<Envelope>> Create(
 
@@ -20,11 +25,15 @@ public class VolunteerController : Controller
         CancellationToken cancellationToken=default)
 
     {
-
         var handlerResult = await handler.Handler(volunteerRequest, cancellationToken);
 
         if (handlerResult.IsFailure)
+        {
+            _logger.LogError("Create volunteer failure!{Errors}", handlerResult.Errors);
             return handlerResult.ToErrorActionResult();
+        }
+
+        _logger.LogInformation("Create volunteer success!");
 
         return CreatedAtAction(nameof(Create), handlerResult.ToEnvelope());
        

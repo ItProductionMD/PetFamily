@@ -11,4 +11,5 @@ public static class ValidationMessages
     public const string INVALID_REQUIRE_OPTION = "The {0} value is required!";
 
     public const string INVALID_GUIDID_EMPTY = "The {0} Guid value is empty!";
+
 }

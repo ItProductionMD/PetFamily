@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
 using PetFamily.Application.Validations;
-using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.DomainResult;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteerAggregates.Root;
 using PetFamily.Domain.VolunteerAggregates.ValueObjects;
 using static PetFamily.Domain.Shared.ValueObjects.ValueObjectFactory;
 using static PetFamily.Application.Validations.ValidationExtensions;
+using Microsoft.Extensions.Logging;
 
 //-------------------------------Handler,UseCases,Services----------------------------------------//
 
@@ -14,27 +14,40 @@ namespace PetFamily.Application.Volunteers.CreateVolunteer;
 
 public class CreateVolunteerHandler(
     IVolunteerRepository volunteerRepository,
-    IValidator<CreateVolunteerRequest> validator)
+    IValidator<CreateVolunteerRequest> validator,
+    ILogger<CreateVolunteerHandler> logger)
 {
     private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
     private readonly IValidator<CreateVolunteerRequest> _validator = validator;
+    private readonly ILogger<CreateVolunteerHandler> _logger = logger;
+
     public async Task<Result<Guid>> Handler(
         CreateVolunteerRequest volunteerRequest,
         CancellationToken cancellationToken = default)
     {
         //--------------------------------------Validator----------------------------------//
 
-        var validationResult = VolunteerRequestValidator.Validate(volunteerRequest);
+        /*var validationResult = VolunteerRequestValidator.Validate(volunteerRequest);
 
         if (validationResult.IsFailure)
-            return Result<Guid>.Failure(validationResult.Errors!);
+        {
+            _logger.LogError("CreateVolunteerHandler volunteerRequest validation failure!{}",
+                validationResult.Errors);
 
+            return Result<Guid>.Failure(validationResult.Errors!);
+        }
+        */
         //--------------------------------------Fluent Validator----------------------------------//
 
         var fluentValidationResult = await _validator.ValidateAsync(volunteerRequest, cancellationToken);
 
         if (fluentValidationResult.IsValid == false)
+        {
+            _logger.LogError("Validate volunteerRequest failure!{}",
+                           fluentValidationResult.Errors);
+
             return fluentValidationResult.Failure<Guid>();
+        }
 
         //------------------Creating ValueObject lists from VolunteerRequest Dtos-----------------//
 
@@ -48,17 +61,17 @@ public class CreateVolunteerHandler(
 
         //-------------------------------Creating ValueObjects------------------------------------//
 
-        var fullNameResult = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName);
+        var fullName = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName).Data;
 
-        var phoneResult = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode);
+        var phone = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode).Data;
 
         //---------------------------------Create Volunteer---------------------------------------//
 
         var volunteerCreateResult = Volunteer.Create(
             VolunteerID.NewGuid(),
-            fullNameResult.Data,
+            fullName,
             volunteerRequest.Email,
-            phoneResult.Data,
+            phone,
             volunteerRequest.ExperienceYears,
             volunteerRequest.Description,
             donateDetails,
@@ -66,14 +79,41 @@ public class CreateVolunteerHandler(
             );
 
         if (volunteerCreateResult.IsFailure)
+        {
+            _logger.LogError("Validate volunteer entity failure!{}", volunteerCreateResult.Errors);
+
             return Result<Guid>.Failure(volunteerCreateResult.Errors!);
+        }
+        var volunteer = volunteerCreateResult.Data;
+
+        //TODO this must be a transaction ?
+
+        //---------------------Check if volunteer with souch Email or phone number exist----------//
+
+        var validateAvailability = await _volunteerRepository
+            .CheckVolunteerContactAvailability(volunteer.Email, volunteer.PhoneNumber);
+
+        if (validateAvailability.IsFailure)
+        {
+            _logger.LogError("Validate volunteer unique phone and unique email failure!{}",
+                validateAvailability.Errors);
+
+            return Result<Guid>.Failure(validateAvailability.Errors!);
+        }
 
         //---------------------------------Add Volunteer to repository----------------------------//
 
         var idResult = await _volunteerRepository.Add(volunteerCreateResult.Data, cancellationToken);
 
         if (idResult.IsFailure)
+        {
+            _logger.LogError("Add volunteer with id:{} to repository failure!{}",
+                volunteer.Id,
+                idResult.Errors);
+
             return idResult;
+        }
+        _logger.LogInformation("Volunteer with id:{} , created sucessfull!", volunteer.Id);
 
         return Result<Guid>.Success(idResult.Data);
     }
