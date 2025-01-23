@@ -7,6 +7,8 @@ using PetFamily.Domain.VolunteerAggregates.ValueObjects;
 using static PetFamily.Domain.Shared.ValueObjects.ValueObjectFactory;
 using static PetFamily.Application.Validations.ValidationExtensions;
 using Microsoft.Extensions.Logging;
+using PetFamily.Domain.Shared;
+using System.Security.AccessControl;
 
 //-------------------------------Handler,UseCases,Services----------------------------------------//
 
@@ -88,17 +90,16 @@ public class CreateVolunteerHandler(
 
         //TODO this must be a transaction ?
 
-        //---------------------Check if volunteer with souch Email or phone number exist----------//
+        //---------------------Check if volunteer with souch Email or phone number exists---------//
+        var validateUniqueness = await ValidateUniqueEmailAndPhone(volunteer);
 
-        var validateAvailability = await _volunteerRepository
-            .CheckVolunteerContactAvailability(volunteer.Email, volunteer.PhoneNumber);
-
-        if (validateAvailability.IsFailure)
+        if (validateUniqueness.IsFailure)
         {
-            _logger.LogError("Validate volunteer unique phone and unique email failure!{}",
-                validateAvailability.Errors);
+            _logger.LogError(
+                "Validate volunteer unique phone and unique email failure!{}",
+                validateUniqueness.Errors);
 
-            return Result<Guid>.Failure(validateAvailability.Errors!);
+            return Result<Guid>.Failure(validateUniqueness.Errors!);
         }
 
         //---------------------------------Add Volunteer to repository----------------------------//
@@ -118,4 +119,26 @@ public class CreateVolunteerHandler(
         return Result<Guid>.Success(idResult.Data);
     }
 
+    private async Task<Result> ValidateUniqueEmailAndPhone(Volunteer volunteer)
+    {
+        var getVolunteer = await _volunteerRepository
+            .GetByEmailOrPhone(volunteer.Email,volunteer.PhoneNumber);
+
+        if (getVolunteer.IsFailure)
+            return Result.Success();
+
+        var existingVolunteers = getVolunteer.Data;
+
+        List<Error> errors = [];
+
+        foreach (var v in existingVolunteers)
+        {
+            if (v.Email == volunteer.Email)
+                errors.Add(Error.CreateErrorValueIsBusy("Email"));
+
+            if (v.PhoneNumber == volunteer.PhoneNumber)
+                errors.Add(Error.CreateErrorValueIsBusy("Phone"));
+        }
+        return Result.Failure(errors!);
+    }
 }

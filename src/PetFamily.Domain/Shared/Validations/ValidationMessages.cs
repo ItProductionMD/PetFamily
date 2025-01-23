@@ -12,4 +12,6 @@ public static class ValidationMessages
 
     public const string INVALID_GUIDID_EMPTY = "The {0} Guid value is empty!";
 
+    public const string VALUE_ALREADY_EXISTS = "This {0} already exist!";
+
 }

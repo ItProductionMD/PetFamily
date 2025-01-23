@@ -8,7 +8,7 @@ namespace PetFamily.Application.Volunteers
     {
         Task<Result<Guid>> Add(Volunteer volunteer, CancellationToken cancellationToken = default);
 
-        Task<Result> CheckVolunteerContactAvailability(string email, Phone phone);
+        Task<Result<List<Volunteer>>> GetByEmailOrPhone(string email, Phone phone);
 
     }
 }

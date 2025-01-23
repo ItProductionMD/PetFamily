@@ -35,40 +35,17 @@ namespace PetFamily.Infrastructure.Repositories
             }
         }
 
-        public async Task<Result> CheckVolunteerContactAvailability(string email, Phone phone)
+        public async Task<Result<List<Volunteer>>> GetByEmailOrPhone(string email, Phone phone)
         {
-            var volunteer = await _context.Volunteers.FirstOrDefaultAsync(v => v.Email == email ||
+            List<Volunteer> volunteers = await _context.Volunteers
+                .Where(v => v.Email == email ||
+                v.PhoneNumber.RegionCode == phone.RegionCode &&
+                v.PhoneNumber.Number == phone.Number).ToListAsync();
 
-                v.PhoneNumber.RegionCode == phone.RegionCode && v.PhoneNumber.Number == phone.Number);
+            if (volunteers.Count == 0)
+                return Result<List<Volunteer>>.Failure(Error.CreateErrorNotFound("Volunteers"));
 
-            if (volunteer != null)
-            {
-                List<Error> errors = [];
-
-                if (volunteer.PhoneNumber == phone)
-                {
-                    var error = Error.CreateCustomError(
-                        code: "value.is.invalid",
-                        message: "Phone is already exists",
-                        errorType: ErrorType.Validation,
-                        valueName: "Phone");
-
-                    errors.Add(error);
-                }
-                if (volunteer.Email == email)
-                {
-                    var error = Error.CreateCustomError(
-                        code: "value.is.invalid",
-                        message: "Email is already exists",
-                        errorType: ErrorType.Validation,
-                        valueName: "Email");
-
-                    errors.Add(error);
-                }
-                return Result.Failure(errors!);
-            }
-            return Result.Success();
-
+            return Result<List<Volunteer>>.Success(volunteers);
         }
     }
 }
