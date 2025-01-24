@@ -9,95 +9,106 @@ using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
-namespace PetFamily.Domain.PetAggregates.Root
+namespace PetFamily.Domain.PetAggregates.Root;
+
+public class Pet : Entity<Guid>
 {
-    public class Pet : Entity<Guid>
+    public string Name { get; private set; }
+    public DateOnly? DateOfBirth { get; private set; }
+    public DateTime DateTimeCreated { get; private set; }
+    public string? Description { get; private set; }
+    public bool IsVaccinated { get; private set; }
+    public bool IsSterilized { get; private set; }
+    public double Weight { get; private set; }
+    public double Height { get; private set; }
+    public string? Color { get; private set; }
+    public PetType PetType { get; private set; } //Species and Breed
+    public Phone? OwnerPhone { get; private set; }
+    public DonateDetails? DonateDetails { get; private set; }
+    public string? HealthInfo { get; private set; }
+    public Adress? Adress { get; private set; }
+    public HelpStatus HelpStatus { get; private set; }
+    public Volunteer Volunteer { get; private set; }//Navigation property
+
+    private Pet(Guid id) : base(id) { }//Ef core needs this
+
+    private Pet(Guid id, PetDomainDto petDomainDto) : base(id)
     {
-        public string Name { get; private set; }
-        public DateOnly? DateOfBirth { get; private set; }
-        public DateTime DateTimeCreated { get; private set; }
-        public string? Description { get; private set; }
-        public bool IsVaccinated { get; private set; }
-        public bool IsSterilized { get; private set; }
-        public double Weight { get; private set; }
-        public double Height { get; private set; }
-        public string? Color { get; private set; }
-        public PetType PetType { get; private set; } //Species and Breed
-        public Phone? OwnerPhone { get; private set; }
-        public DonateDetails? DonateDetails { get; private set; }
-        public string? HealthInfo { get; private set; }
-        public Adress? Adress { get; private set; }
-        public HelpStatus HelpStatus { get; private set; }
-        public Volunteer Volunteer { get; private set; }//Navigation property
-       
-        private Pet(Guid id) : base(id) { }//Ef core needs this
+        DateTimeCreated = DateTime.UtcNow;
 
-        private Pet(Guid id, PetDomainDto petDomainDto) : base(id)
-        {
-            DateTimeCreated = DateTime.UtcNow;
+        Name = petDomainDto.Name!;
 
-            Name = petDomainDto.Name!;
+        DateOfBirth = petDomainDto.DateOfBirth;
 
-            DateOfBirth = petDomainDto.DateOfBirth;
+        Description = petDomainDto.Description;
 
-            Description = petDomainDto.Description;
+        IsVaccinated = GetBoolValue(petDomainDto.IsVaccinated);
 
-            IsVaccinated = GetBoolValue(petDomainDto.IsVaccinated);
+        IsSterilized = GetBoolValue(petDomainDto.IsSterilized);
 
-            IsSterilized = GetBoolValue(petDomainDto.IsSterilized);
+        Weight = petDomainDto.Weight;
 
-            Weight = petDomainDto.Weight;
+        Height = petDomainDto.Height;
 
-            Height = petDomainDto.Height;
+        Color = petDomainDto.Color;
 
-            Color = petDomainDto.Color;
+        PetType = petDomainDto.PetType!;
 
-            PetType = petDomainDto.PetType!;
+        OwnerPhone = petDomainDto.OwnerPhone;
 
-            OwnerPhone = petDomainDto.OwnerPhone;
+        DonateDetails = petDomainDto.DonateDetails;
 
-            DonateDetails = petDomainDto.DonateDetails;
+        HealthInfo = petDomainDto.HealthInfo;
 
-            HealthInfo = petDomainDto.HealthInfo;
+        Adress = petDomainDto.Adress;
 
-            Adress = petDomainDto.Adress;
-
-            HelpStatus = petDomainDto.HelpStatus;
-        }
-
-        public static Result<Pet> Create(PetDomainDto petDomainDto)
-        {
-            var validatePetDomain = Validate(petDomainDto);
-            if (validatePetDomain.IsFailure)
-                return Result<Pet>.Failure(validatePetDomain.Error!);
-
-            return Result<Pet>.Success(new Pet(Guid.NewGuid(), petDomainDto));
-        }
-
-        public static Result Validate(PetDomainDto petDomainDto) =>
-
-            ValidateRequiredField(petDomainDto.Name,"Pet name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN)
-
-            .OnFailure(() =>
-                ValidationExtensions.ValidateRequiredObject(petDomainDto.PetType,"Pet type"))
-
-            .OnFailure(() =>
-                ValidateNonRequiredField(petDomainDto.Description,"Pet description", MAX_LENGTH_LONG_TEXT))
-
-            .OnFailure(() => 
-                ValidateNonRequiredField(petDomainDto.HealthInfo,"Pet health description", MAX_LENGTH_LONG_TEXT))
-
-            .OnFailure(() => 
-                ValidateNonRequiredField(petDomainDto.Color,"Pet color", MAX_LENGTH_SHORT_TEXT));
-
-        //TODO: Add more validations
-
-        private static bool GetBoolValue(bool? variable)
-        {
-            if (variable.HasValue)
-                return variable.Value;
-
-            return false;
-        }
+        HelpStatus = petDomainDto.HelpStatus;
     }
+
+    public static Result<Pet> Create(PetDomainDto petDomainDto)
+    {
+        var validatePetDomain = Validate(petDomainDto);
+
+        if (validatePetDomain.IsFailure)
+            return Result<Pet>.Failure(validatePetDomain.Errors!);
+
+        return Result<Pet>.Success(new Pet(Guid.NewGuid(), petDomainDto));
+    }
+
+    public static Result Validate(PetDomainDto petDomainDto)
+    {
+        return Result.ValidateCollection(
+
+            () => ValidateRequiredField(
+                valueToValidate: petDomainDto.Name,
+                valueName: "Pet name",
+                maxLength: MAX_LENGTH_SHORT_TEXT,
+                pattern: NAME_PATTERN),
+
+            () => ValidationExtensions.ValidateRequiredObject(
+                objToValidate: petDomainDto.PetType,
+                valueName: "Pet type"),
+
+            () => ValidateNonRequiredField(
+                valueToValidate: petDomainDto.Description,
+                valueName: "Pet description",
+                maxLength: MAX_LENGTH_LONG_TEXT),
+
+            () => ValidateNonRequiredField(
+                valueToValidate: petDomainDto.HealthInfo,
+                valueName: "Pet health description",
+                maxLength: MAX_LENGTH_LONG_TEXT),
+
+            () => ValidateNonRequiredField(
+                valueToValidate: petDomainDto.Color,
+                valueName: "Pet color",
+                maxLength: MAX_LENGTH_SHORT_TEXT)
+            );
+    }
+
+    //TODO: Add more validations
+
+    private static bool GetBoolValue(bool? variable) => variable ?? false;
+
+
 }

@@ -1,39 +1,39 @@
 ﻿using PetFamily.Domain.PetAggregates.ValueObjects;
 using PetFamily.Domain.Shared.DomainResult;
 
-namespace PetFamily.Domain.Shared.ValueObjects
+namespace PetFamily.Domain.Shared.ValueObjects;
+
+public record PetType
 {
-    public record PetType
+    public Guid SpeciesId { get; }
+    public Guid BreedId { get; }
+
+    private PetType() { }//EF core need this
+
+    private PetType(Guid breedId, Guid speciesId)
     {
-        public Guid SpeciesId { get; }
-        public Guid BreedId { get; }
+        SpeciesId = speciesId;
+        BreedId = breedId;
+    }
 
-        private PetType() { }//EF core need this
+    public static Result<PetType> Create(BreedID breedId, SpeciesID speciesId)
+    {
+        var validatePetType = Validate(breedId, speciesId);
 
-        private PetType(Guid breedId, Guid speciesId)
-        {
-            SpeciesId = speciesId;
-            BreedId = breedId;
-        }
+        if (validatePetType.IsFailure)
+            return Result<PetType>.Failure(validatePetType.Errors!);
 
-        public static Result<PetType> Create(BreedID breedId, SpeciesID speciesId)
-        {
-            var validatePetType = Validate(breedId, speciesId);
-            if (validatePetType.IsFailure)
-                return Result<PetType>.Failure(validatePetType.Error!);
+        return Result<PetType>.Success(new PetType(breedId.Value, speciesId.Value));
+    }
 
-            return Result<PetType>.Success(new PetType(breedId.Value, speciesId.Value));
-        }
+    private static Result Validate(BreedID breedId, SpeciesID speciesId)
+    {
+        if (breedId.Value == Guid.Empty)
+            return Result.Failure(Error.CreateErrorGuidIdIsEmpty("PetType breedId"));
 
-        private static Result Validate(BreedID breedId, SpeciesID speciesId)
-        {
-            if (breedId.Value == Guid.Empty)
-                return Result.Failure(Error.CreateErrorGuidIdIsEmpty("PetType breedId"));
+        if (speciesId.Value == Guid.Empty)
+            return Result.Failure(Error.CreateErrorGuidIdIsEmpty("PetType speciesId"));
 
-            if (speciesId.Value == Guid.Empty)
-                return Result.Failure(Error.CreateErrorGuidIdIsEmpty("PetType speciesId"));
-
-            return Result.Success();
-        }
+        return Result.Success();
     }
 }

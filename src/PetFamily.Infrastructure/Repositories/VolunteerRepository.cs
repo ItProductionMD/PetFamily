@@ -1,6 +1,8 @@
-﻿using PetFamily.Application.Volunteers;
+﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.Application.Volunteers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteerAggregates.Root;
 
 namespace PetFamily.Infrastructure.Repositories
@@ -15,7 +17,9 @@ namespace PetFamily.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Result<Guid>> Add(Volunteer volunteer, CancellationToken cancellationToken = default)
+        public async Task<Result<Guid>> Add(
+            Volunteer volunteer,
+            CancellationToken cancellationToken = default)
         {
             try
             {
@@ -29,6 +33,19 @@ namespace PetFamily.Infrastructure.Repositories
             {
                 return Result<Guid>.Failure(Error.CreateErrorException(ex));
             }
+        }
+
+        public async Task<Result<List<Volunteer>>> GetByEmailOrPhone(string email, Phone phone)
+        {
+            List<Volunteer> volunteers = await _context.Volunteers
+                .Where(v => v.Email == email ||
+                v.PhoneNumber.RegionCode == phone.RegionCode &&
+                v.PhoneNumber.Number == phone.Number).ToListAsync();
+
+            if (volunteers.Count == 0)
+                return Result<List<Volunteer>>.Failure(Error.CreateErrorNotFound("Volunteers"));
+
+            return Result<List<Volunteer>>.Success(volunteers);
         }
     }
 }

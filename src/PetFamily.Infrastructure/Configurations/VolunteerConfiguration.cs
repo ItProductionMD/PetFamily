@@ -19,7 +19,7 @@ namespace PetFamily.Infrastructure.Configurations
                 .HasMaxLength(MAX_LENGTH_MEDIUM_TEXT)
                 .IsRequired();
 
-            builder.Property(v => v.ExpirienceYears);
+            builder.Property(v => v.ExperienceYears);
 
             builder.Property(v => v.Description)
                 .HasMaxLength(MAX_LENGTH_MEDIUM_TEXT);

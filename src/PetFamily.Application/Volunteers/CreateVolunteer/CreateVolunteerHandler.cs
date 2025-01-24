@@ -1,101 +1,144 @@
-﻿using PetFamily.Domain.Shared.DomainResult;
+﻿using FluentValidation;
+using PetFamily.Application.Validations;
+using PetFamily.Domain.Shared.DomainResult;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteerAggregates.Root;
 using PetFamily.Domain.VolunteerAggregates.ValueObjects;
-using System.Net.Http.Headers;
+using static PetFamily.Domain.Shared.ValueObjects.ValueObjectFactory;
+using static PetFamily.Application.Validations.ValidationExtensions;
+using Microsoft.Extensions.Logging;
+using PetFamily.Domain.Shared;
+using System.Security.AccessControl;
 
-//Handler,UseCases,Services
+//-------------------------------Handler,UseCases,Services----------------------------------------//
+
 namespace PetFamily.Application.Volunteers.CreateVolunteer;
 
-public class CreateVolunteerHandler
+public class CreateVolunteerHandler(
+    IVolunteerRepository volunteerRepository,
+    IValidator<CreateVolunteerRequest> validator,
+    ILogger<CreateVolunteerHandler> logger)
 {
-    private readonly IVolunteerRepository _volunteerRepository;
-
-    public CreateVolunteerHandler(IVolunteerRepository volunteerRepository)
-    {
-        _volunteerRepository= volunteerRepository;
-    }
+    private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
+    private readonly IValidator<CreateVolunteerRequest> _validator = validator;
+    private readonly ILogger<CreateVolunteerHandler> _logger = logger;
 
     public async Task<Result<Guid>> Handler(
         CreateVolunteerRequest volunteerRequest,
-        CancellationToken cancellationToken=default)
+        CancellationToken cancellationToken = default)
     {
+        //--------------------------------------Validator----------------------------------//
 
-        var volunteerId=VolunteerID.NewGuid();
-        var expirienceYears = volunteerRequest.ExpirienceYears;
-        var email=volunteerRequest.Email;
-        var description = volunteerRequest.Description;
+        /*var validationResult = VolunteerRequestValidator.Validate(volunteerRequest);
 
-        var donateDetailsResult = CreateDonateDetailsList(volunteerRequest.DonateDetailsDtos);
-        if (donateDetailsResult.IsFailure)
-            return Result<Guid>.Failure(donateDetailsResult.Error!);
+        if (validationResult.IsFailure)
+        {
+            _logger.LogError("CreateVolunteerHandler volunteerRequest validation failure!{}",
+                validationResult.Errors);
 
-        var socialNetworksResult = CreateSocialNetworkList(volunteerRequest.SocialNetworksDtos);
-        if(socialNetworksResult.IsFailure)
-            return Result<Guid>.Failure(socialNetworksResult.Error!);
+            return Result<Guid>.Failure(validationResult.Errors!);
+        }
+        */
+        //--------------------------------------Fluent Validator----------------------------------//
 
-        var fullNameResult = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName);
-        if (fullNameResult.IsFailure)
-            return Result<Guid>.Failure(fullNameResult.Error!);
+        var fluentValidationResult = await _validator.ValidateAsync(volunteerRequest, cancellationToken);
 
-        var phoneNumberResult = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode);
-        if (phoneNumberResult.IsFailure)
-            return Result<Guid>.Failure(phoneNumberResult.Error!);
+        if (fluentValidationResult.IsValid == false)
+        {
+            _logger.LogError("Validate volunteerRequest failure!{}",
+                           fluentValidationResult.Errors);
+
+            return fluentValidationResult.Failure<Guid>();
+        }
+
+        //------------------Creating ValueObject lists from VolunteerRequest Dtos-----------------//
+
+        IReadOnlyList<SocialNetwork> socialNetworks = MapDtosToValueObjects(
+            volunteerRequest.SocialNetworksDtos,
+            dto => SocialNetwork.Create(dto.Name, dto.Url))!;
+
+        IReadOnlyList<DonateDetails> donateDetails = MapDtosToValueObjects(
+            volunteerRequest.DonateDetailsDtos,
+            dto => DonateDetails.Create(dto.Name, dto.Description))!;
+
+        //-------------------------------Creating ValueObjects------------------------------------//
+
+        var fullName = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName).Data;
+
+        var phone = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode).Data;
+
+        //---------------------------------Create Volunteer---------------------------------------//
 
         var volunteerCreateResult = Volunteer.Create(
-            volunteerId,
-            fullNameResult.Data,
-            email,
-            phoneNumberResult.Data,
-            expirienceYears,
-            description,
-            donateDetailsResult.Data,
-            socialNetworksResult.Data
+            VolunteerID.NewGuid(),
+            fullName,
+            volunteerRequest.Email,
+            phone,
+            volunteerRequest.ExperienceYears,
+            volunteerRequest.Description,
+            donateDetails,
+            socialNetworks
             );
 
         if (volunteerCreateResult.IsFailure)
-            return Result<Guid>.Failure(volunteerCreateResult.Error!);
+        {
+            _logger.LogError("Validate volunteer entity failure!{}", volunteerCreateResult.Errors);
 
-        var idResult = await _volunteerRepository.Add(volunteerCreateResult.Data,cancellationToken);
+            return Result<Guid>.Failure(volunteerCreateResult.Errors!);
+        }
+        var volunteer = volunteerCreateResult.Data;
+
+        //TODO this must be a transaction ?
+
+        //---------------------Check if volunteer with souch Email or phone number exists---------//
+        var validateUniqueness = await ValidateUniqueEmailAndPhone(volunteer);
+
+        if (validateUniqueness.IsFailure)
+        {
+            _logger.LogError(
+                "Validate volunteer unique phone and unique email failure!{}",
+                validateUniqueness.Errors);
+
+            return Result<Guid>.Failure(validateUniqueness.Errors!);
+        }
+
+        //---------------------------------Add Volunteer to repository----------------------------//
+
+        var idResult = await _volunteerRepository.Add(volunteerCreateResult.Data, cancellationToken);
+
         if (idResult.IsFailure)
+        {
+            _logger.LogError("Add volunteer with id:{} to repository failure!{}",
+                volunteer.Id,
+                idResult.Errors);
+
             return idResult;
+        }
+        _logger.LogInformation("Volunteer with id:{} , created sucessfull!", volunteer.Id);
 
-        return Result<Guid>.Success(volunteerId.Value);
+        return Result<Guid>.Success(idResult.Data);
     }
 
-    private Result<List<DonateDetails>> CreateDonateDetailsList(List<DonateDetailsDto> donateDetailsDtos)
+    private async Task<Result> ValidateUniqueEmailAndPhone(Volunteer volunteer)
     {
-        List<DonateDetails> donateDetailsList = [];
+        var getVolunteer = await _volunteerRepository
+            .GetByEmailOrPhone(volunteer.Email,volunteer.PhoneNumber);
 
-        foreach (var item in donateDetailsDtos)
+        if (getVolunteer.IsFailure)
+            return Result.Success();
+
+        var existingVolunteers = getVolunteer.Data;
+
+        List<Error> errors = [];
+
+        foreach (var v in existingVolunteers)
         {
-            var donateDetailsResult = DonateDetails.Create(item.Name, item.Description,false);
+            if (v.Email == volunteer.Email)
+                errors.Add(Error.CreateErrorValueIsBusy("Email"));
 
-            if (donateDetailsResult.IsFailure)
-                return Result<List<DonateDetails>>.Failure(donateDetailsResult.Error!);
-                    
-            if(donateDetailsResult.Data != null)
-                donateDetailsList.Add(donateDetailsResult.Data);
+            if (v.PhoneNumber == volunteer.PhoneNumber)
+                errors.Add(Error.CreateErrorValueIsBusy("Phone"));
         }
-
-        return Result<List<DonateDetails>>.Success(donateDetailsList);
-    }
-
-    private Result<List<SocialNetwork>> CreateSocialNetworkList(List<SocialNetworksDto> socialNetworksDtos)
-    {
-        List<SocialNetwork> socialNetworks = [];
-
-        foreach(var item in socialNetworksDtos)
-        {
-            var socialNetworksResult = SocialNetwork.Create(item.Name,item.Url,false);
-
-            if(socialNetworksResult.IsFailure)
-                return Result<List<SocialNetwork>>.Failure(socialNetworksResult.Error!);
-
-            if(socialNetworksResult.Data != null)   
-                socialNetworks.Add(socialNetworksResult.Data);
-        }
-
-        return Result<List<SocialNetwork>>.Success(socialNetworks);
+        return Result.Failure(errors!);
     }
 }

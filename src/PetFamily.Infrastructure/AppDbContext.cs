@@ -1,5 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PetFamily.Domain.VolunteerAggregates.Root;
 using static PetFamily.Domain.Shared.Constants;
