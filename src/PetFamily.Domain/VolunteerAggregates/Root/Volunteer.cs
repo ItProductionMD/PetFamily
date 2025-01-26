@@ -9,10 +9,9 @@ using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
-
 namespace PetFamily.Domain.VolunteerAggregates.Root;
 
-public class Volunteer : Entity<Guid>
+public class Volunteer : Entity<Guid>, ISoftDeletable
 {
     public FullName FullName { get; private set; }
     public string Email { get; private set; }
@@ -24,7 +23,8 @@ public class Volunteer : Entity<Guid>
     public IReadOnlyList<Pet> Pets => _pets;
 
     private readonly List<Pet> _pets = [];
-
+    private bool _isDeleted;
+    private DateTime? _deletedDateTime;
     private Volunteer(Guid id) : base(id) { } //Ef core needs this
 
     private Volunteer(
@@ -47,7 +47,7 @@ public class Volunteer : Entity<Guid>
         SocialNetworksList = socialNetworksList ?? new(null);//list can be emty
     }
 
-    //------------------------------------------Factory method----------------------------------------------//
+    //--------------------------------------Factory method----------------------------------------//
     public static Result<Volunteer> Create(
         VolunteerID id,
         FullName? fullName,
@@ -59,14 +59,14 @@ public class Volunteer : Entity<Guid>
         IReadOnlyList<SocialNetwork>? socialNetworksList
         )
     {
-        //------------------------------------Validation---------------------------------------------//
+        //---------------------------------Validate Volunteer-------------------------------------//
 
         var validationResult = Validate(fullName, email, phoneNumber, expirienceYears, description);
 
         if (validationResult.IsFailure)
             return Result<Volunteer>.Failure(validationResult.Errors!);
 
-        //-----------------Create ValueObjectList<valueObject> from IReadOnlyList<valueObject>--------//
+        //-------------Create ValueObjectList<valueObject> from IReadOnlyList<valueObject>--------//
 
         var socialNetworks = new ValueObjectList<SocialNetwork>(socialNetworksList);
 
@@ -81,29 +81,84 @@ public class Volunteer : Entity<Guid>
                 donateDetails,
                 socialNetworks));
     }
-
-    public static Result Validate(FullName? fullName, string? email, Phone? phone, int experienceYears, string? description)
+    //-------------------------------------Validation method--------------------------------------//
+    public static Result Validate(
+        FullName? fullName,
+        string? email,
+        Phone? phone,
+        int experienceYears,
+        string? description)
     {
         return Result.ValidateCollection(
 
+            () => ValidateRequiredObject(fullName, "Volunteer fullName"),
+            () => ValidateRequiredObject(phone, "volunteer phone"),
             () => ValidateNumber(experienceYears, "volunteer experienece", 0, 100),
-
-            () => ValidationExtensions.ValidateRequiredObject(fullName, "Volunteer fullName"),
-
-            () => ValidationExtensions.ValidateRequiredObject(phone, "volunteer phone"),
-
             () => ValidateRequiredField(email, "Volunteer email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
+            () => ValidateNonRequiredField(description, "Volunteer description", MAX_LENGTH_LONG_TEXT));
+    }
+    //--------------------------------------Add Pet-----------------------------------------------//
+    public void AddPet(Pet pet) => _pets.Add(pet);
+    //--------------------------------------Remove Pet--------------------------------------------//
+    public int GetPetsCount() => _pets.Count;
+    //-----------------------------------Get Count of Pets for Adopt------------------------------//
+    public int GetCountOfPetsForAdopt() =>
+        _pets.Where(p => p.HelpStatus == HelpStatus.ForAdopt).Count();
+    //----------------------------------Get Count of Pets for other Help--------------------------//
+    public int GetCountOfPetsForHelp() =>
+        _pets.Where(p => p.HelpStatus == HelpStatus.ForHelp).Count();
+    //----------------------------------Get Count of Pets Adopted---------------------------------//
+    public int GetCountOfPetsAdopted() =>
+        _pets.Where(p => p.HelpStatus == HelpStatus.Adopted).Count();
+    //------------------------------Set is Deleted flase(for soft deleting)-----------------------//
+    public void Delete()
+    {
+        _isDeleted = true;
+        _deletedDateTime = DateTime.UtcNow;
 
-            () => ValidateNonRequiredField(description, "Volunteer description", MAX_LENGTH_LONG_TEXT, pattern: null));
+        foreach (var pet in _pets)
+            pet.Delete();      
+    }
+    //------------------------------Set is Deleted true(for soft deleting)-----------------------//
+    public void Restore()
+    {
+        _isDeleted = false;
+        _deletedDateTime = null;
+
+        foreach (var pet in _pets)
+            pet.Restore();
+    }
+    //------------------------------------Update Main Info----------------------------------------//
+    public bool UpdateMainInfo(
+        FullName fullName,
+        string email,
+        Phone phoneNumber,
+        int experienceYears,
+        string description
+        )
+    {
+        var validationResult = Validate(fullName, email, phoneNumber, experienceYears, description);
+
+        if (validationResult.IsFailure)
+            return false;
+
+        FullName = fullName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        ExperienceYears = experienceYears;
+        Description = description;
+
+        return true;
     }
 
-    public void AddPet(Pet pet) => _pets.Add(pet);
-
-    public int GetPetsCount() => _pets.Count;
-
-    public int GetCountOfPetsForAdopt() => _pets.Where(p => p.HelpStatus == HelpStatus.ForAdopt).Count();
-
-    public int GetCountOfPetsForHelp() => _pets.Where(p => p.HelpStatus == HelpStatus.ForHelp).Count();
-
-    public int GetCountOfPetsAdopted() => _pets.Where(p => p.HelpStatus == HelpStatus.Adopted).Count();
+    //------------------------------------Update Donate Details-----------------------------------//
+    public void UpdateDonateDetails(IEnumerable<DonateDetails>? donateDetailsList)
+    {   
+        DonateDetailsList = new ValueObjectList<DonateDetails>(donateDetailsList);
+    }
+    //------------------------------------Update Social Networks----------------------------------//
+    public void UpdateSocialNetworks(IEnumerable<SocialNetwork> socialNetworkList)
+    {
+        SocialNetworksList = new ValueObjectList<SocialNetwork>(socialNetworkList);
+    }
 }

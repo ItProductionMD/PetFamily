@@ -44,10 +44,10 @@ namespace PetFamily.Infrastructure.Configurations
 
                 pn.Property(p => p.Number)
                     .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
-                    .IsRequired();              
-            });  
-            
-            builder.OwnsOne(v => v.DonateDetailsList,d =>
+                    .IsRequired();
+            });
+
+            builder.OwnsOne(v => v.DonateDetailsList, d =>
             {
                 d.ToJson();
                 d.OwnsMany(d => d.ObjectList, db =>
@@ -65,17 +65,25 @@ namespace PetFamily.Infrastructure.Configurations
             builder.OwnsOne(v => v.SocialNetworksList, d =>
             {
                 d.ToJson();
-                d.OwnsMany(d => d.ObjectList,db =>
+                d.OwnsMany(d => d.ObjectList, db =>
                 {
                     db.Property(d => d.Name)
                         .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
                         .IsRequired();
 
-                    db.Property(d=>d.Url)
+                    db.Property(d => d.Url)
                         .HasMaxLength(MAX_LENGTH_MEDIUM_TEXT)
                         .IsRequired();
                 });
             });
+            //For soft deleting
+            builder.Property<bool>("_isDeleted")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasColumnName("is_deleted");
+
+            builder.Property<DateTime?>("_deletedDateTime")
+                .UsePropertyAccessMode(PropertyAccessMode.Field)
+                .HasColumnName("deleted_date_time");
             // Relationships
             builder.HasMany(v => v.Pets)
                 .WithOne(p => p.Volunteer)
