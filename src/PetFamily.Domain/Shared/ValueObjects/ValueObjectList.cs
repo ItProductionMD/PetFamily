@@ -6,11 +6,10 @@ public record ValueObjectList<T> where T : class
 {
     public IReadOnlyList<T> ObjectList { get; }
 
-    protected ValueObjectList() { }//Ef core need this
+    protected ValueObjectList() { } // EF Core needs this
 
-    public ValueObjectList(IReadOnlyList<T>? values)
+    public ValueObjectList(IEnumerable<T>? values)
     {
-        ObjectList = values ?? [];
+        ObjectList = values?.ToList() ?? [];
     }
-
 }

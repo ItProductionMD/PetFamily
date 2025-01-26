@@ -133,6 +133,14 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("weight");
 
+                    b.Property<DateTime?>("_deletedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_date_time");
+
+                    b.Property<bool>("_isDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
                     b.HasKey("Id")
                         .HasName("pk_pets");
 
@@ -166,6 +174,14 @@ namespace PetFamily.Infrastructure.Migrations
                     b.Property<int>("ExperienceYears")
                         .HasColumnType("integer")
                         .HasColumnName("experience_years");
+
+                    b.Property<DateTime?>("_deletedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_date_time");
+
+                    b.Property<bool>("_isDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
 
                     b.HasKey("Id")
                         .HasName("pk_volunteers");

@@ -58,7 +58,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 .IsRequired();
         });
 
-        builder.OwnsOne(p => p.DonateDetails,donate =>
+        builder.OwnsOne(p => p.DonateDetails, donate =>
         {
             donate.Property(p => p.Name)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
@@ -78,7 +78,14 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             address.Property(a => a.Region)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
         });
+        // For soft delete
+        builder.Property<bool>("_isDeleted")
+           .UsePropertyAccessMode(PropertyAccessMode.Field)
+           .HasColumnName("is_deleted");
 
+        builder.Property<DateTime?>("_deletedDateTime")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasColumnName("deleted_date_time");
         // Indexes
         builder.HasIndex(p => p.Name).IsUnique(false);
     }

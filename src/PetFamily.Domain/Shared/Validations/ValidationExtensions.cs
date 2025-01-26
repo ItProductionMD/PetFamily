@@ -40,7 +40,7 @@ public static class ValidationExtensions
         return Result.Success();
     }
 
-    public static Result ValidateRequiredObject<T>(this T? objToValidate, string valueName) =>
+    public static Result ValidateRequiredObject<T>(T objToValidate, string valueName) =>
 
         objToValidate != null ? Result.Success() : Result.Failure(CreateErrorValueRequired(valueName));
    

@@ -51,5 +51,10 @@ namespace PetFamily.API.Extensions
             return envelope;
         }
 
+        public static Envelope ToEnvelope(this Result result)
+        {
+            var envelope = Envelope.Success(null);
+            return envelope;
+        }
     }
 }

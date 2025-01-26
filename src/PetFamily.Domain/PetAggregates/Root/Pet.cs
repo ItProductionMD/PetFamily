@@ -11,7 +11,7 @@ using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
 namespace PetFamily.Domain.PetAggregates.Root;
 
-public class Pet : Entity<Guid>
+public class Pet : Entity<Guid>, ISoftDeletable
 {
     public string Name { get; private set; }
     public DateOnly? DateOfBirth { get; private set; }
@@ -29,7 +29,8 @@ public class Pet : Entity<Guid>
     public Adress? Adress { get; private set; }
     public HelpStatus HelpStatus { get; private set; }
     public Volunteer Volunteer { get; private set; }//Navigation property
-
+    private bool _isDeleted;
+    private DateTime? _deletedDateTime;
     private Pet(Guid id) : base(id) { }//Ef core needs this
 
     private Pet(Guid id, PetDomainDto petDomainDto) : base(id)
@@ -110,5 +111,14 @@ public class Pet : Entity<Guid>
 
     private static bool GetBoolValue(bool? variable) => variable ?? false;
 
-
+    public void Delete()
+    {
+        _isDeleted = true;
+        _deletedDateTime = DateTime.UtcNow;
+    }
+    public void Restore() 
+    {
+        _isDeleted = false;
+        _deletedDateTime = null;
+    }
 }

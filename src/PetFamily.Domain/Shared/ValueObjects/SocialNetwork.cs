@@ -51,7 +51,6 @@ public record SocialNetwork
                 valueName: "SocialNetwork url",
                 maxLength: MAX_LENGTH_SHORT_TEXT));
     }
-    public static Result Validate(SocialNetworkDTO dto) => Validate(dto.Name, dto.Url);
 
     private static bool IsSocialNetworkEmpty(string? name, string? url)
     {
