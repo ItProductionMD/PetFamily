@@ -8,6 +8,7 @@ using PetFamily.Domain.Shared.Validations;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using PetFamily.Domain.PetAggregates.ValueObjects;
 
 namespace PetFamily.Domain.VolunteerAggregates.Root;
 
@@ -21,8 +22,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public ValueObjectList<DonateDetails> DonateDetailsList { get; private set; }
     public ValueObjectList<SocialNetwork> SocialNetworksList { get; private set; }
     public IReadOnlyList<Pet> Pets => _pets;
-
     private readonly List<Pet> _pets = [];
+
     private bool _isDeleted;
     private DateTime? _deletedDateTime;
     private Volunteer(Guid id) : base(id) { } //Ef core needs this
@@ -34,8 +35,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         Phone phoneNumber,
         int experienceYears,
         string? description,
-        ValueObjectList<DonateDetails>? donateDetailsList,
-        ValueObjectList<SocialNetwork>? socialNetworksList
+        ValueObjectList<DonateDetails> donateDetailsList,
+        ValueObjectList<SocialNetwork> socialNetworksList
         ) : base(id)
     {
         FullName = fullName;
@@ -43,20 +44,19 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         PhoneNumber = phoneNumber;
         ExperienceYears = experienceYears;
         Description = description?.Trim();
-        DonateDetailsList = donateDetailsList ?? new(null); // List Can be empty
-        SocialNetworksList = socialNetworksList ?? new(null);//list can be emty
+        DonateDetailsList = donateDetailsList; // List Can be empty
+        SocialNetworksList = socialNetworksList;//list can be emty
     }
-
     //--------------------------------------Factory method----------------------------------------//
     public static Result<Volunteer> Create(
         VolunteerID id,
-        FullName? fullName,
-        string? email,
-        Phone? phoneNumber,
+        FullName fullName,
+        string email,
+        Phone phoneNumber,
         int expirienceYears,
         string? description,
-        IReadOnlyList<DonateDetails>? donateDetailsList,
-        IReadOnlyList<SocialNetwork>? socialNetworksList
+        IReadOnlyList<DonateDetails> donateDetailsList,
+        IReadOnlyList<SocialNetwork> socialNetworksList
         )
     {
         //---------------------------------Validate Volunteer-------------------------------------//
@@ -97,9 +97,55 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
             () => ValidateRequiredField(email, "Volunteer email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
             () => ValidateNonRequiredField(description, "Volunteer description", MAX_LENGTH_LONG_TEXT));
     }
+    //-------------------------------------Move Pet position--------------------------------------//
+    public void MovePetSerialNumber(Pet movedPet, PetSerialNumber newSerialNumber)
+    {
+        var oldPosition = movedPet.GetSerialNumber().Value;
+        var newPosition = newSerialNumber.Value;
+        if (oldPosition == newPosition)
+            return;
+
+        var affectedPets = _pets.Where(p =>
+            oldPosition > newPosition
+                ? p.SerialNumber.Value >= newPosition && p.SerialNumber.Value < oldPosition
+                : p.SerialNumber.Value <= newPosition && p.SerialNumber.Value > oldPosition);
+
+        foreach (var pet in affectedPets)
+        {
+            var oldSerialNumberValue = pet.SerialNumber.Value;
+
+            var updatedSerialNumberValue = oldPosition > newPosition
+                ? oldSerialNumberValue + 1
+                : oldSerialNumberValue - 1;
+
+            var updatedSerialNumber = PetSerialNumber.Create(updatedSerialNumberValue,this);
+
+            pet.SetSerialNumber(updatedSerialNumber.Data);
+        }
+
+        movedPet.SetSerialNumber(newSerialNumber);
+    }
     //--------------------------------------Add Pet-----------------------------------------------//
-    public void AddPet(Pet pet) => _pets.Add(pet);
+    public void AddPet(Pet pet)
+    {
+        var petsCount = GetPetsCount();
+        var serialNumberValue = petsCount + 1;
+        _pets.Add(pet);
+        var serialNumber = PetSerialNumber.Create(serialNumberValue, this).Data;
+        pet.SetSerialNumber(serialNumber);
+    }
     //--------------------------------------Remove Pet--------------------------------------------//
+    public void RemovePet(Pet pet)
+    {
+        var maxSerialNumberValue = _pets.Max(pet => pet.SerialNumber.Value);
+
+        var maxSerialNumber = PetSerialNumber.Create(maxSerialNumberValue, this);
+
+        MovePetSerialNumber(pet,maxSerialNumber.Data);
+
+        _pets.Remove(pet);
+    }
+    //--------------------------------------Get pets count----------------------------------------//
     public int GetPetsCount() => _pets.Count;
     //-----------------------------------Get Count of Pets for Adopt------------------------------//
     public int GetCountOfPetsForAdopt() =>
@@ -110,14 +156,14 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     //----------------------------------Get Count of Pets Adopted---------------------------------//
     public int GetCountOfPetsAdopted() =>
         _pets.Where(p => p.HelpStatus == HelpStatus.Adopted).Count();
-    //------------------------------Set is Deleted flase(for soft deleting)-----------------------//
+    //------------------------------Set is Deleted fal se(for soft deleting)-----------------------//
     public void Delete()
     {
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
 
         foreach (var pet in _pets)
-            pet.Delete();      
+            pet.Delete();
     }
     //------------------------------Set is Deleted true(for soft deleting)-----------------------//
     public void Restore()
@@ -153,7 +199,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
 
     //------------------------------------Update Donate Details-----------------------------------//
     public void UpdateDonateDetails(IEnumerable<DonateDetails>? donateDetailsList)
-    {   
+    {
         DonateDetailsList = new ValueObjectList<DonateDetails>(donateDetailsList);
     }
     //------------------------------------Update Social Networks----------------------------------//
@@ -161,4 +207,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     {
         SocialNetworksList = new ValueObjectList<SocialNetwork>(socialNetworkList);
     }
+
+    public bool GetIsDeleted() => _isDeleted;
+    public DateTime? GetDeletedTime() => _deletedDateTime;
 }

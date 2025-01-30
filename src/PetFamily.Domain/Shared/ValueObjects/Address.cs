@@ -10,16 +10,16 @@ namespace PetFamily.Domain.Shared.ValueObjects;
 // In the Create method, it prevents unnecessary validation when all fields are empty.
 // In the Validate method, it allows reuse of validation logic in other contexts without relying on Create.
 // While this duplication may seem redundant, it ensures consistency and flexibility for different use cases.
-public record Adress
+public record Address
 {
     public string Street { get; }
     public string City { get; }
     public string Region { get; }
     public string Number { get; }
 
-    private Adress() { }//EF core need this
+    private Address() { }//EF core need this
 
-    private Adress(string region, string city, string street, string number)
+    private Address(string region, string city, string street, string number)
     {
         Region = region;
         City = city;
@@ -27,18 +27,18 @@ public record Adress
         Number = number;
     }
 
-    public static Result<Adress?> Create(string? region, string? city, string? street, string? number)
+    public static Result<Address?> Create(string? region, string? city, string? street, string? number)
     {       
 
         if (IsAdressEmpty(region, city, street, number))
-            return Result<Adress?>.Success(null);
+            return Result<Address?>.Success(null);
 
         var validationResult = Validate(region, city, street, number);
 
         if (validationResult.IsFailure)
-            return Result<Adress?>.Failure(validationResult.Errors!);
+            return Result<Address?>.Failure(validationResult.Errors!);
 
-        return Result<Adress?>.Success(new Adress(region!, city!, street!, number!));
+        return Result<Address?>.Success(new Address(region!, city!, street!, number!));
     }
 
     public static Result Validate(string? region, string? city, string? street, string? number)

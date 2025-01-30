@@ -13,9 +13,13 @@ using System.Security.AccessControl;
 
 
 //-------------------------------Handler,UseCases,Services----------------------------------------//
-
 namespace PetFamily.Application.Volunteers.CreateVolunteer;
-
+/// <summary>
+/// Create Volunteer Handler
+/// </summary>
+/// <param name="volunteerRepository"></param>
+/// <param name="validator"></param>
+/// <param name="logger"></param>
 public class CreateVolunteerHandler(
     IVolunteerRepository volunteerRepository,
     IValidator<CreateVolunteerCommand> validator,
@@ -64,13 +68,11 @@ public class CreateVolunteerHandler(
             dto => DonateDetails.Create(dto.Name, dto.Description))!;
 
         //-------------------------------Creating ValueObjects------------------------------------//
-
         var fullName = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName).Data;
 
         var phone = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode).Data;
 
         //---------------------------------Create Volunteer---------------------------------------//
-
         var volunteerCreateResult = Volunteer.Create(
             VolunteerID.NewGuid(),
             fullName,

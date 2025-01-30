@@ -8,6 +8,7 @@ using PetFamily.Domain.Shared.Validations;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using PetFamily.Domain.PetAggregates.ValueObjects;
 
 namespace PetFamily.Domain.PetAggregates.Root;
 
@@ -17,6 +18,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public DateOnly? DateOfBirth { get; private set; }
     public DateTime DateTimeCreated { get; private set; }
     public string? Description { get; private set; }
+    public PetSerialNumber SerialNumber { get; private set; }
     public bool IsVaccinated { get; private set; }
     public bool IsSterilized { get; private set; }
     public double Weight { get; private set; }
@@ -26,7 +28,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public Phone? OwnerPhone { get; private set; }
     public DonateDetails? DonateDetails { get; private set; }
     public string? HealthInfo { get; private set; }
-    public Adress? Adress { get; private set; }
+    public Address? Adress { get; private set; }
     public HelpStatus HelpStatus { get; private set; }
     public Volunteer Volunteer { get; private set; }//Navigation property
     private bool _isDeleted;
@@ -36,7 +38,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
     private Pet(Guid id, PetDomainDto petDomainDto) : base(id)
     {
         DateTimeCreated = DateTime.UtcNow;
-
+  
         Name = petDomainDto.Name!;
 
         DateOfBirth = petDomainDto.DateOfBirth;
@@ -76,6 +78,11 @@ public class Pet : Entity<Guid>, ISoftDeletable
         return Result<Pet>.Success(new Pet(Guid.NewGuid(), petDomainDto));
     }
 
+    public void SetSerialNumber(PetSerialNumber serialNumber)
+    {
+        SerialNumber = serialNumber;
+    }
+    public PetSerialNumber GetSerialNumber() => SerialNumber;
     public static Result Validate(PetDomainDto petDomainDto)
     {
         return Result.ValidateCollection(

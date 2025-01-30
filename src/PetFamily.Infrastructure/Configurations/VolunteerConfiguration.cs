@@ -88,7 +88,7 @@ namespace PetFamily.Infrastructure.Configurations
             builder.HasMany(v => v.Pets)
                 .WithOne(p => p.Volunteer)
                 .HasForeignKey("VolunteerId") // Define the foreign key on Pet
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Navigation(v => v.Pets)
                 .UsePropertyAccessMode(PropertyAccessMode.Field);

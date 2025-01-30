@@ -13,7 +13,8 @@ builder.Configuration.AddUserSecrets<Program>();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
-    .WriteTo.Seq(builder.Configuration.GetConnectionString("Seq") ?? throw new ArgumentNullException("Seq"))
+    .WriteTo.Seq(
+        builder.Configuration.GetConnectionString("Seq") ?? throw new ArgumentNullException("Seq"))
     .CreateLogger();
 
 builder.Services.AddControllers();
@@ -22,7 +23,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services
     .AddApplication()
-    .AddInfrastructure();
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSwaggerGen();
 

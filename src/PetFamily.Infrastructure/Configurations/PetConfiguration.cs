@@ -78,6 +78,11 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             address.Property(a => a.Region)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
         });
+        builder.ComplexProperty(p => p.SerialNumber, v=>
+        {
+            v.Property(s => s.Value).HasColumnName("serial_number").IsRequired();
+        });
+       
         // For soft delete
         builder.Property<bool>("_isDeleted")
            .UsePropertyAccessMode(PropertyAccessMode.Field)
