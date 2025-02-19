@@ -17,12 +17,17 @@ Log.Logger = new LoggerConfiguration()
         builder.Configuration.GetConnectionString("Seq") ?? throw new ArgumentNullException("Seq"))
     .CreateLogger();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100MB
+});
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services
-    .AddApplication()
+    .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSwaggerGen();

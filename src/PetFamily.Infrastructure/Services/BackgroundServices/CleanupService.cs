@@ -14,7 +14,7 @@ public class CleanupService : BackgroundService
     private  int _deleteAfterDays;
     private  int _timeDelayInHours;
 
-    public CleanupService(
+    public CleanupService(    
         IServiceScopeFactory serviceScopeFactory,
         ILogger<CleanupService> logger,
         IConfiguration configuration)

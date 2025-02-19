@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.Shared;
+﻿using PetFamily.Domain.DomainError;
 
 namespace PetFamily.API.Responce
 {
@@ -18,7 +18,8 @@ namespace PetFamily.API.Responce
 
         public static Envelope Success(Object data) => new(data,null);
 
-        public static Envelope Failure(List<Error>? errors ) => new(null,errors);
+        public static Envelope Failure(List<Error>? errors,Object? data = null) => new(data, errors);
+
     }
 
 }

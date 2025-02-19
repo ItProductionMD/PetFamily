@@ -28,15 +28,14 @@ public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteer
             .WithMessage($"Description length is bigger than {MAX_LENGTH_LONG_TEXT}")
             .WithErrorCode("value.format.is.invalid");
 
-
         RuleFor(c => c.ExperienceYears)
             .GreaterThanOrEqualTo(0)
             .LessThanOrEqualTo(100);
 
         RuleForEach(c => c.SocialNetworksList)
-            .MustBeValueObject(s => SocialNetwork.Validate(s.Name, s.Url));
+            .MustBeValueObject(s => SocialNetworkInfo.Validate(s.Name, s.Url));
 
-        RuleForEach(c => c.DonateDetailsList)
-           .MustBeValueObject(d => DonateDetails.Validate(d.Name, d.Description));
+        RuleForEach(c => c.Requisites)
+           .MustBeValueObject(d => RequisitesInfo.Validate(d.Name, d.Description));
     }
 }

@@ -1,34 +1,34 @@
-﻿using System.Text.RegularExpressions;
-using PetFamily.Domain.Shared.DomainResult;
-using static PetFamily.Domain.Shared.Error;
+﻿using System.Numerics;
+using System.Text.RegularExpressions;
+using PetFamily.Domain.Results;
+using static PetFamily.Domain.DomainError.Error;
+using PetFamily.Domain.DomainError;
 
 namespace PetFamily.Domain.Shared.Validations;
 
 public static class ValidationExtensions
 {
-    public delegate Result ListValidatorDelegate<T1, TResult>(T1 arg1);
-
-    public static Result ValidateRequiredField(
+    public static UnitResult ValidateRequiredField(
         string? valueToValidate,
         string valueName,
         int maxLength, 
         string? pattern =null)
     {
         if (string.IsNullOrWhiteSpace(valueToValidate))
-            return Result.Failure(CreateErrorStringNullOrEmpty(valueName));
+            return UnitResult.Fail(StringIsNullOrEmpty(valueName));
 
         valueToValidate = valueToValidate.Trim();
 
         if (valueToValidate.Length > maxLength)
-            return Result.Failure(CreateErrorInvalidLength(valueName));
+            return UnitResult.Fail(InvalidLength(valueName));
 
         if (pattern!=null && !Regex.IsMatch(valueToValidate, pattern))
-            return Result.Failure(CreateErrorInvalidFormat(valueName));
+            return UnitResult.Fail(InvalidFormat(valueName));
 
-        return Result.Success();
+        return UnitResult.Ok();
     }
 
-    public static Result ValidateNonRequiredField(
+    public static UnitResult ValidateNonRequiredField(
         string? valueToValidate,
         string valueName,
         int maxLength, 
@@ -37,46 +37,51 @@ public static class ValidationExtensions
         if (!string.IsNullOrWhiteSpace(valueToValidate))
             ValidateRequiredField(valueToValidate, valueName, maxLength,pattern);
 
-        return Result.Success();
+        return UnitResult.Ok();
     }
 
-    public static Result ValidateRequiredObject<T>(T objToValidate, string valueName) =>
+    public static UnitResult ValidateRequiredObject<T>(T? objToValidate, string valueName) =>
 
-        objToValidate != null ? Result.Success() : Result.Failure(CreateErrorValueRequired(valueName));
+        objToValidate != null ? UnitResult.Ok() : UnitResult.Fail(ValueIsRequired(valueName));
    
     public static bool HasOnlyEmptyStrings(params string?[] strings) =>
 
          !strings.Any(s => !string.IsNullOrWhiteSpace(s));
 
-    public static Result ValidateNumber(int number, string valueName ,int minValue,int maxValue) 
+    public static UnitResult ValidateIntegerNumber(int number, string valueName ,int minValue,int maxValue) 
     {
         if (number < minValue || number > maxValue)    
-            return Result.Failure(CreateErrorInvalidFormat(valueName));
+            return UnitResult.Fail(InvalidFormat(valueName));
         
-        return Result.Success();
+        return UnitResult.Ok();
     }
+    public static UnitResult ValidateNumber<T>(T number, string valueName, T minValue, T maxValue)
+        where T : IComparable<T>
+    {
+        if (number.CompareTo(minValue)<0 || number.CompareTo(maxValue) > 0)
+            return UnitResult.Fail(InvalidFormat(valueName));
 
+        return UnitResult.Ok();
+    }
     /// <summary>
     /// Validates a collection of objects using a provided validation delegate for each item.
     /// </summary>
     /// <typeparam name="T">The type of the objects in the collection.</typeparam>
     /// <param name="items">The collection of items to validate.</param>
-    /// <param name="itemValidator">A delegate that validates a single item and returns a <see cref="Result"/>.</param>
+    /// <param name="itemValidator">A delegate that validates a single item and returns a <see cref="UnitResult"/>.</param>
     /// <returns>
-    /// A <see cref="Result"/> indicating success if all items are valid, or failure with a list of errors if any validation fails.
+    /// A <see cref="UnitResult"/> indicating success if all items are valid, or failure with a list of errors if any validation fails.
     /// </returns>
-    public static Result ValidateItems<T>(IEnumerable<T> items, Func<T, Result> itemValidator)
+    public static UnitResult ValidateItems<T>(IEnumerable<T> items, Func<T, UnitResult> itemValidator)
     {
-        var errors = new List<Domain.Shared.Error>();
-
+        var errors = new List<Error>();
         foreach (var item in items)
         {
             var validationResult = itemValidator(item);
-
             if (validationResult.IsFailure)
                 errors.AddRange(validationResult.Errors);
         }
-        return errors.Count > 0 ? Result.Failure(errors) : Result.Success();
+        return errors.Count > 0 ? UnitResult.Fail(errors) : UnitResult.Ok();
     }
 
 }

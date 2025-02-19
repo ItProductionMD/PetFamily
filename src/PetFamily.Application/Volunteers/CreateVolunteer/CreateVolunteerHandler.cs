@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using PetFamily.Application.Validations;
-using PetFamily.Domain.Shared.DomainResult;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteerAggregates.Root;
 using PetFamily.Domain.VolunteerAggregates.ValueObjects;
@@ -10,16 +9,12 @@ using static PetFamily.Application.Volunteers.VolunteerValidationExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Shared;
 using System.Security.AccessControl;
+using PetFamily.Domain.Results;
 
 
 //-------------------------------Handler,UseCases,Services----------------------------------------//
 namespace PetFamily.Application.Volunteers.CreateVolunteer;
-/// <summary>
-/// Create Volunteer Handler
-/// </summary>
-/// <param name="volunteerRepository"></param>
-/// <param name="validator"></param>
-/// <param name="logger"></param>
+
 public class CreateVolunteerHandler(
     IVolunteerRepository volunteerRepository,
     IValidator<CreateVolunteerCommand> validator,
@@ -33,46 +28,28 @@ public class CreateVolunteerHandler(
         CreateVolunteerCommand volunteerRequest,
         CancellationToken cancellationToken = default)
     {
-        //--------------------------------------Validator----------------------------------//
-
-        /*var validationResult = VolunteerRequestValidatorCustom.Validate(volunteerRequest);
-
-        if (validationResult.IsFailure)
-        {
-            _logger.LogError("CreateVolunteerHandler volunteerRequest validation failure!{}",
-                validationResult.Errors);
-
-            return Result<Guid>.Failure(validationResult.Errors!);
-        }
-        */
         //--------------------------------------Fluent Validator----------------------------------//
-
-        var fluentValidationResult = await _validator.ValidateAsync(volunteerRequest, cancellationToken);
-
+        var fluentValidationResult = await _validator.ValidateAsync(
+            volunteerRequest,
+            cancellationToken);
         if (fluentValidationResult.IsValid == false)
         {
-            _logger.LogError("Validate volunteerRequest failure!{fluentValidationResult.Errors}",
-                           fluentValidationResult.Errors);
+            _logger.LogError("Fail validate volunteerRequest!{Errors}",
+                           fluentValidationResult.Errors.Select(e=>e.ErrorMessage));
 
             return fluentValidationResult.ToResultFailure<Guid>();
         }
-
-        //------------------Creating ValueObject lists from VolunteerRequest Dtos-----------------//
-
-        IReadOnlyList<SocialNetwork> socialNetworks = MapDtosToValueObjects(
-            volunteerRequest.SocialNetworksList,
-            dto => SocialNetwork.Create(dto.Name, dto.Url))!;
-
-        IReadOnlyList<DonateDetails> donateDetails = MapDtosToValueObjects(
-            volunteerRequest.DonateDetailsList,
-            dto => DonateDetails.Create(dto.Name, dto.Description))!;
-
         //-------------------------------Creating ValueObjects------------------------------------//
-        var fullName = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName).Data;
+        var fullName = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName).Data!;
 
-        var phone = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode).Data;
+        var phone = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode).Data!;
 
-        //---------------------------------Create Volunteer---------------------------------------//
+        var socialNetworkList = volunteerRequest.SocialNetworksList
+            .Select(dto => SocialNetworkInfo.Create(dto.Name, dto.Url).Data!).ToList();
+
+        var requisites = volunteerRequest.Requisites
+           .Select(dto => RequisitesInfo.Create(dto.Name, dto.Description).Data!).ToList();
+
         var volunteerCreateResult = Volunteer.Create(
             VolunteerID.NewGuid(),
             fullName,
@@ -80,20 +57,17 @@ public class CreateVolunteerHandler(
             phone,
             volunteerRequest.ExperienceYears,
             volunteerRequest.Description,
-            donateDetails,
-            socialNetworks
-            );
+            requisites,
+            socialNetworkList);
 
         if (volunteerCreateResult.IsFailure)
         {
-            _logger.LogError(
-                "Validate volunteer entity failure!{ volunteerCreateResult.Errors}",
-                volunteerCreateResult.Errors);
+            _logger.LogError("Validate volunteer entity failure!{ volunteerCreateResult.Errors}",
+                volunteerCreateResult.ConcateErrorMessages());
 
-            return Result<Guid>.Failure(volunteerCreateResult.Errors!);
+            return Result.Fail(volunteerCreateResult.Errors!);
         }
-        var volunteer = volunteerCreateResult.Data;
-
+        var volunteer = volunteerCreateResult.Data!;
         //---------------------Verify that the email and phone number are unique------------------//
         var validateUniqueness = await ValidateUniqueEmailAndPhone(
             volunteer,
@@ -102,22 +76,17 @@ public class CreateVolunteerHandler(
             cancellationToken);
 
         if (validateUniqueness.IsFailure)
-            return Result<Guid>.Failure(validateUniqueness.Errors!);
-        
-        //---------------------------------Add Volunteer to repository----------------------------//
-        var idResult = await _volunteerRepository.Add(volunteerCreateResult.Data, cancellationToken);
-
-        if (idResult.IsFailure)
         {
-            _logger.LogError(
-                "Add volunteer with id:{volunteer.Id} to repository failure!{idResult.Errors}",
-                volunteer.Id,
-                idResult.Errors);
+            _logger.LogWarning("Volunteer with souch email or phone is already exists!Errors:{Errors}",
+                validateUniqueness.ConcateErrorMessages());
 
-            return idResult;
+            return validateUniqueness;
         }
+        //---------------------------------Add Volunteer to repository----------------------------//
+        await _volunteerRepository.Add(volunteer, cancellationToken);
+
         _logger.LogInformation("Volunteer with id:{volunteer.Id},created sucessfull!", volunteer.Id);
 
-        return Result<Guid>.Success(idResult.Data);
+        return Result.Ok(volunteer.Id);
     }
 }

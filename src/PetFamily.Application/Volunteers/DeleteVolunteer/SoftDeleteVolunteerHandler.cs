@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Volunteers.DeleteVolunteer;
 
@@ -15,15 +15,19 @@ public class SoftDeleteVolunteerHandler(
         var getVolunteer = await _volunteerRepository.GetById(volunteerId, cancellationToken);
         if (getVolunteer.IsFailure)
         {
-            _logger.LogError("Volunteer with id {volunteerId} not found", volunteerId);
-            return Result<Guid>.Failure(getVolunteer.Errors!);
+            _logger.LogError("Fail get volunteer with id {volunteerId} for delete volunteer!Errors:{Errors}",
+                volunteerId, getVolunteer.ConcateErrorMessages());
+
+            return Result.Fail(getVolunteer.Errors!);
         }
-        var volunteer = getVolunteer.Data;
-        //----------------------------------Soft Delete Volunteer---------------------------------//
+        var volunteer = getVolunteer.Data!;
+
         volunteer.Delete();
-        //--------------------------------------Save Volunteer------------------------------------//
+
         await _volunteerRepository.Save(volunteer, cancellationToken);
 
-        return Result<Guid>.Success(volunteer.Id);
+        _logger.LogInformation("Softdelete volunteer with id:{volunteerId} successful!", volunteerId);
+
+        return Result.Ok(volunteer.Id);
     }
 }

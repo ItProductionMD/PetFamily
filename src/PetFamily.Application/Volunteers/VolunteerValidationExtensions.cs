@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
 using PetFamily.Domain.VolunteerAggregates.Root;
 
 namespace PetFamily.Application.Volunteers;
@@ -13,7 +13,7 @@ public static class VolunteerValidationExtensions
     /// <param name="volunteer"></param>
     /// <param name="volunteerRepository"></param>
     /// <returns>Task<Result></returns>
-    public static async Task<Result> ValidateUniqueEmailAndPhone<T>(
+    public static async Task<UnitResult> ValidateUniqueEmailAndPhone<T>(
         Volunteer volunteer,
         IVolunteerRepository volunteerRepository,
         ILogger<T> logger,
@@ -24,10 +24,9 @@ public static class VolunteerValidationExtensions
             .GetByEmailOrPhone(volunteer.Email, volunteer.PhoneNumber, cancellationToken);
 
         if (getVolunteers.IsFailure)
-            return Result.Success();
+            return UnitResult.Ok();
 
-        var existingVolunteers = getVolunteers.Data;
-
+        List<Volunteer> existingVolunteers = getVolunteers.Data!;
         List<Error> errors = [];
         //-------------------------------Creating Error List--------------------------------------//
         foreach (var v in existingVolunteers)
@@ -36,16 +35,14 @@ public static class VolunteerValidationExtensions
                 break;
 
             if (v.Email == volunteer.Email)
-                errors.Add(Error.CreateErrorValueIsBusy("Email"));
+                errors.Add(Error.ValueIsBusy("Email"));
 
             if (v.PhoneNumber == volunteer.PhoneNumber)
-                errors.Add(Error.CreateErrorValueIsBusy("Phone"));
+                errors.Add(Error.ValueIsBusy("Phone"));
         }
         if (errors.Count == 0)
-            return Result.Success();
+            return UnitResult.Ok();
 
-        logger.LogError("Validate volunteer unique phone and unique email failure!{errors}", errors);
-
-        return Result.Failure(errors!);
+        return UnitResult.Fail(errors!);
     }
 }

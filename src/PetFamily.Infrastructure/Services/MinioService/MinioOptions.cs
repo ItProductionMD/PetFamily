@@ -14,5 +14,7 @@ namespace PetFamily.Infrastructure.Services.MinioService
         public string SecretKey { get; init; } = string.Empty;
         public string BucketName { get; init; } = string.Empty;
         public bool WithSsl { get; init; }
+        public int CountForSemaphore { get; init; } 
+        public int MaxTaskTimeLimitInMiliseconds { get; init; }
     }
 }

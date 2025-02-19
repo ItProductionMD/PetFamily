@@ -1,7 +1,7 @@
 ﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -27,26 +27,25 @@ public record Address
         Number = number;
     }
 
-    public static Result<Address?> Create(string? region, string? city, string? street, string? number)
-    {       
-
+    public static Result<Address> Create(string? region, string? city, string? street, string? number)
+    {
         if (IsAdressEmpty(region, city, street, number))
-            return Result<Address?>.Success(null);
-
+            return UnitResult.Ok();
+ 
         var validationResult = Validate(region, city, street, number);
 
         if (validationResult.IsFailure)
-            return Result<Address?>.Failure(validationResult.Errors!);
+            return validationResult;
 
-        return Result<Address?>.Success(new Address(region!, city!, street!, number!));
+        return Result.Ok(new Address(region!, city!, street!, number!));
     }
 
-    public static Result Validate(string? region, string? city, string? street, string? number)
+    public static UnitResult Validate(string? region, string? city, string? street, string? number)
     {
         if (IsAdressEmpty(region, city, street, number))
-            return Result.Success();
+            return UnitResult.Ok();
 
-        return Result.ValidateCollection(
+        return UnitResult.ValidateCollection(
 
             () => ValidateRequiredField(
                 valueToValidate: region,

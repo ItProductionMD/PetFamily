@@ -18,7 +18,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPetFamily", "..\TestPetFamily\TestPetFamily.csproj", "{C579695B-F663-45CF-BD1B-B63EE97ADB7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestPetFamily", "..\TestPetFamily\TestPetFamily.csproj", "{C579695B-F663-45CF-BD1B-B63EE97ADB7D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0CAAC511-FA4D-47F4-A05A-892E43A0A1EA} = {0CAAC511-FA4D-47F4-A05A-892E43A0A1EA}
+		{E806255E-B78C-4F62-A803-35D77C9756D6} = {E806255E-B78C-4F62-A803-35D77C9756D6}
+		{F0CD8EB6-02FB-4B64-9B42-622063828D96} = {F0CD8EB6-02FB-4B64-9B42-622063828D96}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,4 @@
-﻿using PetFamily.Domain.Shared.DomainResult;
-using PetFamily.Domain.Shared.ValueObjects;
+﻿using PetFamily.Domain.Shared.ValueObjects;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
@@ -7,27 +6,33 @@ using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
 using static PetFamily.Application.Validations.ValidationExtensions;
 
 using PetFamily.Application.Validations;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Volunteers.CreateVolunteer;
 
 public static class CreateVolunteerRequestValidatorCustom
 {
-    public static Result Validate(CreateVolunteerCommand volunteer)
+    public static UnitResult Validate(CreateVolunteerCommand volunteer)
     {
-        return Result.ValidateCollection(
+        return UnitResult.ValidateCollection(
 
             () => Phone.Validate(volunteer.PhoneNumber, volunteer.PhoneRegionCode),
 
             () => FullName.Validate(volunteer.FirstName, volunteer.LastName),
 
-            () => ValidateRequiredField(volunteer.Email, "Email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
+            () => ValidateRequiredField(
+                volunteer.Email, "Email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
 
-            () => ValidateNonRequiredField(volunteer.Description, "Description", MAX_LENGTH_LONG_TEXT),
+            () => ValidateNonRequiredField(
+                volunteer.Description, "Description", MAX_LENGTH_LONG_TEXT),
 
-            () => ValidateNumber(volunteer.ExperienceYears, "Experience years", minValue: 0, maxValue: 100),
+            () => ValidateIntegerNumber(
+                volunteer.ExperienceYears, "Experience years", minValue: 0, maxValue: 100),
 
-            () => ValidateItems(volunteer.SocialNetworksList, ValidateSocialNetwork),
+            () => ValidateItems(
+                volunteer.SocialNetworksList, s => SocialNetworkInfo.Validate(s.Name, s.Url)),
 
-            () => ValidateItems(volunteer.DonateDetailsList, ValidateDonateDetails));
+            () => ValidateItems(
+                volunteer.Requisites, r => RequisitesInfo.Validate(r.Name, r.Description)));
     }
 }

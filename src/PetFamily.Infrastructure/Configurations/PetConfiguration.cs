@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetFamily.Domain.PetAggregates.Root;
+using PetFamily.Domain.Shared.ValueObjects;
+using System.Text.Json;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.Configurations;
@@ -58,14 +62,18 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 .IsRequired();
         });
 
-        builder.OwnsOne(p => p.DonateDetails, donate =>
-        {
-            donate.Property(p => p.Name)
-                .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
+        builder.Property(p => p.DonateDetailsBox)
+            .HasConversion(
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<IReadOnlyList<RequisitesInfo>>(v, JsonSerializerOptions.Default)
+                    ?? new List<RequisitesInfo>())
 
-            donate.Property(p => p.Description)
-                .HasMaxLength(MAX_LENGTH_MEDIUM_TEXT);
-        });
+                .Metadata.SetValueComparer(
+                    new ValueComparer<IReadOnlyList<RequisitesInfo>>(
+                    (c1, c2) => c1 != null && c2 != null && c1.Count == c2.Count && c1.SequenceEqual(c2),
+                    c => c != null ? c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())) : 0,
+                    c => c != null ? c.ToList() : new List<RequisitesInfo>())
+                );
 
         builder.OwnsOne(p => p.Adress, address =>
         {
@@ -78,11 +86,24 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             address.Property(a => a.Region)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
         });
-        builder.ComplexProperty(p => p.SerialNumber, v=>
+        builder.ComplexProperty(p => p.SerialNumber, v =>
         {
             v.Property(s => s.Value).HasColumnName("serial_number").IsRequired();
         });
-       
+
+        builder.Property(p => p.Images)
+            .HasConversion(
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<IReadOnlyList<Image>>(v, JsonSerializerOptions.Default)
+                    ?? new List<Image>())
+
+                .Metadata.SetValueComparer(
+                    new ValueComparer<IReadOnlyList<Image>>(
+                    (c1, c2) => c1 != null && c2 != null && c1.Count == c2.Count && c1.SequenceEqual(c2),
+                    c => c != null ? c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())) : 0,
+                    c => c != null ? c.ToList() : new List<Image>())
+                );
+
         // For soft delete
         builder.Property<bool>("_isDeleted")
            .UsePropertyAccessMode(PropertyAccessMode.Field)
