@@ -21,3 +21,18 @@ services:
      ports: 
        - 5341:5341
        - 8081:80
+
+  minio:
+     container_name: pet-family-minio
+     image: minio/minio
+     restart: always
+     ports:
+        - 9000:9000
+        - 9001:9001
+     command: server --console-address ":9001" /data
+     volumes:
+     - pet-family_minio_data:/data
+
+volumes:
+  pet-family_data:
+  pet-family_minio_data:

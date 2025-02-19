@@ -1,5 +1,5 @@
 ﻿using PetFamily.API.Responce;
-using PetFamily.Domain.Shared;
+using PetFamily.Domain.DomainError;
 
 namespace PetFamily.API.Middlewares;
 
@@ -23,7 +23,7 @@ public class ExceptionMiddleware
         {
             _logger.LogCritical(ex,message:"Exception:{Exception}",ex.Message);
 
-            var error = Error.CreateInternalServerError(ex.Message);
+            var error = Error.InternalServerError(ex.Message);
 
             var envelope = Envelope.Failure([error]);
 

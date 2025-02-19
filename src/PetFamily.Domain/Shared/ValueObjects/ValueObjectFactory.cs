@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.Shared.DomainResult;
+﻿using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -32,4 +32,5 @@ public static class ValueObjectFactory
         }
         return valueObjects;
     }
+   
 }

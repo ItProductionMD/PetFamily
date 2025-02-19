@@ -6,6 +6,7 @@ using PetFamily.Application.Volunteers.CreateVolunteer;
 using PetFamily.Application.Volunteers.DeleteVolunteer;
 using PetFamily.Application.Volunteers.GetVolunteer;
 using PetFamily.Application.Volunteers.RestoreVolunteer;
+using PetFamily.Application.Volunteers.UpdateRequisites;
 using PetFamily.Application.Volunteers.UpdateSocialNetworks;
 using PetFamily.Application.Volunteers.UpdateVolunteer;
 using static PetFamily.API.Extensions.ResultExtensions;
@@ -37,19 +38,12 @@ public class VolunteerController : Controller
         CancellationToken cancellationToken = default)
     {
         var handlerResult = await handler.Handle(volunteerRequest, cancellationToken);
-        if (handlerResult.IsFailure)
-        {
-            _logger.LogError(
-                "Create volunteer failure!{handlerResult.Errors}",
-                handlerResult.Errors);
-            return handlerResult.ToErrorActionResult();
-        }
-        _logger.LogInformation(
-            "Create volunteer with id:{handlerResult.Data} success!",
-            handlerResult.Data);
 
-        return CreatedAtAction(nameof(Create), handlerResult.ToEnvelope());
+        return handlerResult.IsFailure
+            ? handlerResult.ToErrorActionResult()
+            : CreatedAtAction(nameof(Create), handlerResult.ToEnvelope());
     }
+
     //------------------------------------UpdateVolunteer-----------------------------------------//
     /// <summary>
     /// Update a volunteer
@@ -79,14 +73,11 @@ public class VolunteerController : Controller
         var handlerResult = await handler.Handle(volunteerRequest, cancellationToken);
         if (handlerResult.IsFailure)
         {
-            _logger.LogError(
-                "Update volunteer with id:{id} failure!{handlerResult.Errors}",
-                id,
-                handlerResult.Errors);
+            _logger.LogError("Update volunteer with id:{id} failure!{Errors}",
+                id,handlerResult.ConcateErrorMessages());
+
             return handlerResult.ToErrorActionResult();
         }
-        _logger.LogInformation("Update volunteer  with id:{id} success!", id);
-
         return Ok(handlerResult.ToEnvelope());
     }
     //--------------------------------------Get Volunteer ById------------------------------------//
@@ -104,17 +95,10 @@ public class VolunteerController : Controller
         CancellationToken cancellationToken = default)
     {
         var handlerResult = await handler.Handle(id, cancellationToken);
-        if (handlerResult.IsFailure)
-        {
-            _logger.LogError(
-                "Get volunteer with id:{id} failure!{handlerResult.Errors}",
-                id,
-                handlerResult.Errors);
-            return handlerResult.ToErrorActionResult();
-        }
-        _logger.LogInformation("Get volunteer with id:{id} success!", id);
 
-        return Ok(handlerResult.ToEnvelope());
+        return handlerResult.IsFailure
+            ? handlerResult.ToErrorActionResult()
+            : Ok(handlerResult.ToEnvelope());
     }
     //------------------------------------SoftDeleteVolunteer-------------------------------------//
     /// <summary>
@@ -131,18 +115,9 @@ public class VolunteerController : Controller
         CancellationToken cancellationToken = default)
     {
         var handlerResult = await handler.Handle(id, cancellationToken);
-        if (handlerResult.IsFailure)
-        {
-            _logger.LogError(
-                "SoftDelete volunteer with id:{id} failure!{handlerResult.Error}",
-                id,
-                handlerResult.Errors);
-
-            return handlerResult.ToErrorActionResult();
-        }
-        _logger.LogInformation("SoftDelete volunteer with id:{id} success!", id);
-
-        return Ok(handlerResult.ToEnvelope());
+        return handlerResult.IsFailure
+            ? handlerResult.ToErrorActionResult()
+            : Ok(handlerResult.ToEnvelope());
     }
     //------------------------------------HardDeleteVolunteer-------------------------------------//
     /// <summary>
@@ -159,17 +134,10 @@ public class VolunteerController : Controller
        CancellationToken cancellationToken = default)
     {
         var handlerResult = await handler.Handle(id, cancellationToken);
-        if (handlerResult.IsFailure)
-        {
-            _logger.LogError(
-                "Delete volunteer with id:{id} failure!{handlerResult.Errors}",
-                 id,
-                 handlerResult.Errors);
-            return handlerResult.ToErrorActionResult();
-        }
-        _logger.LogInformation("Delete volunteer with id:{id} success!", id);
 
-        return Ok(handlerResult.ToEnvelope());
+        return handlerResult.IsFailure 
+            ? handlerResult.ToErrorActionResult() 
+            : Ok(handlerResult.ToEnvelope());
     }
     //------------------------------------UpdateSocialNetworks------------------------------------//
     /// <summary>
@@ -188,17 +156,31 @@ public class VolunteerController : Controller
         CancellationToken cancellationToken = default)
     {
         var handlerResult = await handler.Handle(id, dtos, cancellationToken);
-        if (handlerResult.IsFailure)
-        {
-            _logger.LogError(
-                "Update social networks for volunteer with id:{id} failure!{handlerResult.Errors}",
-                id,
-                handlerResult.Errors);
-            return handlerResult.ToErrorActionResult();
-        }
-        _logger.LogInformation("Update social networks for volunteer with id:{id} success!", id);
 
-        return Ok(handlerResult.ToEnvelope());
+        return handlerResult.IsFailure
+            ? handlerResult.ToErrorActionResult()
+            : Ok(handlerResult.ToEnvelope());
+    }
+
+    /// <summary>
+    /// Update Requisites
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="dtos"></param>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPatch("{id}/requisites")]
+    public async Task<ActionResult<Envelope>> UpdateRequisites(
+        [FromServices] UpdateRequisitesHandler handler,
+        [FromBody] IEnumerable<RequisitesRequest> dtos,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var handlerResult = await handler.Handle(id, dtos, cancellationToken);
+        return handlerResult.IsFailure 
+            ? handlerResult.ToErrorActionResult() 
+            : Ok(handlerResult.ToEnvelope());
     }
     //------------------------------------RestoreVolunteer----------------------------------------//
     /// <summary>
@@ -215,16 +197,9 @@ public class VolunteerController : Controller
         CancellationToken cancellationToken = default)
     {
         var handlerResult = await handler.Handle(id, cancellationToken);
-        if (handlerResult.IsFailure)
-        {
-            _logger.LogError(
-                "Restore volunteer with id:{id} failure!{handlerResult.Errors}",
-                id, 
-                handlerResult.Errors);
-            return handlerResult.ToErrorActionResult();
-        }
-        _logger.LogInformation("Restore volunteer with id:{id} success!", id);
 
-        return Ok(handlerResult.ToEnvelope());
+        return handlerResult.IsFailure
+            ? handlerResult.ToErrorActionResult()
+            : Ok(handlerResult.ToEnvelope());
     }
 }

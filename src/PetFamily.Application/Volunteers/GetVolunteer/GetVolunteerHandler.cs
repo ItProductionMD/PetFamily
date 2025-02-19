@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.Results;
 using PetFamily.Domain.VolunteerAggregates.Root;
 using System;
 using System.Collections.Generic;
@@ -14,16 +14,19 @@ public class GetVolunteerHandler(
     IVolunteerRepository volunteerRepository)
 {
     private ILogger<GetVolunteerHandler> _logger = logger;
-    private IVolunteerRepository _volunteerRepository = volunteerRepository;
-    
+    private IVolunteerRepository _volunteerRepository = volunteerRepository; 
     public async Task<Result<Volunteer>> Handle(Guid volunteerId, CancellationToken cancelToken)
     {
         var getVolunteer = await _volunteerRepository.GetById(volunteerId, cancelToken);
         if (getVolunteer.IsFailure)
         {
-            _logger.LogError("Volunteer with id {volunteerId} not found", volunteerId);
-            return Result<Volunteer>.Failure(getVolunteer.Errors!);
+            _logger.LogError("Fail to get volunteer with id {volunteerId}!Errors:{Errors}",
+                volunteerId, getVolunteer.ConcateErrorMessages());
+
+            return Result.Fail(getVolunteer.Errors!);
         }
-        return Result<Volunteer>.Success(getVolunteer.Data);
+        _logger.LogInformation("Get volunteer with {volunteerId} succesfully!",volunteerId);
+
+        return Result.Ok(getVolunteer.Data);
     }
 }

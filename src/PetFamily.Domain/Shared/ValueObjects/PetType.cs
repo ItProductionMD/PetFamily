@@ -1,5 +1,6 @@
-﻿using PetFamily.Domain.PetAggregates.ValueObjects;
-using PetFamily.Domain.Shared.DomainResult;
+﻿using PetFamily.Domain.DomainError;
+using PetFamily.Domain.PetAggregates.ValueObjects;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -18,22 +19,21 @@ public record PetType
 
     public static Result<PetType> Create(BreedID breedId, SpeciesID speciesId)
     {
-        var validatePetType = Validate(breedId, speciesId);
+        var validationResult = Validate(breedId, speciesId);
+        if (validationResult.IsFailure)
+            return validationResult;
 
-        if (validatePetType.IsFailure)
-            return Result<PetType>.Failure(validatePetType.Errors!);
-
-        return Result<PetType>.Success(new PetType(breedId.Value, speciesId.Value));
+        return Result.Ok(new PetType(breedId.Value, speciesId.Value));
     }
 
-    private static Result Validate(BreedID breedId, SpeciesID speciesId)
+    public static UnitResult Validate(BreedID breedId, SpeciesID speciesId)
     {
         if (breedId.Value == Guid.Empty)
-            return Result.Failure(Error.CreateErrorGuidIdIsEmpty("PetType breedId"));
+            return UnitResult.Fail(Error.GuidIsEmpty("PetType breedId"));
 
         if (speciesId.Value == Guid.Empty)
-            return Result.Failure(Error.CreateErrorGuidIdIsEmpty("PetType speciesId"));
+            return UnitResult.Fail(Error.GuidIsEmpty("PetType speciesId"));
 
-        return Result.Success();
+        return UnitResult.Ok();
     }
 }

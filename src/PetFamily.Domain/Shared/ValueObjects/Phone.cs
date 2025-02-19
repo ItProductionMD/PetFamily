@@ -1,7 +1,7 @@
-﻿using PetFamily.Domain.Shared.DomainResult;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 public record Phone
@@ -18,16 +18,15 @@ public record Phone
     public static Result<Phone> Create(string? number, string? regionCode)
     {
         var validationResult = Validate(number, regionCode);
-
         if (validationResult.IsFailure)
-            return Result<Phone>.Failure(validationResult.Errors!);
+            return validationResult;
 
-        return Result<Phone>.Success(new Phone(number!, regionCode!));
+        return Result.Ok(new Phone(number!, regionCode!));
     }
 
-    public static Result Validate(string? number, string? regionCode) =>
+    public static UnitResult Validate(string? number, string? regionCode) =>
 
-        Result.ValidateCollection(
+        UnitResult.ValidateCollection(
 
             () => ValidateRequiredField(
 

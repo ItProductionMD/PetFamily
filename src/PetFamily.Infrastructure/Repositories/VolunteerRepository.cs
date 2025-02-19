@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Volunteers;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.PetAggregates.Root;
+using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteerAggregates.Root;
 using System.Threading;
@@ -17,15 +18,12 @@ public class VolunteerRepository : IVolunteerRepository
         _context = context;
     }
 
-    public async Task<Result<Guid>> Add(
+    public async Task Add(
         Volunteer volunteer,
         CancellationToken cancellationToken = default)
     {
         await _context.Volunteers.AddAsync(volunteer, cancellationToken);
-
         await _context.SaveChangesAsync(cancellationToken);
-
-        return Result<Guid>.Success(volunteer.Id);
     }
 
     public async Task<Result<List<Volunteer>>> GetByEmailOrPhone(
@@ -39,61 +37,52 @@ public class VolunteerRepository : IVolunteerRepository
             v.PhoneNumber.Number == phone.Number).ToListAsync(cancellation);
 
         if (volunteers.Count == 0)
-            return Result<List<Volunteer>>.Failure(Error.CreateErrorNotFound("Volunteers"));
+            return Result.Fail(Error.NotFound("Volunteers"));
 
-        return Result<List<Volunteer>>.Success(volunteers);
+        return Result.Ok(volunteers);
     }
 
     public async Task<Result<Volunteer>> GetById(Guid id, CancellationToken cancellation = default)
     {
-        var volunteer = await _context.Volunteers
+        var volunteer = await _context.Volunteers.Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == id, cancellation);
-
         if (volunteer == null)
-            return Result<Volunteer>.Failure(Error.CreateErrorNotFound("Volunteer"));
+            return Result.Fail(Error.NotFound("Volunteer"));
 
-        return Result<Volunteer>.Success(volunteer);
+        return Result.Ok(volunteer);
     }
 
-    public async Task<Result> Save(Volunteer volunteer, CancellationToken cancellToken = default)
-    {
-        var entries = _context.Entry(volunteer);
-
+    public async Task Save(Volunteer volunteer, CancellationToken cancellToken = default)
+    {    
         await _context.SaveChangesAsync(cancellToken);
-
-        return Result.Success();
     }
 
-    public async Task<Result<Guid>> Delete(
+    public async Task Delete(
         Volunteer volunteer,
         CancellationToken cancellToken = default)
     {
         _context.Volunteers.Remove(volunteer);
-
         await _context.SaveChangesAsync(cancellToken);
-
-        return Result<Guid>.Success(volunteer.Id);
     }
-
-    public async Task<Result> UpdateSocialNetworks(
+    public async Task<UnitResult> UpdateSocialNetworks(
         Guid volunteerId,
-        ValueObjectList<SocialNetwork> socialNetworks,
+        ValueObjectList<SocialNetworkInfo> socialNetworks,
         CancellationToken cancellation = default)
     {
         var socialNetworksValue = await _context.Volunteers
              .Where(v => v.Id == volunteerId)
-             .Select(v => v.SocialNetworksList)
+             .Select(v => v.SocialNetworks)
              .FirstOrDefaultAsync(cancellation);
 
         if (socialNetworksValue == null)
-            return Result.Failure(Error.CreateErrorNotFound("Volunteer"));
+            return UnitResult.Fail(Error.NotFound("Volunteer"));
 
         if(socialNetworksValue == socialNetworks)
-            return Result.Success();
+            return UnitResult.Ok();
 
         await _context.SaveChangesAsync(cancellation);
 
-        return Result.Success();
+        return UnitResult.Ok();
     }
 
 }

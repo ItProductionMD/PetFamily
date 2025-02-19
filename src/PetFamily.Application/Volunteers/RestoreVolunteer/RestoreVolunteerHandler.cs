@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Volunteers.RestoreVolunteer;
 
@@ -9,21 +9,23 @@ IVolunteerRepository volunteerRepository)
 {
     private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<RestoreVolunteerHandler> _logger = logger;
-    public async Task<Result<Guid>> Handle(Guid volunteerId, CancellationToken cancellationToken)
+    public async Task<UnitResult> Handle(Guid volunteerId, CancellationToken cancellationToken)
     {
-        //--------------------------------------Get Volunteer-------------------------------------//
         var getVolunteer = await _volunteerRepository.GetById(volunteerId, cancellationToken);
         if (getVolunteer.IsFailure)
         {
-            _logger.LogError("Volunteer with id {volunteerId} not found", volunteerId);
-            return Result<Guid>.Failure(getVolunteer.Errors!);
+            _logger.LogError("Fail get volunteer with id {volunteerId} fore restore volunteer!", volunteerId);
+
+            return UnitResult.Fail(getVolunteer.Errors);
         }
-        var volunteer = getVolunteer.Data;
-        //--------------------------------------Restore Volunteer---------------------------------//
+        var volunteer = getVolunteer.Data!;
+
         volunteer.Restore();
-        //--------------------------------------Save Volunteer------------------------------------//
+
         await _volunteerRepository.Save(volunteer, cancellationToken);
 
-        return Result<Guid>.Success(volunteer.Id);
+        _logger.LogInformation("Restore volunteer with Id:{Id} successful",volunteerId);
+
+        return UnitResult.Ok();
     }
 }

@@ -1,6 +1,7 @@
-﻿using FluentValidation.Results;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.DomainResult;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
 using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
 
@@ -8,6 +9,30 @@ namespace PetFamily.Application.Validations;
 
 public static class ValidationExtensions
 {
+    public static IRuleBuilderOptionsConditions<T, TElement> MustBeValueObject<T, TElement>(
+        this IRuleBuilder<T, TElement> ruleBuilder,
+        Func<TElement, UnitResult> validate)
+    {
+        return ruleBuilder.Custom((value, context) =>
+        {
+            UnitResult result = validate(value);
+
+            if (result.IsSuccess)
+                return;
+
+            foreach (var error in result.Errors)
+            {
+                if (error != null)
+                {
+                    var failure = new ValidationFailure(error.FieldName, error.Message)
+                    {
+                        ErrorCode = error.Code
+                    };
+                    context.AddFailure(failure);
+                }
+            }
+        });
+    }
     public static Result<T> ToResultFailure<T>(this ValidationResult validationResult)
     {
         var errors = validationResult.Errors;
@@ -17,7 +42,7 @@ public static class ValidationExtensions
         //convert fluentvalidation error in error from Result 
         foreach (var item in errors)
         {
-            var customError = Error.CreateCustomError(
+            var customError = Error.Custom(
                 item.ErrorCode,
                 item.ErrorMessage,
                 ErrorType.Validation,
@@ -25,10 +50,10 @@ public static class ValidationExtensions
 
             myErrors.Add(customError);
         }
-        return Result<T>.Failure(myErrors!);
+        return Result.Fail(myErrors!);
     }
 
-    public static Result ToResultFailure(this ValidationResult validationResult)
+    public static UnitResult ToResultFailure(this ValidationResult validationResult)
     {
         var errors = validationResult.Errors;
 
@@ -37,7 +62,7 @@ public static class ValidationExtensions
         //convert fluentvalidation error in error from Result 
         foreach (var item in errors)
         {
-            var customError = Error.CreateCustomError(
+            var customError = Error.Custom(
                 item.ErrorCode,
                 item.ErrorMessage,
                 ErrorType.Validation,
@@ -45,12 +70,6 @@ public static class ValidationExtensions
 
             myErrors.Add(customError);
         }
-        return Result.Failure(myErrors!);
+        return UnitResult.Fail(myErrors!);
     }
-
-    public static Result ValidateDonateDetails(DonateDetailsRequest request) =>
-           DonateDetails.Validate(request.Name, request.Description);
-
-    public static Result ValidateSocialNetwork(SocialNetworksRequest request) =>
-        SocialNetwork.Validate(request.Name, request.Url);
 }

@@ -10,6 +10,6 @@ namespace PetFamily.Application.Volunteers.CreateVolunteer
         string PhoneNumber,
         string PhoneRegionCode,
         int ExperienceYears,
-        IEnumerable<DonateDetailsRequest> DonateDetailsList,
+        IEnumerable<RequisitesRequest> Requisites,
         IEnumerable<SocialNetworksRequest> SocialNetworksList);
 }
