@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Species;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetAggregates.Entities;
+using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.VolunteerAggregates.Root;
 
 namespace PetFamily.Infrastructure.Repositories;
 

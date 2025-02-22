@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using PetFamily.Domain.PetAggregates.Entities;
-using PetFamily.Domain.VolunteerAggregates.Root;
+using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.PetManagment.Root;
 using static PetFamily.Domain.Shared.Constants;
 
 

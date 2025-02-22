@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Domain.PetAggregates.Entities;
-using PetFamily.Domain.PetAggregates.ValueObjects;
+using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
-using PetSpecies = PetFamily.Domain.PetAggregates.Entities.Species;
+using PetSpecies = PetFamily.Domain.PetManagment.Entities.Species;
 
 
 namespace PetFamily.Application.Species;

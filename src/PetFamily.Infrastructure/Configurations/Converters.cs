@@ -15,9 +15,9 @@ public static class Converters
     {
         public ReadOnlyListConverter()
             : base(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
                 v => JsonSerializer
-                .Deserialize<IReadOnlyList<T>>(v, (JsonSerializerOptions?)null) ?? new List<T>())
+                .Deserialize<IReadOnlyList<T>>(v, JsonSerializerOptions.Default) ?? new List<T>())
         { }
     }
     

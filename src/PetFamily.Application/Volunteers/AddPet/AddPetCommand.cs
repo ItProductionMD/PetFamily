@@ -1,6 +1,5 @@
 ﻿using PetFamily.Application.FilesManagment.Commands;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteerAggregates.Root;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,5 +29,5 @@ namespace PetFamily.Application.Volunteers.AddPet
        string Region,
        string Street,
        string HomeNumber,
-       IEnumerable<RequisitesRequest> DonateDetails);
+       IEnumerable<RequisitesRequest> Requisites);
 }

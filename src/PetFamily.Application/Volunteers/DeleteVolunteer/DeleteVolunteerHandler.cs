@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.VolunteerAggregates.Root;
 
 namespace PetFamily.Application.Volunteers.DeleteVolunteer;
 

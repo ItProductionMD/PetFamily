@@ -2,10 +2,11 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PetFamily.Domain.PetAggregates.Root;
+using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.Shared.ValueObjects;
 using System.Text.Json;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Infrastructure.Configurations.Converters;
 
 namespace PetFamily.Infrastructure.Configurations;
 
@@ -13,7 +14,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 {
     public void Configure(EntityTypeBuilder<Pet> builder)
     {
-        builder.ToTable("Pets");
+        builder.ToTable("pets");
 
         builder.HasKey(p => p.Id);
 
@@ -42,40 +43,26 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .HasConversion<string>() // Store enum as a string, and get enum from string
             .IsRequired();
 
-        // Value Objects
-        builder.OwnsOne(p => p.PetType, petType =>
+        builder.ComplexProperty(p => p.PetType, petType =>
         {
-            petType.Property(p => p.BreedId)
-                .IsRequired();
-            petType.Property(p => p.SpeciesId)
-                .IsRequired();
+            petType.Property(p => p.BreedId);
+            petType.Property(p => p.SpeciesId);
         });
 
-        builder.OwnsOne(p => p.OwnerPhone, phone =>
+        builder.ComplexProperty(p => p.OwnerPhone, phone =>
         {
             phone.Property(p => p.Number)
-                .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
-                .IsRequired();
+                .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
 
             phone.Property(p => p.RegionCode)
-                .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
-                .IsRequired();
+                .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
         });
 
-        builder.Property(p => p.DonateDetailsBox)
-            .HasConversion(
-                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                    v => JsonSerializer.Deserialize<IReadOnlyList<RequisitesInfo>>(v, JsonSerializerOptions.Default)
-                    ?? new List<RequisitesInfo>())
+        builder.Property(p => p.Requisites)
+                .HasConversion(new ReadOnlyListConverter<RequisitesInfo>())
+                .Metadata.SetValueComparer(new ReadOnlyListComparer<RequisitesInfo>());
 
-                .Metadata.SetValueComparer(
-                    new ValueComparer<IReadOnlyList<RequisitesInfo>>(
-                    (c1, c2) => c1 != null && c2 != null && c1.Count == c2.Count && c1.SequenceEqual(c2),
-                    c => c != null ? c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())) : 0,
-                    c => c != null ? c.ToList() : new List<RequisitesInfo>())
-                );
-
-        builder.OwnsOne(p => p.Adress, address =>
+        builder.ComplexProperty(p => p.Address, address =>
         {
             address.Property(a => a.Street)
                 .HasMaxLength(MAX_LENGTH_MEDIUM_TEXT);
@@ -86,23 +73,15 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             address.Property(a => a.Region)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
         });
+
         builder.ComplexProperty(p => p.SerialNumber, v =>
         {
-            v.Property(s => s.Value).HasColumnName("serial_number").IsRequired();
+            v.Property(s => s.Value).HasColumnName("serial_number");
         });
 
         builder.Property(p => p.Images)
-            .HasConversion(
-                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                    v => JsonSerializer.Deserialize<IReadOnlyList<Image>>(v, JsonSerializerOptions.Default)
-                    ?? new List<Image>())
-
-                .Metadata.SetValueComparer(
-                    new ValueComparer<IReadOnlyList<Image>>(
-                    (c1, c2) => c1 != null && c2 != null && c1.Count == c2.Count && c1.SequenceEqual(c2),
-                    c => c != null ? c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())) : 0,
-                    c => c != null ? c.ToList() : new List<Image>())
-                );
+            .HasConversion(new ReadOnlyListConverter<Image>())
+           .Metadata.SetValueComparer(new ReadOnlyListComparer<Image>());
 
         // For soft delete
         builder.Property<bool>("_isDeleted")
@@ -112,6 +91,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.Property<DateTime?>("_deletedDateTime")
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .HasColumnName("deleted_date_time");
+
         // Indexes
         builder.HasIndex(p => p.Name).IsUnique(false);
     }

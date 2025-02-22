@@ -1,8 +1,8 @@
 ﻿using PetFamily.Domain.DomainError;
+using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.VolunteerAggregates.Root;
 
-namespace PetFamily.Domain.PetAggregates.ValueObjects;
+namespace PetFamily.Domain.PetManagment.ValueObjects;
 
 public record PetSerialNumber
 {
@@ -23,7 +23,7 @@ public record PetSerialNumber
     {
         if (value > volunteer.Pets.Count + 1 || value < 0 || value == 0)
         {
-            return UnitResult.Fail(Error.InvalidFormat("PetSerialNumber"));
+            return Result.Fail(Error.InvalidFormat("PetSerialNumber"));
         }
         return UnitResult.Ok();
     }

@@ -2,10 +2,10 @@
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.PetAggregates.ValueObjects;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.PetManagment.ValueObjects;
 
-namespace PetFamily.Domain.PetAggregates.Entities
+namespace PetFamily.Domain.PetManagment.Entities
 {
     public class Species : Entity<Guid>
     {
@@ -35,7 +35,7 @@ namespace PetFamily.Domain.PetAggregates.Entities
         }
         public static UnitResult Validate(string? name) =>
 
-            ValidateRequiredField(name,"Species name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN);
+            ValidateRequiredField(name, "Species name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN);
 
         public void AddBreeds(List<Breed> breeds)
         {

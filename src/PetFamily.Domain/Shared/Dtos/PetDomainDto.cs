@@ -1,5 +1,4 @@
-﻿using PetFamily.Domain.PetAggregates.Enums;
-using PetFamily.Domain.PetAggregates.ValueObjects;
+﻿using PetFamily.Domain.PetManagment.Enums;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Domain.Shared.Dtos;
@@ -16,7 +15,7 @@ public record PetDomainDto(
     Phone? OwnerPhone,
     IReadOnlyList<RequisitesInfo> DonateDetails,
     string? HealthInfo,
-    Address? Adress,
+    Address? Address,
     HelpStatus HelpStatus,
     List<Image> Images);
 

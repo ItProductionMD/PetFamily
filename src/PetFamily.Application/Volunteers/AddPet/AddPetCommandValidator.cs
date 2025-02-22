@@ -9,10 +9,10 @@ using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
 using static PetFamily.Application.Validations.ValidationExtensions;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.PetAggregates.Enums;
 using PetFamily.Application.SharedValidations;
-using PetFamily.Domain.PetAggregates.ValueObjects;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetManagment.Enums;
 
 namespace PetFamily.Application.Volunteers.AddPet;
 
@@ -45,7 +45,7 @@ public static class AddPetCommandValidator
                 command.Region, command.City, command.Street, command.HomeNumber),
 
             () => ValidateItems(
-                command.DonateDetails, r => RequisitesInfo.Validate(r.Name, r.Description)),
+                command.Requisites, r => RequisitesInfo.Validate(r.Name, r.Description)),
 
             () => PetType.Validate(
                 BreedID.SetValue(command.BreedId), SpeciesID.SetValue(Guid.NewGuid())));

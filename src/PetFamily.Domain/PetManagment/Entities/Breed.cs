@@ -2,10 +2,10 @@
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.PetAggregates.ValueObjects;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.PetManagment.ValueObjects;
 
-namespace PetFamily.Domain.PetAggregates.Entities;
+namespace PetFamily.Domain.PetManagment.Entities;
 
 public class Breed : Entity<Guid>
 {
@@ -29,7 +29,7 @@ public class Breed : Entity<Guid>
         return Result.Ok(new Breed(id.Value, name!, description));
     }
 
-    public static UnitResult Validate(string? name, string? description) => 
+    public static UnitResult Validate(string? name, string? description) =>
 
         UnitResult.ValidateCollection(
 

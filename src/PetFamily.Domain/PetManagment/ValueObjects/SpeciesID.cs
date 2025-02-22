@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Domain.PetAggregates.ValueObjects
+﻿namespace PetFamily.Domain.PetManagment.ValueObjects
 {
     public record SpeciesID
     {
@@ -9,6 +9,6 @@
             Value = id;
         }
         public static SpeciesID NewGuid() => new(Guid.NewGuid());
-        public static SpeciesID SetValue(Guid id)=>new(id);
+        public static SpeciesID SetValue(Guid id) => new(id);
     }
 }

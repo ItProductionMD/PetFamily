@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PetSpecies = PetFamily.Domain.PetAggregates.Entities.Species;
+using PetSpecies = PetFamily.Domain.PetManagment.Entities.Species;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using PetFamily.Domain.PetAggregates.Entities;
+using PetFamily.Domain.PetManagment.Entities;
 
 namespace PetFamily.Application.Species;
 

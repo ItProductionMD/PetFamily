@@ -1,5 +1,5 @@
 ﻿using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetAggregates.ValueObjects;
+using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;

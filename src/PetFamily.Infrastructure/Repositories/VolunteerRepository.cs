@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Volunteers;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetAggregates.Root;
+using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteerAggregates.Root;
 using System.Threading;
 
 namespace PetFamily.Infrastructure.Repositories;
@@ -70,7 +69,7 @@ public class VolunteerRepository : IVolunteerRepository
     }
     public async Task<UnitResult> UpdateSocialNetworks(
         Guid volunteerId,
-        ValueObjectList<SocialNetworkInfo> socialNetworks,
+        List<SocialNetworkInfo> socialNetworks,
         CancellationToken cancellation = default)
     {
         var socialNetworksValue = await _context.Volunteers

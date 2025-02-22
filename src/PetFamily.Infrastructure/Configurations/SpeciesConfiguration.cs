@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Domain.PetAggregates.Entities;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using PetFamily.Domain.PetManagment.Entities;
 
 namespace PetFamily.Infrastructure.Configurations;
 public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
 {
     public void Configure(EntityTypeBuilder<Species> builder)
     {
-        builder.ToTable("Species");
+        builder.ToTable("species");
 
         builder.HasKey(s => s.Id);
 

@@ -4,17 +4,16 @@ using PetFamily.Application.FilesManagment.Dtos;
 using PetFamily.Application.Species;
 using PetFamily.Application.Volunteers;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetAggregates.Enums;
-using PetFamily.Domain.PetAggregates.Root;
-using PetFamily.Domain.PetAggregates.ValueObjects;
+using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.Dtos;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteerAggregates.Root;
-using System.Threading;
-using static PetFamily.Domain.Shared.ValueObjects.ValueObjectFactory;
-using PetSpecies = PetFamily.Domain.PetAggregates.Entities.Species;
+using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetManagment.Enums;
+using PetSpecies = PetFamily.Domain.PetManagment.Entities.Species;
+using System;
+using System.Reflection.Metadata.Ecma335;
 
 
 namespace PetFamily.Application.Volunteers.AddPet;
@@ -66,7 +65,42 @@ public class AddPetHandler(
         }
         var volunteer = getVolunteer.Data!;
 
-        var newPet = volunteer.CreateAndAddNewPet(CreatePetDomainDto(command));
+        var address = Address.Create(command.Region, command.City, command.Street, command.HomeNumber).Data!;
+
+        var ownerPhone = Phone.Create(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;
+
+        HelpStatus? helpStatus = Enum.IsDefined(typeof(HelpStatus), command.HelpStatus)
+            ? (HelpStatus)command.HelpStatus
+            : null;
+
+        if (helpStatus == null)
+        {
+            _logger.LogError("Help status with value:{HelpStatus} not found!", command.HelpStatus);
+            return Result.Fail(Error.NotFound("HelpStatus"));
+        }
+
+        var requisites = command.Requisites
+            .Select(d => RequisitesInfo.Create(d.Name, d.Description).Data!).ToList();
+
+        var petType = PetType.Create(
+            BreedID.SetValue(command.BreedId), SpeciesID.SetValue(command.SpeciesId)).Data!;
+
+        var newPet = volunteer.CreateAndAddPet(
+            command.PetName,
+            command.DateOfBirth,
+            command.Description,
+            command.IsVaccinated,
+            command.IsSterilized,
+            command.Weight,
+            command.Height,
+            command.Color,
+            petType,
+            ownerPhone,
+            requisites,
+            [],
+            helpStatus.Value,
+            command.HealthInfo,
+            address);
 
         await _volunteerRepository.Save(volunteer, cancellationToken);
 
@@ -78,34 +112,6 @@ public class AddPetHandler(
         return Result.Ok(addPetResponse);
     }
     //---------------------------------Private methods--------------------------------------------//
-    private static PetDomainDto CreatePetDomainDto(AddPetCommand command)
-    {
-        var address = Address.Create(command.Region, command.City, command.Street, command.HomeNumber).Data!;
-
-        var ownerPhone = Phone.Create(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;
-
-        var donateDetails = MapDtosToValueObjects(
-            command.DonateDetails, dto => RequisitesInfo.Create(dto.Name, dto.Description))!;
-
-        var petType = PetType.Create(
-            BreedID.SetValue(command.BreedId), SpeciesID.SetValue(command.SpeciesId)).Data!;
-
-        return new PetDomainDto(
-            command.PetName,
-            command.DateOfBirth,
-            command.Description,
-            command.IsVaccinated,
-            command.IsSterilized,
-            command.Weight,
-            command.Height,
-            command.Color,
-            petType,
-            ownerPhone,
-            donateDetails,
-            command.HealthInfo,
-            address,
-            (HelpStatus)command.HelpStatus, []);
-    }
 
     private async Task<UnitResult> CheckPetTypeAsync(
         Guid speciesId,

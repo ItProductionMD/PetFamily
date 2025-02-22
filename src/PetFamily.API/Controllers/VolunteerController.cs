@@ -14,13 +14,13 @@ using PetFamily.Application.Volunteers.UpdateRequisites;
 using PetFamily.Application.Volunteers.UpdateSocialNetworks;
 using PetFamily.Application.Volunteers.UpdateVolunteer;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetAggregates.Root;
 using PetFamily.Domain.Results;
 using static PetFamily.API.Extensions.ResultExtensions;
 using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
 using static PetFamily.API.AppiValidators.Validators;
 using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.UpdatePetImages;
+using PetFamily.Domain.PetManagment.Entities;
 
 namespace PetFamily.API.Controllers;
 
@@ -33,7 +33,7 @@ public class VolunteerController(
     private readonly FileValidatorOptions _fileValidatorOptions = validateFileOptions.Value;
     private readonly ILogger<VolunteerController> _logger = logger;
     private const string FOLDER_NAME = "test";
-   
+
     //------------------------------------CreateVolunteer-----------------------------------------//
     /// <summary>
     /// Create a volunteer
@@ -85,7 +85,7 @@ public class VolunteerController(
         if (handlerResult.IsFailure)
         {
             _logger.LogError("Update volunteer with id:{id} failure!{Errors}",
-                id,handlerResult.ConcateErrorMessages());
+                id, handlerResult.ConcateErrorMessages());
 
             return handlerResult.ToErrorActionResult();
         }
@@ -146,8 +146,8 @@ public class VolunteerController(
     {
         var handlerResult = await handler.Handle(id, cancellationToken);
 
-        return handlerResult.IsFailure 
-            ? handlerResult.ToErrorActionResult() 
+        return handlerResult.IsFailure
+            ? handlerResult.ToErrorActionResult()
             : Ok(handlerResult.ToEnvelope());
     }
     //------------------------------------UpdateSocialNetworks------------------------------------//
@@ -189,8 +189,8 @@ public class VolunteerController(
         CancellationToken cancellationToken = default)
     {
         var handlerResult = await handler.Handle(id, dtos, cancellationToken);
-        return handlerResult.IsFailure 
-            ? handlerResult.ToErrorActionResult() 
+        return handlerResult.IsFailure
+            ? handlerResult.ToErrorActionResult()
             : Ok(handlerResult.ToEnvelope());
     }
     //------------------------------------RestoreVolunteer----------------------------------------//

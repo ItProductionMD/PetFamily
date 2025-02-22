@@ -1,5 +1,4 @@
-﻿using PetFamily.Domain.PetAggregates.Entities;
-using PetSpecies = PetFamily.Domain.PetAggregates.Entities.Species;
+﻿using PetSpecies = PetFamily.Domain.PetManagment.Entities.Species;
 using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Species;

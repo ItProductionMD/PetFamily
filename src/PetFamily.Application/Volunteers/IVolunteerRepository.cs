@@ -1,7 +1,6 @@
-﻿using PetFamily.Domain.PetAggregates.Root;
+﻿using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteerAggregates.Root;
 
 namespace PetFamily.Application.Volunteers;
 
@@ -22,6 +21,6 @@ public interface IVolunteerRepository
 
     Task<UnitResult> UpdateSocialNetworks(
         Guid volunteerId,
-        ValueObjectList<SocialNetworkInfo> socialNetworks,
+        List<SocialNetworkInfo> socialNetworks,
         CancellationToken cancellation = default);
 }
