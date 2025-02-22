@@ -11,7 +11,7 @@ IVolunteerRepository volunteerRepository)
     private readonly ILogger<RestoreVolunteerHandler> _logger = logger;
     public async Task<UnitResult> Handle(Guid volunteerId, CancellationToken cancellationToken)
     {
-        var getVolunteer = await _volunteerRepository.GetById(volunteerId, cancellationToken);
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (getVolunteer.IsFailure)
         {
             _logger.LogError("Fail get volunteer with id {volunteerId} fore restore volunteer!", volunteerId);

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
 
-namespace PetFamily.Application.Pets.CreatePet
+namespace PetFamily.Application.Volunteers.AddPet
 {
     public record AddPetCommand(
        Guid VolunteerId,

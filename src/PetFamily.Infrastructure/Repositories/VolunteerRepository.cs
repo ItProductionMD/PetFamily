@@ -42,9 +42,10 @@ public class VolunteerRepository : IVolunteerRepository
         return Result.Ok(volunteers);
     }
 
-    public async Task<Result<Volunteer>> GetById(Guid id, CancellationToken cancellation = default)
+    public async Task<Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken cancellation = default)
     {
-        var volunteer = await _context.Volunteers.Include(v => v.Pets)
+        var volunteer = await _context.Volunteers
+            .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == id, cancellation);
         if (volunteer == null)
             return Result.Fail(Error.NotFound("Volunteer"));
@@ -53,7 +54,10 @@ public class VolunteerRepository : IVolunteerRepository
     }
 
     public async Task Save(Volunteer volunteer, CancellationToken cancellToken = default)
-    {    
+    {
+        var entries = _context.Entry(volunteer);
+        var entries2 = _context.Entry(volunteer.Pets.FirstOrDefault(p=>p.Name == "bruno"));
+        //entries2.State = EntityState.Added;
         await _context.SaveChangesAsync(cancellToken);
     }
 

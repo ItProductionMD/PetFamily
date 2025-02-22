@@ -11,9 +11,9 @@ public record PetSerialNumber
     {
         Value = value;
     }
-    public static Result<PetSerialNumber> Create(int value , Volunteer volunteer)
+    public static Result<PetSerialNumber> Create(int value, Volunteer volunteer)
     {
-        var validationResult = Validate(value,volunteer);
+        var validationResult = Validate(value, volunteer);
         if (validationResult.IsFailure)
             return validationResult;
 
@@ -21,7 +21,7 @@ public record PetSerialNumber
     }
     public static UnitResult Validate(int value, Volunteer volunteer)
     {
-        if (value > volunteer.Pets.Count || value < 0)
+        if (value > volunteer.Pets.Count + 1 || value < 0 || value == 0)
         {
             return UnitResult.Fail(Error.InvalidFormat("PetSerialNumber"));
         }

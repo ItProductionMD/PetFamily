@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PetFamily.Application.FilesManagment;
-using PetFamily.Application.Pets;
 using PetFamily.Application.Species;
 using PetFamily.Application.Volunteers;
 using PetFamily.Infrastructure.Repositories;
@@ -19,7 +18,6 @@ public static class Inject
     {
         services
             .AddScoped<ISpeciesRepository, SpeciesRepository>()
-            .AddScoped<IPetRepository,PetRepository>()
             .AddScoped<IVolunteerRepository, VolunteerRepository>()
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddScoped<AppDbContext>()

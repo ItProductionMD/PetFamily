@@ -39,7 +39,7 @@ public class UpdateVolunteerHandler(
 
         //----------------------------Get Volunteer from database--------------------------------//
         var getVolunteer = await _volunteerRepository
-            .GetById(request.VolunteerId, cancellationToken);
+            .GetByIdAsync(request.VolunteerId, cancellationToken);
 
         if (getVolunteer.IsFailure)
         {

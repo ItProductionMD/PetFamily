@@ -18,7 +18,7 @@ namespace PetFamily.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -136,10 +136,6 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("VolunteerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("volunteer_id");
-
                     b.Property<double>("Weight")
                         .HasColumnType("double precision")
                         .HasColumnName("weight");
@@ -174,11 +170,7 @@ namespace PetFamily.Infrastructure.Migrations
                     b.HasIndex("volunteer_id")
                         .HasDatabaseName("ix_pets_volunteer_id");
 
-                    b.ToTable("Pets", null, t =>
-                        {
-                            t.Property("volunteer_id")
-                                .HasColumnName("volunteer_id1");
-                        });
+                    b.ToTable("Pets", (string)null);
                 });
 
             modelBuilder.Entity("PetFamily.Domain.VolunteerAggregates.Root.Volunteer", b =>
@@ -238,7 +230,7 @@ namespace PetFamily.Infrastructure.Migrations
 
             modelBuilder.Entity("PetFamily.Domain.PetAggregates.Root.Pet", b =>
                 {
-                    b.HasOne("PetFamily.Domain.VolunteerAggregates.Root.Volunteer", null)
+                    b.HasOne("PetFamily.Domain.VolunteerAggregates.Root.Volunteer", "Volunteer")
                         .WithMany("Pets")
                         .HasForeignKey("volunteer_id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -334,6 +326,8 @@ namespace PetFamily.Infrastructure.Migrations
 
                     b.Navigation("PetType")
                         .IsRequired();
+
+                    b.Navigation("Volunteer");
                 });
 
             modelBuilder.Entity("PetFamily.Domain.VolunteerAggregates.Root.Volunteer", b =>

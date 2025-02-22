@@ -9,8 +9,6 @@ public record Image
 {
     public string Name { get;}
 
-    private Image() { }//EF core need this
-
     [JsonConstructorAttribute]
     private Image(string name)
     {

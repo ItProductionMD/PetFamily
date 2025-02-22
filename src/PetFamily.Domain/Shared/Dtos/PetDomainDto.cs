@@ -1,4 +1,5 @@
 ﻿using PetFamily.Domain.PetAggregates.Enums;
+using PetFamily.Domain.PetAggregates.ValueObjects;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Domain.Shared.Dtos;

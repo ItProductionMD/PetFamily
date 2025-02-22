@@ -85,14 +85,12 @@ namespace PetFamily.Infrastructure.Configurations
             builder.Property<DateTime?>("_deletedDateTime")
                 .UsePropertyAccessMode(PropertyAccessMode.Field)
                 .HasColumnName("deleted_date_time");
+
             // Relationships
             builder.HasMany(v => v.Pets)
-                .WithOne()
-                .HasForeignKey("volunteer_id") // Define the foreign key on Pet
+                .WithOne(p=>p.Volunteer)
+                .HasForeignKey("volunteer_id") 
                 .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Navigation(v => v.Pets)
-                .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         }
     }

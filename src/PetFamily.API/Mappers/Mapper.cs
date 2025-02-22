@@ -1,6 +1,6 @@
 ﻿using PetFamily.API.Dtos;
 using PetFamily.Application.FilesManagment.Commands;
-using PetFamily.Application.Pets.CreatePet;
+using PetFamily.Application.Volunteers.AddPet;
 
 namespace PetFamily.API.Mappers;
 
@@ -33,7 +33,7 @@ public static class Mapper
            petDto.DonateDetails);
     }
 
-    public static List<UploadFileCommand> MapToUploadFileCommandList(this List<IFormFile> files)
+    public static List<UploadFileCommand> MapToUploadFileCommands(this List<IFormFile> files)
     {
         List<UploadFileCommand> uploadCommands = [];
         foreach (var file in files)

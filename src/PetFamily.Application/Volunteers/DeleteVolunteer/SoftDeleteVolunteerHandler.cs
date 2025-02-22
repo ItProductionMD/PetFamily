@@ -12,7 +12,7 @@ public class SoftDeleteVolunteerHandler(
     public async Task<Result<Guid>> Handle(Guid volunteerId, CancellationToken cancellationToken)
     {
         //--------------------------------------Get Volunteer-------------------------------------//
-        var getVolunteer = await _volunteerRepository.GetById(volunteerId, cancellationToken);
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (getVolunteer.IsFailure)
         {
             _logger.LogError("Fail get volunteer with id {volunteerId} for delete volunteer!Errors:{Errors}",

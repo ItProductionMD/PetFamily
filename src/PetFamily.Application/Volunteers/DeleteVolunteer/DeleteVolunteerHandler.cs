@@ -12,7 +12,7 @@ public class DeleteVolunteerHandler(
     private readonly ILogger<DeleteVolunteerHandler> _logger = logger;
     public async Task<Result<Guid>> Handle(Guid volunteerId, CancellationToken cancellationToken)
     {
-        var getVolunteer = await _volunteerRepository.GetById(volunteerId, cancellationToken);
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (getVolunteer.IsFailure)
         {
             _logger.LogError("Fail get volunteer with id {Id} for deleting volunteer!Errors:{Errors}",

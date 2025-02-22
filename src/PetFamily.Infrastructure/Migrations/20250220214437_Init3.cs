@@ -5,25 +5,18 @@
 namespace PetFamily.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class _1245 : Migration
+    public partial class Init3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "donate_details",
-                table: "Volunteers",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "donate_details",
-                table: "Volunteers");
+
         }
     }
 }

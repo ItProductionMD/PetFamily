@@ -14,7 +14,7 @@ using PetFamily.Application.SharedValidations;
 using PetFamily.Domain.PetAggregates.ValueObjects;
 using PetFamily.Domain.Results;
 
-namespace PetFamily.Application.Pets.CreatePet;
+namespace PetFamily.Application.Volunteers.AddPet;
 
 public static class AddPetCommandValidator
 {

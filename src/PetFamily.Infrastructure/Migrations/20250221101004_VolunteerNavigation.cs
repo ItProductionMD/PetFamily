@@ -6,10 +6,39 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetFamily.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Test123456 : Migration
+    public partial class VolunteerNavigation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropForeignKey(
+                name: "fk_pets_volunteers_volunteer_id",
+                table: "Pets");
+
+            migrationBuilder.DropIndex(
+                name: "ix_pets_volunteer_id",
+                table: "Pets");
+
+            migrationBuilder.DropColumn(
+                name: "volunteer_id1",
+                table: "Pets");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_pets_volunteer_id",
+                table: "Pets",
+                column: "volunteer_id");
+
+            migrationBuilder.AddForeignKey(
+                name: "fk_pets_volunteers_volunteer_id",
+                table: "Pets",
+                column: "volunteer_id",
+                principalTable: "Volunteers",
+                principalColumn: "id",
+                onDelete: ReferentialAction.Cascade);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "fk_pets_volunteers_volunteer_id",
@@ -35,35 +64,6 @@ namespace PetFamily.Infrastructure.Migrations
                 name: "fk_pets_volunteers_volunteer_id",
                 table: "Pets",
                 column: "volunteer_id1",
-                principalTable: "Volunteers",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "fk_pets_volunteers_volunteer_id",
-                table: "Pets");
-
-            migrationBuilder.DropIndex(
-                name: "ix_pets_volunteer_id",
-                table: "Pets");
-
-            migrationBuilder.DropColumn(
-                name: "volunteer_id1",
-                table: "Pets");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_pets_volunteer_id",
-                table: "Pets",
-                column: "volunteer_id");
-
-            migrationBuilder.AddForeignKey(
-                name: "fk_pets_volunteers_volunteer_id",
-                table: "Pets",
-                column: "volunteer_id",
                 principalTable: "Volunteers",
                 principalColumn: "id",
                 onDelete: ReferentialAction.Cascade);

@@ -9,6 +9,7 @@ using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using PetFamily.Domain.PetAggregates.ValueObjects;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.Dtos;
 
 namespace PetFamily.Domain.VolunteerAggregates.Root;
 
@@ -19,11 +20,9 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public Phone PhoneNumber { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? Description { get; private set; }
-
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
     public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
-    public IReadOnlyList<Pet> Pets => _pets;
-    private readonly List<Pet> _pets = [];
+    public List<Pet> Pets { get; private set; } = [];
 
     private bool _isDeleted;
     private DateTime? _deletedDateTime;
@@ -95,7 +94,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         if (oldPosition == newPosition)
             return;
 
-        var affectedPets = _pets.Where(p =>
+        var affectedPets = Pets.Where(p =>
             oldPosition > newPosition
                 ? p.SerialNumber.Value >= newPosition && p.SerialNumber.Value < oldPosition
                 : p.SerialNumber.Value <= newPosition && p.SerialNumber.Value > oldPosition);
@@ -116,44 +115,41 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         movedPet.SetSerialNumber(newSerialNumber);
     }
     //--------------------------------------Add Pet-----------------------------------------------//
-    public void AddPet(Pet pet)
+    public Pet CreateAndAddNewPet(PetDomainDto dto)
     {
-        pet.SetVolunteerId(Id);
-        var petsCount = GetPetsCount();
-        var serialNumberValue = petsCount + 1;
-        _pets.Add(pet);
-        var serialNumber = PetSerialNumber.Create(serialNumberValue, this).Data;
-        pet.SetSerialNumber(serialNumber);
+        var serialNumberValue = Pets.Count + 1;
+        var serialNumber = PetSerialNumber.Create(serialNumberValue, this).Data!;
+        var pet= Pet.Create(dto,serialNumber).Data!;
+        Pets.Add(pet);
+        return pet;
     }
     //--------------------------------------Remove Pet--------------------------------------------//
     public void RemovePet(Pet pet)
     {
-        var maxSerialNumberValue = _pets.Max(pet => pet.SerialNumber.Value);
+        var maxSerialNumberValue = Pets.Max(pet => pet.SerialNumber.Value);
 
         var maxSerialNumber = PetSerialNumber.Create(maxSerialNumberValue, this);
 
-        MovePetSerialNumber(pet, maxSerialNumber.Data);
+        MovePetSerialNumber(pet, maxSerialNumber.Data!);
 
-        _pets.Remove(pet);
+        Pets.Remove(pet);
     }
-    //--------------------------------------Get pets count----------------------------------------//
-    public int GetPetsCount() => _pets.Count;
     //-----------------------------------Get Count of Pets for Adopt------------------------------//
     public int GetCountOfPetsForAdopt() =>
-        _pets.Where(p => p.HelpStatus == HelpStatus.ForAdopt).Count();
+        Pets.Where(p => p.HelpStatus == HelpStatus.ForAdopt).Count();
     //----------------------------------Get Count of Pets for other Help--------------------------//
     public int GetCountOfPetsForHelp() =>
-        _pets.Where(p => p.HelpStatus == HelpStatus.ForHelp).Count();
+        Pets.Where(p => p.HelpStatus == HelpStatus.ForHelp).Count();
     //----------------------------------Get Count of Pets Adopted---------------------------------//
     public int GetCountOfPetsAdopted() =>
-        _pets.Where(p => p.HelpStatus == HelpStatus.Adopted).Count();
+        Pets.Where(p => p.HelpStatus == HelpStatus.Adopted).Count();
     //------------------------------Set is Deleted fal se(for soft deleting)-----------------------//
     public void Delete()
     {
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
 
-        foreach (var pet in _pets)
+        foreach (var pet in Pets)
             pet.Delete();
     }
     //------------------------------Set is Deleted true(for soft deleting)-----------------------//
@@ -162,7 +158,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         _isDeleted = false;
         _deletedDateTime = null;
 
-        foreach (var pet in _pets)
+        foreach (var pet in Pets)
             pet.Restore();
     }
     //------------------------------------Update Main Info----------------------------------------//

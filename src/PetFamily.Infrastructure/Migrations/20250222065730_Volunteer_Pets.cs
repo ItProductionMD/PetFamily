@@ -5,7 +5,7 @@
 namespace PetFamily.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class firstMigration131 : Migration
+    public partial class Volunteer_Pets : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

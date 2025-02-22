@@ -9,6 +9,7 @@ using PetFamily.Domain.Shared.Dtos;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using System.Text.Json.Serialization;
 
 namespace PetFamily.Domain.PetAggregates.Root;
 
@@ -34,14 +35,15 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public IReadOnlyList<Image> Images => _images;
 
     private readonly List<Image> _images = [];
-    public Guid VolunteerId { get; private set; }//Navigation property
 
     private bool _isDeleted;
 
     private DateTime? _deletedDateTime;
+    [JsonIgnore]
+    public Volunteer Volunteer { get; private set; }//Navigation property
     private Pet(Guid id) : base(id) { }//Ef core needs this
 
-    private Pet(Guid id, PetDomainDto petDto) : base(id)
+    private Pet(Guid id, PetDomainDto petDto, PetSerialNumber serialNumber) : base(id)
     {
         DateTimeCreated = DateTime.UtcNow;
 
@@ -74,20 +76,23 @@ public class Pet : Entity<Guid>, ISoftDeletable
         HelpStatus = petDto.HelpStatus;
 
         _images = petDto.Images;
+
+        SerialNumber = serialNumber;
     }
 
-    public static Result<Pet> Create(PetDomainDto petDto)
+    public static Result<Pet> Create(PetDomainDto petDto, PetSerialNumber serialNumber)
     {
         var validatePetDomain = Validate(petDto);
         if (validatePetDomain.IsFailure)
             return validatePetDomain;
 
-        return Result.Ok(new Pet(Guid.NewGuid(), petDto));
+        return Result.Ok(new Pet(Guid.NewGuid(), petDto, serialNumber));
     }
 
     public static UnitResult Validate(PetDomainDto petDto)
     {
         return UnitResult.ValidateCollection(
+
             () => ValidateNumber(petDto.Images.Count, "Images count", 0, 10),
 
             () => ValidateRequiredField(petDto.Name, "Pet name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
@@ -120,36 +125,31 @@ public class Pet : Entity<Guid>, ISoftDeletable
         _isDeleted = false;
         _deletedDateTime = null;
     }
-    public bool IsAddImagesCountPermited(int count) => MAX_IMAGES_COUNT > Images.Count + count;
+    public bool UpdateImages(List<string> imagesToDelete, List<string> imagesToAdd)
+    {
+        DeleteImages(imagesToDelete);
+        return AddImages(imagesToAdd) == false ? false : true;
+    }
 
     public bool AddImages(List<string> imageNames)
     {
-        if (IsAddImagesCountPermited(imageNames.Count) == false)
+        if (Images.Count + imageNames.Count > MAX_IMAGES_COUNT)
             return false;
 
         var newImageList = imageNames.Select(i => Image.Create(i).Data!).ToList();
         _images.AddRange(newImageList);
         return true;
     }
-    public void DeleteImages(List<Image> imagesToDelete)
+    public void DeleteImages(List<string> imagesToDelete)
     {
         if (imagesToDelete.Count == 0)
             return;
 
-        var imagesToDeleteSet = new HashSet<Image>(imagesToDelete);
-
-        var newImageList = Images
-            .Where(img => !imagesToDeleteSet.Contains(img))
-            .ToList();
-
-        if (newImageList.Count != Images.Count)
-        {
-            _images.Clear();
-            _images.AddRange(newImageList);
-        }
+        var imagesToDeleteSet = new HashSet<string>(imagesToDelete);
+        _images.RemoveAll(i => imagesToDeleteSet.Contains(i.Name));
     }
-    public void SetVolunteerId(Guid volunteerId)
+    public void SetVolunteer(Volunteer volunteer)
     {
-        VolunteerId = volunteerId;
+        Volunteer = volunteer;
     }
 }

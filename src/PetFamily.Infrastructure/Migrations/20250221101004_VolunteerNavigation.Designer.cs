@@ -6,14 +6,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using PetFamily.Infrastructure;
 
 #nullable disable
 
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250131162411_firstMigration131")]
-    partial class firstMigration131
+    [Migration("20250221101004_VolunteerNavigation")]
+    partial class VolunteerNavigation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,6 +102,11 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("description");
 
+                    b.Property<string>("DonateDetailsBox")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("donate_details_box");
+
                     b.Property<string>("HealthInfo")
                         .HasColumnType("text")
                         .HasColumnName("health_info");
@@ -113,6 +119,11 @@ namespace PetFamily.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("help_status");
+
+                    b.Property<string>("Images")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("images");
 
                     b.Property<bool>("IsSterilized")
                         .HasColumnType("boolean")
@@ -128,10 +139,6 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("VolunteerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("volunteer_id");
-
                     b.Property<double>("Weight")
                         .HasColumnType("double precision")
                         .HasColumnName("weight");
@@ -143,6 +150,10 @@ namespace PetFamily.Infrastructure.Migrations
                     b.Property<bool>("_isDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
+
+                    b.Property<Guid>("volunteer_id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("volunteer_id");
 
                     b.ComplexProperty<Dictionary<string, object>>("SerialNumber", "PetFamily.Domain.PetAggregates.Root.Pet.SerialNumber#PetSerialNumber", b1 =>
                         {
@@ -159,7 +170,7 @@ namespace PetFamily.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .HasDatabaseName("ix_pets_name");
 
-                    b.HasIndex("VolunteerId")
+                    b.HasIndex("volunteer_id")
                         .HasDatabaseName("ix_pets_volunteer_id");
 
                     b.ToTable("Pets", (string)null);
@@ -187,6 +198,16 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("experience_years");
 
+                    b.Property<string>("Requisites")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("requisites");
+
+                    b.Property<string>("SocialNetworks")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("social_networks");
+
                     b.Property<DateTime?>("_deletedDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_date_time");
@@ -207,44 +228,17 @@ namespace PetFamily.Infrastructure.Migrations
                         .WithMany("Breeds")
                         .HasForeignKey("SpeciesId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("fk_breeds_species_species_id");
+                        .HasConstraintName("fk_breeds_animal_types_species_id");
                 });
 
             modelBuilder.Entity("PetFamily.Domain.PetAggregates.Root.Pet", b =>
                 {
                     b.HasOne("PetFamily.Domain.VolunteerAggregates.Root.Volunteer", "Volunteer")
                         .WithMany("Pets")
-                        .HasForeignKey("VolunteerId")
+                        .HasForeignKey("volunteer_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_pets_volunteers_volunteer_id");
-
-                    b.OwnsOne("PetFamily.Domain.Shared.ValueObjects.DonateDetails", "DonateDetails", b1 =>
-                        {
-                            b1.Property<Guid>("PetId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
-
-                            b1.Property<string>("Description")
-                                .IsRequired()
-                                .HasMaxLength(500)
-                                .HasColumnType("character varying(500)")
-                                .HasColumnName("donate_details_description");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("donate_details_name");
-
-                            b1.HasKey("PetId");
-
-                            b1.ToTable("Pets");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PetId")
-                                .HasConstraintName("fk_pets_pets_id");
-                        });
 
                     b.OwnsOne("PetFamily.Domain.Shared.ValueObjects.Phone", "OwnerPhone", b1 =>
                         {
@@ -331,8 +325,6 @@ namespace PetFamily.Infrastructure.Migrations
 
                     b.Navigation("Adress");
 
-                    b.Navigation("DonateDetails");
-
                     b.Navigation("OwnerPhone");
 
                     b.Navigation("PetType")
@@ -370,102 +362,6 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasConstraintName("fk_volunteers_volunteers_id");
                         });
 
-                    b.OwnsOne("PetFamily.Domain.Shared.ValueObjects.ValueObjectList<PetFamily.Domain.Shared.ValueObjects.DonateDetails>", "DonateDetailsList", b1 =>
-                        {
-                            b1.Property<Guid>("VolunteerId")
-                                .HasColumnType("uuid");
-
-                            b1.HasKey("VolunteerId");
-
-                            b1.ToTable("Volunteers");
-
-                            b1.ToJson("donate_details_list");
-
-                            b1.WithOwner()
-                                .HasForeignKey("VolunteerId")
-                                .HasConstraintName("fk_volunteers_volunteers_id");
-
-                            b1.OwnsMany("PetFamily.Domain.Shared.ValueObjects.DonateDetails", "ObjectList", b2 =>
-                                {
-                                    b2.Property<Guid>("ValueObjectListVolunteerId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    b2.Property<string>("Description")
-                                        .IsRequired()
-                                        .HasMaxLength(500)
-                                        .HasColumnType("character varying(500)");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired()
-                                        .HasMaxLength(100)
-                                        .HasColumnType("character varying(100)");
-
-                                    b2.HasKey("ValueObjectListVolunteerId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("Volunteers");
-
-                                    b2.ToJson("donate_details_list");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ValueObjectListVolunteerId")
-                                        .HasConstraintName("fk_volunteers_volunteers_value_object_list_volunteer_id");
-                                });
-
-                            b1.Navigation("ObjectList");
-                        });
-
-                    b.OwnsOne("PetFamily.Domain.Shared.ValueObjects.ValueObjectList<PetFamily.Domain.Shared.ValueObjects.SocialNetwork>", "SocialNetworksList", b1 =>
-                        {
-                            b1.Property<Guid>("VolunteerId")
-                                .HasColumnType("uuid");
-
-                            b1.HasKey("VolunteerId");
-
-                            b1.ToTable("Volunteers");
-
-                            b1.ToJson("social_networks_list");
-
-                            b1.WithOwner()
-                                .HasForeignKey("VolunteerId")
-                                .HasConstraintName("fk_volunteers_volunteers_id");
-
-                            b1.OwnsMany("PetFamily.Domain.Shared.ValueObjects.SocialNetwork", "ObjectList", b2 =>
-                                {
-                                    b2.Property<Guid>("ValueObjectListVolunteerId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("__synthesizedOrdinal")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired()
-                                        .HasMaxLength(100)
-                                        .HasColumnType("character varying(100)");
-
-                                    b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasMaxLength(500)
-                                        .HasColumnType("character varying(500)");
-
-                                    b2.HasKey("ValueObjectListVolunteerId", "__synthesizedOrdinal");
-
-                                    b2.ToTable("Volunteers");
-
-                                    b2.ToJson("social_networks_list");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ValueObjectListVolunteerId")
-                                        .HasConstraintName("fk_volunteers_volunteers_value_object_list_volunteer_id");
-                                });
-
-                            b1.Navigation("ObjectList");
-                        });
-
                     b.OwnsOne("PetFamily.Domain.Shared.ValueObjects.Phone", "PhoneNumber", b1 =>
                         {
                             b1.Property<Guid>("VolunteerId")
@@ -493,16 +389,10 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasConstraintName("fk_volunteers_volunteers_id");
                         });
 
-                    b.Navigation("DonateDetailsList")
-                        .IsRequired();
-
                     b.Navigation("FullName")
                         .IsRequired();
 
                     b.Navigation("PhoneNumber")
-                        .IsRequired();
-
-                    b.Navigation("SocialNetworksList")
                         .IsRequired();
                 });
 

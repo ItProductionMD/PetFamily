@@ -27,7 +27,7 @@ public class UpdateRequisitesHandler(
 
             return validateRequisites;
         }
-        var getVolunteer = await _volunteerRepository.GetById(volunteerId, cancellationToken);
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (getVolunteer.IsFailure)
         {
             _logger.LogError("Fail get volunteer with Id:{volunteerId} for update requisites!Errors:{Errors}",
