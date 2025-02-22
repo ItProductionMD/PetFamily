@@ -1,4 +1,5 @@
-﻿using PetFamily.Domain.PetManagment.Root;
+﻿using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
 
@@ -23,4 +24,5 @@ public interface IVolunteerRepository
         Guid volunteerId,
         List<SocialNetworkInfo> socialNetworks,
         CancellationToken cancellation = default);
+    void SetPetStateAdded(Pet pet); 
 }

@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Volunteers;
 using PetFamily.Domain.DomainError;
+using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace PetFamily.Infrastructure.Repositories;
@@ -54,12 +56,12 @@ public class VolunteerRepository : IVolunteerRepository
 
     public async Task Save(Volunteer volunteer, CancellationToken cancellToken = default)
     {
-        var entries = _context.Entry(volunteer);
-        var entries2 = _context.Entry(volunteer.Pets.FirstOrDefault(p=>p.Name == "bruno"));
-        //entries2.State = EntityState.Added;
         await _context.SaveChangesAsync(cancellToken);
     }
-
+    public  void  SetPetStateAdded(Pet pet)
+    {
+       _context.Entry(pet).State = EntityState.Added;
+    }
     public async Task Delete(
         Volunteer volunteer,
         CancellationToken cancellToken = default)

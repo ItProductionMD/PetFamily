@@ -102,6 +102,8 @@ public class AddPetHandler(
             command.HealthInfo,
             address);
 
+        _volunteerRepository.SetPetStateAdded(newPet);
+
         await _volunteerRepository.Save(volunteer, cancellationToken);
 
         var addPetResponse = new AddPetResponse(newPet.Id, newPet.SerialNumber.Value);
