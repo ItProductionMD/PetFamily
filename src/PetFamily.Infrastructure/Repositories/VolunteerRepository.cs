@@ -1,24 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.Volunteers;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
+using Polly;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace PetFamily.Infrastructure.Repositories;
 
-public class VolunteerRepository : IVolunteerRepository
+public class VolunteerRepository(
+    ILogger<VolunteerRepository> logger,
+    AppDbContext context) : IVolunteerRepository
 {
-    private readonly AppDbContext _context;
-
-    public VolunteerRepository(AppDbContext context)
-    {
-        _context = context;
-    }
-
+    private readonly ILogger<VolunteerRepository> _logger = logger;
+    private readonly AppDbContext _context = context;
     public async Task Add(
         Volunteer volunteer,
         CancellationToken cancellationToken = default)
@@ -38,29 +38,30 @@ public class VolunteerRepository : IVolunteerRepository
             v.PhoneNumber.Number == phone.Number).ToListAsync(cancellation);
 
         if (volunteers.Count == 0)
-            return Result.Fail(Error.NotFound("Volunteers"));
+            return Result.Fail(Error.NotFound("Volunteers with souch email or phone"));
 
         return Result.Ok(volunteers);
     }
 
-    public async Task<Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken cancellation = default)
+    public async Task<Volunteer> GetByIdAsync(Guid id, CancellationToken cancelToken = default)
     {
         var volunteer = await _context.Volunteers
             .Include(v => v.Pets)
-            .FirstOrDefaultAsync(v => v.Id == id, cancellation);
-        if (volunteer == null)
-            return Result.Fail(Error.NotFound("Volunteer"));
+            .Include(v => v.Tests)
+            .FirstOrDefaultAsync(v => v.Id == id, cancelToken);
 
-        return Result.Ok(volunteer);
+        if (volunteer == null)
+        {
+            _logger.LogError("Volunteer with id:{id} not found", id);
+            throw new KeyNotFoundException($"Volunteer with id {id} not found");
+        }
+        _logger.LogInformation("Volunteer with id:{id} found", id);
+        return volunteer;
     }
 
     public async Task Save(Volunteer volunteer, CancellationToken cancellToken = default)
     {
         await _context.SaveChangesAsync(cancellToken);
-    }
-    public  void  SetPetStateAdded(Pet pet)
-    {
-       _context.Entry(pet).State = EntityState.Added;
     }
     public async Task Delete(
         Volunteer volunteer,
@@ -82,7 +83,7 @@ public class VolunteerRepository : IVolunteerRepository
         if (socialNetworksValue == null)
             return UnitResult.Fail(Error.NotFound("Volunteer"));
 
-        if(socialNetworksValue == socialNetworks)
+        if (socialNetworksValue == socialNetworks)
             return UnitResult.Ok();
 
         await _context.SaveChangesAsync(cancellation);
@@ -90,4 +91,19 @@ public class VolunteerRepository : IVolunteerRepository
         return UnitResult.Ok();
     }
 
+    public async Task SaveWithRetry(Volunteer volunteer, CancellationToken cancelToken = default)
+    {
+        var retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(
+               3, retryAttempt => TimeSpan.FromMilliseconds(200 * Math.Pow(2, retryAttempt)),
+               onRetry: (exception, timeSpan, retryCount, context) =>
+               {
+                   _logger.LogWarning($"Attempt {retryCount} failed: {exception.Message}, " +
+                       $"retrying in {timeSpan.TotalSeconds}s.");
+               });
+
+        await retryPolicy.ExecuteAsync(async () =>
+        {
+            await Save(volunteer, cancelToken);
+        });
+    }
 }

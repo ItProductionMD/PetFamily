@@ -7,7 +7,7 @@ using static PetFamily.Domain.Shared.Validations.ValidationCodes;
 
 namespace PetFamily.Application.Volunteers.UpdateVolunteer
 {
-    public class UpdateVolunteerRequestValidator : AbstractValidator<UpdateVolunteerRequest>
+    public class UpdateVolunteerRequestValidator : AbstractValidator<UpdateVolunteerCommand>
     {
         public UpdateVolunteerRequestValidator()
         {

@@ -13,64 +13,49 @@ namespace PetFamily.Application.Volunteers.UpdateVolunteer;
 public class UpdateVolunteerHandler(
     IVolunteerRepository volunteerRepository,
     ILogger<UpdateVolunteerHandler> logger,
-    IValidator<UpdateVolunteerRequest> validator)
+    IValidator<UpdateVolunteerCommand> validator)
 {
     private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<UpdateVolunteerHandler> _logger = logger;
-    private readonly IValidator<UpdateVolunteerRequest> _validator = validator;
+    private readonly IValidator<UpdateVolunteerCommand> _validator = validator;
     public async Task<Result<Volunteer>> Handle(
-        UpdateVolunteerRequest request,
-        CancellationToken cancellationToken = default)
+        UpdateVolunteerCommand command,
+        CancellationToken cancelToken = default)
     {
         //--------------------------------------Validation----------------------------------------//
-        var validateResult = await _validator.ValidateAsync(request, cancellationToken);
+        var validateResult = await _validator.ValidateAsync(command, cancelToken);
         if (validateResult.IsValid)
         {
             _logger.LogError(
                 "Fail validate volunteerRequest! Errors: {Errors}",
-                string.Join("; ", validateResult.Errors.Select(e=>e.ErrorMessage)));
+                string.Join("; ", validateResult.Errors.Select(e => e.ErrorMessage)));
 
             return validateResult.ToResultFailure<Volunteer>()!;
         }
         //-------------------------------Creating ValueObjects------------------------------------//
-        var fullName = FullName.Create(request.FirstName, request.LastName).Data!;
+        var fullName = FullName.Create(command.FirstName, command.LastName).Data!;
 
-        var phone = Phone.Create(request.PhoneNumber, request.PhoneRegionCode).Data!;
+        var phone = Phone.Create(command.PhoneNumber, command.PhoneRegionCode).Data!;
 
         //----------------------------Get Volunteer from database--------------------------------//
-        var getVolunteer = await _volunteerRepository
-            .GetByIdAsync(request.VolunteerId, cancellationToken);
+        var volunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
 
-        if (getVolunteer.IsFailure)
-        {
-            _logger.LogError("Volunteer with id:{VolunteerId} not found!Errors:{Errors}",
-                request.VolunteerId, getVolunteer.ConcateErrorMessages());
-
-            return Result<Volunteer>.Fail(getVolunteer.Errors!);
-        }
-        //------------------------------------Update Volunteer------------------------------------//
-        var volunteer = getVolunteer.Data!;
-        var updateResultOk = volunteer.UpdateMainInfo(
-            fullName,
-            request.Email,
-            phone,
-            request.ExperienceYears,
-            request.Description);
+        volunteer.UpdateMainInfo(fullName, command.Email, phone, command.ExperienceYears, command.Description);
 
         //---------------------Verify that the email and phone number are unique------------------//
         var validateUniqueness = await ValidateUniqueEmailAndPhone(
             volunteer,
             _volunteerRepository,
             _logger,
-            cancellationToken);
+            cancelToken);
         if (validateUniqueness.IsFailure)
         {
             _logger.LogWarning("Fail update volunteer with souch email or phone!Errors{Errors}",
-                validateUniqueness.ConcateErrorMessages());
+                validateUniqueness.ToErrorMessages());
 
             return Result.Fail(validateUniqueness.Errors!);
         }
-        await _volunteerRepository.Save(volunteer, cancellationToken);
+        await _volunteerRepository.Save(volunteer, cancelToken);
 
         _logger.LogInformation("Volunteer with id:{Id} updated successfully!", volunteer.Id);
 

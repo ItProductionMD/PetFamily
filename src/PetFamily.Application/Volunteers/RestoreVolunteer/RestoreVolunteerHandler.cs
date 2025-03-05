@@ -9,20 +9,13 @@ IVolunteerRepository volunteerRepository)
 {
     private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<RestoreVolunteerHandler> _logger = logger;
-    public async Task<UnitResult> Handle(Guid volunteerId, CancellationToken cancellationToken)
+    public async Task<UnitResult> Handle(Guid volunteerId, CancellationToken cancelToken)
     {
-        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
-        if (getVolunteer.IsFailure)
-        {
-            _logger.LogError("Fail get volunteer with id {volunteerId} fore restore volunteer!", volunteerId);
-
-            return UnitResult.Fail(getVolunteer.Errors);
-        }
-        var volunteer = getVolunteer.Data!;
-
+        var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancelToken);
+        
         volunteer.Restore();
 
-        await _volunteerRepository.Save(volunteer, cancellationToken);
+        await _volunteerRepository.Save(volunteer, cancelToken);
 
         _logger.LogInformation("Restore volunteer with Id:{Id} successful",volunteerId);
 

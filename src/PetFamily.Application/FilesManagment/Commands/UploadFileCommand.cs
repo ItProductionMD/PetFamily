@@ -2,7 +2,7 @@
 
 namespace PetFamily.Application.FilesManagment.Commands;
 
-public class UploadFileCommand : IFileCommand
+public class UploadFileCommand
 {
     public string OriginalName { get; init; }
     public string StoredName { get; private set; }

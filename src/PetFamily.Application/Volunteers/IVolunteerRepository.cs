@@ -15,8 +15,9 @@ public interface IVolunteerRepository
         CancellationToken cancellation = default);
 
     Task Save(Volunteer volunteer, CancellationToken cancellation = default);
+    Task SaveWithRetry(Volunteer volunteer, CancellationToken cancellation = default);
 
-    Task<Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken cancellation = default);
+    Task<Volunteer> GetByIdAsync(Guid id, CancellationToken cancellation = default);
 
     Task Delete(Volunteer volunteer, CancellationToken cancellation = default);
 
@@ -24,5 +25,4 @@ public interface IVolunteerRepository
         Guid volunteerId,
         List<SocialNetworkInfo> socialNetworks,
         CancellationToken cancellation = default);
-    void SetPetStateAdded(Pet pet); 
 }

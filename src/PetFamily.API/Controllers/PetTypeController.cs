@@ -9,6 +9,7 @@ using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationMessages;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using PetFamily.API.Dtos;
 
 namespace PetFamily.API.Controllers;
 
@@ -32,7 +33,7 @@ public class PetTypeController : ControllerBase
     {
         List<Error> validationErrors = [];
 
-        var addPetType = await handler.Handle(request,cancellationToken);
+        var addPetType = await handler.Handle(request.ToCommand(),cancellationToken);
 
          return addPetType.IsFailure
             ? addPetType.ToErrorActionResult()

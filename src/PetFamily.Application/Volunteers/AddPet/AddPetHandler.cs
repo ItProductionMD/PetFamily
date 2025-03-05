@@ -7,13 +7,13 @@ using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.Dtos;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.Enums;
 using PetSpecies = PetFamily.Domain.PetManagment.Entities.Species;
 using System;
 using System.Reflection.Metadata.Ecma335;
+using PetFamily.Domain.PetManagment.Entities;
 
 
 namespace PetFamily.Application.Volunteers.AddPet;
@@ -28,45 +28,50 @@ public class AddPetHandler(
     private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
 
     public async Task<Result<AddPetResponse>> Handle(
-        Guid volunteerId,
         AddPetCommand command,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancelToken = default)
     {
-        //-------------------------------------Validation-------------------------------------//
-        var validationResult = AddPetCommandValidator.Validate(command);
-        if (validationResult.IsFailure)
+        var validate = AddPetCommandValidator.Validate(command);
+        if (validate.IsFailure)
         {
-            _logger.LogWarning("Validate add pet command errors:{Errors}",
-                validationResult.ConcateErrorMessages());
-
-            return validationResult;
+            _logger.LogWarning("Validate add pet command errors:{Errors}", validate.ToErrorMessages());
+            return validate;
         }
-        //-----------------------------Check if Species and Breed exists----------------------//
-        var checkPetTypeResult = await CheckPetTypeAsync(
-            command.SpeciesId,
-            command.BreedId,
-            cancellationToken);
+        var checkPetType = await CheckPetTypeAsync(command.SpeciesId, command.BreedId, cancelToken);
+        if (checkPetType.IsFailure)
+            return checkPetType;      
+        
+        var volunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
 
-        if (checkPetTypeResult.IsFailure)
+        var newPet = CreatingPetProccess(command, volunteer);
+
+        await _volunteerRepository.Save(volunteer, cancelToken);
+
+        _logger.LogInformation("Pet with id:{petId} was added to volunteer with id:{Id} successful!",
+            newPet.Id, command.VolunteerId);
+
+        return Result.Ok(new AddPetResponse(newPet.Id, newPet.SerialNumber.Value));
+    }
+
+    private async Task<UnitResult> CheckPetTypeAsync(Guid speciesId, Guid breedId, CancellationToken cancelToken)
+    {
+        var species = await _speciesRepository.GetAsync(speciesId, cancelToken);
+        if (species == null)
         {
-            _logger.LogError("Fail check pet type while adding a new pet!Errors:{Errors}",
-                checkPetTypeResult.ConcateErrorMessages());
-
-            return checkPetTypeResult;
+            _logger.LogError("Fail check pet type! Species with id:{Id} not found", speciesId);
+            return Result.Fail(Error.NotFound("Species"));
         }
-        //----------------------------------Get Volunteer-------------------------------------//
-        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
-        if (getVolunteer.IsFailure)
+        if (species.Breeds.Any(b => b.Id == breedId) == false)
         {
-            _logger.LogError("Get volunteer with Id:{volunteerId} errors:{Errors}",
-                volunteerId, getVolunteer.ConcateErrorMessages());
-
-            return Result.Fail(getVolunteer.Errors!);
+            _logger.LogError("Fail check pet type! Breed with id:{Id} not found", breedId);
+            return Result.Fail(Error.NotFound("Breed"));
         }
-        var volunteer = getVolunteer.Data!;
+        return UnitResult.Ok();
+    }
 
+    private Pet CreatingPetProccess(AddPetCommand command, Volunteer volunteer)
+    {
         var address = Address.Create(command.Region, command.City, command.Street, command.HomeNumber).Data!;
-
         var ownerPhone = Phone.Create(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;
 
         HelpStatus? helpStatus = Enum.IsDefined(typeof(HelpStatus), command.HelpStatus)
@@ -75,17 +80,17 @@ public class AddPetHandler(
 
         if (helpStatus == null)
         {
-            _logger.LogError("Help status with value:{HelpStatus} not found!", command.HelpStatus);
-            return Result.Fail(Error.NotFound("HelpStatus"));
+            _logger.LogError("Help status with value:{HelpStatus} not found!" +
+                "Set help status to default!", command.HelpStatus);
+            helpStatus = HelpStatus.ForAdoption;
         }
-
         var requisites = command.Requisites
             .Select(d => RequisitesInfo.Create(d.Name, d.Description).Data!).ToList();
 
         var petType = PetType.Create(
             BreedID.SetValue(command.BreedId), SpeciesID.SetValue(command.SpeciesId)).Data!;
 
-        var newPet = volunteer.CreateAndAddPet(
+        return volunteer.CreateAndAddPet(
             command.PetName,
             command.DateOfBirth,
             command.Description,
@@ -101,38 +106,5 @@ public class AddPetHandler(
             helpStatus.Value,
             command.HealthInfo,
             address);
-
-        _volunteerRepository.SetPetStateAdded(newPet);
-
-        await _volunteerRepository.Save(volunteer, cancellationToken);
-
-        var addPetResponse = new AddPetResponse(newPet.Id, newPet.SerialNumber.Value);
-
-        _logger.LogInformation("Pet with id:{petId} was added to volunteer with id:{Id} successful!",
-            newPet.Id, volunteerId);
-
-        return Result.Ok(addPetResponse);
     }
-    //---------------------------------Private methods--------------------------------------------//
-
-    private async Task<UnitResult> CheckPetTypeAsync(
-        Guid speciesId,
-        Guid breedId,
-        CancellationToken cancellationToken)
-    {
-        var species = await _speciesRepository.GetAsync(speciesId, cancellationToken);
-        if (species == null)
-        {
-            _logger.LogError("Species with id:{speciesId} not found", speciesId);
-            return Result.Fail(Error.NotFound("Species"));
-        }
-        if (species.Breeds.Any(b => b.Id == breedId) == false)
-        {
-            _logger.LogError("Breed with id:{breedId} not found", breedId);
-            return Result.Fail(Error.NotFound("Breed"));
-        }
-
-        return UnitResult.Ok();
-    }
-
 }

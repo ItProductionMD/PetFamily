@@ -3,7 +3,6 @@ using FluentValidation.Results;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
-using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
 
 namespace PetFamily.Application.Validations;
 

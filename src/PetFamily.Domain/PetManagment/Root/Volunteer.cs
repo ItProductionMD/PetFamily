@@ -2,7 +2,6 @@
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.Dtos;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.Enums;
@@ -23,6 +22,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
     public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
     public IReadOnlyList<Pet> Pets => _pets;
+    public List<TestEntityState> Tests { get; set; } = [];
     private List<Pet> _pets { get; set; } = [];
     public bool IsDeleted => _isDeleted;
     private bool _isDeleted;
@@ -31,7 +31,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     private DateTime? _deletedDateTime;
     private Volunteer(Guid id) : base(id) { } //Ef core needs this
 
-    public int PetsForAdoptCount => Pets.Where(p => p.HelpStatus == HelpStatus.ForAdopt).Count();
+    public int PetsForAdoptCount => Pets.Where(p => p.HelpStatus == HelpStatus.ForAdoption).Count();
     public int PetsForHelpCount => Pets.Where(p => p.HelpStatus == HelpStatus.ForHelp).Count();
     public int PetsAdoptedCount => Pets.Where(p => p.HelpStatus == HelpStatus.Adopted).Count();
 
@@ -159,7 +159,10 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
             address,
             serialNumber).Data!;
 
+
         _pets.Add(pet);
+
+        AddTest();
 
         return pet;
     }
@@ -222,5 +225,17 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public void UpdateSocialNetworks(IEnumerable<SocialNetworkInfo> socialNetworks)
     {
         SocialNetworks = socialNetworks.ToList();
+    }
+
+    public void AddTest()
+    {
+        TestEntityState test = new() { Id = Guid.NewGuid(), Name = "TestName" };
+    }
+    public Pet GetPet(Guid petId)
+    {
+        var pet = Pets.FirstOrDefault(p => p.Id == petId);
+        if (pet == null)
+            throw new KeyNotFoundException($"Pet with id {petId} not found");
+        return pet;
     }
 }

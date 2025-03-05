@@ -3,7 +3,7 @@ using PetFamily.Domain.Results;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using PetFamily.Domain.Shared.ValueObjects;
 using Microsoft.Extensions.Logging;
-using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
+using PetFamily.Application.Volunteers.Dtos;
 
 namespace PetFamily.Application.Volunteers.UpdateRequisites;
 
@@ -15,7 +15,7 @@ public class UpdateRequisitesHandler(
     private readonly ILogger<UpdateRequisitesHandler> _logger = logger;
     public async Task<UnitResult> Handle(
         Guid volunteerId,
-        IEnumerable<RequisitesRequest> dtos,
+        IEnumerable<RequisitesDto> dtos,
         CancellationToken cancellationToken = default)
     {
         var validateRequisites = ValidateItems(
@@ -23,19 +23,11 @@ public class UpdateRequisitesHandler(
         if (validateRequisites.IsFailure)
         {
             _logger.LogWarning("Validate Requisites for volunteer failure!Errors:{Errors}",
-                validateRequisites.ConcateErrorMessages());
+                validateRequisites.ToErrorMessages());
 
             return validateRequisites;
         }
-        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
-        if (getVolunteer.IsFailure)
-        {
-            _logger.LogError("Fail get volunteer with Id:{volunteerId} for update requisites!Errors:{Errors}",
-                volunteerId, getVolunteer.ConcateErrorMessages());
-
-            return UnitResult.Fail(getVolunteer.Errors!);
-        }
-        var volunteer = getVolunteer.Data!;
+        var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
 
         var requisites = dtos.Select(c => RequisitesInfo.Create(c.Name, c.Description).Data!);
 

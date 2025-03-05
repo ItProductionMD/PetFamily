@@ -2,7 +2,6 @@
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.Dtos;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.Enums;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
@@ -98,7 +97,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
         return validatePetDomain.IsFailure
             ? validatePetDomain
             : Result.Ok(new Pet(
-                Guid.NewGuid(),
+                Guid.Empty,
                 name,
                 dateOfBirth,
                 description,
@@ -116,7 +115,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
                 address,
                 serialNumber));
     }
-
     public static UnitResult Validate(
         string name,
         DateOnly? dateOfBirth,
@@ -155,27 +153,34 @@ public class Pet : Entity<Guid>, ISoftDeletable
         _isDeleted = false;
         _deletedDateTime = null;
     }
-    public bool UpdateImages(List<string> imagesToDelete, List<string> imagesToAdd)
-    {
-        DeleteImages(imagesToDelete);
-        return AddImages(imagesToAdd) == false ? false : true;
-    }
-
-    public bool AddImages(List<string> imageNames)
+    public List<string> AddImages(List<string> imageNames)
     {
         if (Images.Count + imageNames.Count > MAX_IMAGES_COUNT)
-            return false;
+            return [];
 
         var newImageList = imageNames.Select(i => Image.Create(i).Data!).ToList();
         _images.AddRange(newImageList);
-        return true;
+        return imageNames;
     }
-    public void DeleteImages(List<string> imagesToDelete)
+    public List<string> DeleteImages(List<string> imagesToDelete)
     {
         if (imagesToDelete.Count == 0)
-            return;
+            return [];
 
-        var imagesToDeleteSet = new HashSet<string>(imagesToDelete);
-        _images.RemoveAll(i => imagesToDeleteSet.Contains(i.Name));
+        var imagesToDeleteSet = new HashSet<string>(imagesToDelete); //delete reapeted images
+        var deletedImages = new List<string>();
+
+        _images.RemoveAll(image =>
+        {
+            if (imagesToDeleteSet.Contains(image.Name))
+            {
+                deletedImages.Add(image.Name);
+                return true;
+            }
+            return false;
+        });
+
+        return deletedImages;
     }
 }
+

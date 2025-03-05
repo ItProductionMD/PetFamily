@@ -18,7 +18,7 @@ public abstract class Result
         result.AddErrors(errors!);
         return result;
     }
-    public string ConcateErrorMessages() => string.Join("; ", Errors.Select(e => e.Message));
+    public string ToErrorMessages() => string.Join("; ", Errors.Select(e => e.Message));
     public void SetToFailure()
     {
         IsSuccess = false;

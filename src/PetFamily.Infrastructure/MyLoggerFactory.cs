@@ -12,4 +12,5 @@ public static class MyLoggerFactory
                 category == DbLoggerCategory.Database.Command.Name 
                 && level == LogLevel.Information); 
     });
+
 }

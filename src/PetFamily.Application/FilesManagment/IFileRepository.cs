@@ -1,32 +1,39 @@
 ﻿using PetFamily.Application.FilesManagment.Commands;
+using PetFamily.Application.FilesManagment.Dtos;
 using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.FilesManagment;
 
 public interface IFileRepository
 {
-    public Task<Result<Uri>> GetFileUrlAsync(
-        string folder,
-        string objectName,
-        CancellationToken cancellationToken);
+    public Task<Result<Uri>> GetFileUrlAsync(AppFile file,CancellationToken cancelToken);
 
-    public Task UploadFileAsync(
-       string folder,
-       UploadFileCommand fileCommand,
-       CancellationToken cancellationToken);
+    public Task UploadFileAsync(AppFile file,CancellationToken cancelToken);
 
     public Task<Result<List<string>>> UploadFileListAsync(
-         string folder,
-         List<UploadFileCommand> fileCommands,
-         CancellationToken cancellationToken);
-    public Task DeleteFileAsync(
-       string folder,
-       DeleteFileCommand fileCommand,
-       CancellationToken cancellationToken);
+        List<AppFile> file,
+        CancellationToken cancelToken);
+    public Task DeleteFileAsync(AppFile file,CancellationToken cancelToken);
 
     public Task<Result<List<string>>> DeleteFileListAsync(
-       string folder,
-       List<DeleteFileCommand> fileCommands,
-       CancellationToken cancellationToken);
+       List<AppFile> file,
+       CancellationToken cancelToken);
+
+    public Task SoftDeleteFileAsync(AppFile file, CancellationToken cancelToken);
+
+    public Task<Result<List<string>>> SoftDeleteFileListAsync(
+        List<AppFile> files,
+        CancellationToken cancelToken);
+
+    public Task RestoreFileAsync(AppFile file, CancellationToken cancelToken);
+    public Task RestoreFileWithRetryAsync(AppFile file, CancellationToken cancelToken = default);
+    public Task<Result<List<string>>> RestoreFileListAsync(
+        List<AppFile> files,
+        CancellationToken cancelToken);
+
+    public Task<UnitResult> RollBackFilesAsync(
+        List<AppFile> filesToRestore,
+        List<AppFile> filesToDelete,
+        CancellationToken cancelToken = default);
 }
 

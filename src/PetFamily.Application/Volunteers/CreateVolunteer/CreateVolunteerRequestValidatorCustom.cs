@@ -2,7 +2,6 @@
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using static PetFamily.Application.Volunteers.SharedVolunteerRequests;
 using static PetFamily.Application.Validations.ValidationExtensions;
 
 using PetFamily.Application.Validations;

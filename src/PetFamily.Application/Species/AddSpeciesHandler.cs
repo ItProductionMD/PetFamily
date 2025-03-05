@@ -12,19 +12,19 @@ public class AddSpeciesHandler(ISpeciesRepository repository, ILogger<AddSpecies
     private ILogger<AddSpeciesHandler> _logger = logger;
     private readonly ISpeciesRepository _repository= repository;
     public async Task<Result<PetSpecies>> Handle(
-        AddPetTypeRequest request,
+        AddPetTypeComand command,
         CancellationToken token)
     {
-        var validationResult = AddSpeciesRequestValidator.Validate(request);
+        var validationResult = AddSpeciesRequestValidator.Validate(command);
         if (validationResult.IsFailure)
         {
             _logger.LogWarning("Validate pet type errors: {Errors}",
                 string.Join("; ",validationResult.Errors.Select(e=>e.Message)));
             return validationResult;
         }         
-        var species = PetSpecies.Create(SpeciesID.NewGuid(), request.SpeciesName).Data!;
+        var species = PetSpecies.Create(SpeciesID.NewGuid(), command.SpeciesName).Data!;
 
-        var breeds = request.BreedList
+        var breeds = command.BreedList
             .Select(b => Breed.Create(BreedID.NewGuid(),b.Name, b.Description).Data!).ToList();
 
         species.AddBreeds(breeds);

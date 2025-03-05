@@ -21,7 +21,7 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex,message:"Exception:{Exception}",ex.Message);
+            _logger.LogError(ex,message:"Exception:{Exception}",ex.Message);
 
             var error = Error.InternalServerError(ex.Message);
 

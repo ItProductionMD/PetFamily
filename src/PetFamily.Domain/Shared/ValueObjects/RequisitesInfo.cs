@@ -2,7 +2,6 @@
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using PetFamily.Domain.Results;
 using System.Text.Json.Serialization;
-using PetFamily.Domain.Shared.Dtos;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -48,7 +47,7 @@ public record RequisitesInfo
                 maxLength: MAX_LENGTH_LONG_TEXT,
                 pattern: null));
 
-    public static UnitResult Validate(DonateDetailsDTO dto) => Validate(dto.Name, dto.Description);
+    //public static UnitResult Validate(DonateDetailsDTO dto) => Validate(dto.Name, dto.Description);
 
 
 }

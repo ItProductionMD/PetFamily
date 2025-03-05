@@ -13,8 +13,8 @@ using PetFamily.Infrastructure;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250222144950_Init")]
-    partial class Init
+    [Migration("20250224164903_1135")]
+    partial class _1135
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,7 +87,7 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("health_info");
 
-                    b.Property<double>("Height")
+                    b.Property<double?>("Height")
                         .HasColumnType("double precision")
                         .HasColumnName("height");
 
@@ -120,7 +120,7 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("requisites");
 
-                    b.Property<double>("Weight")
+                    b.Property<double?>("Weight")
                         .HasColumnType("double precision")
                         .HasColumnName("weight");
 
@@ -229,6 +229,26 @@ namespace PetFamily.Infrastructure.Migrations
                     b.ToTable("species", (string)null);
                 });
 
+            modelBuilder.Entity("PetFamily.Domain.PetManagment.Entities.TestEntityState", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("volunteer_id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("volunteer_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_test_entity_state");
+
+                    b.HasIndex("volunteer_id")
+                        .HasDatabaseName("ix_test_entity_state_volunteer_id");
+
+                    b.ToTable("test_entity_state", (string)null);
+                });
+
             modelBuilder.Entity("PetFamily.Domain.PetManagment.Root.Volunteer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -277,13 +297,13 @@ namespace PetFamily.Infrastructure.Migrations
                                 .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("character varying(100)")
-                                .HasColumnName("full_name_first_name");
+                                .HasColumnName("first_name");
 
                             b1.Property<string>("LastName")
                                 .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("character varying(100)")
-                                .HasColumnName("full_name_last_name");
+                                .HasColumnName("last_name");
                         });
 
                     b.ComplexProperty<Dictionary<string, object>>("PhoneNumber", "PetFamily.Domain.PetManagment.Root.Volunteer.PhoneNumber#Phone", b1 =>
@@ -327,6 +347,15 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasConstraintName("fk_pets_volunteers_volunteer_id");
                 });
 
+            modelBuilder.Entity("PetFamily.Domain.PetManagment.Entities.TestEntityState", b =>
+                {
+                    b.HasOne("PetFamily.Domain.PetManagment.Root.Volunteer", null)
+                        .WithMany("Tests")
+                        .HasForeignKey("volunteer_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("fk_test_entity_state_volunteers_volunteer_id");
+                });
+
             modelBuilder.Entity("PetFamily.Domain.PetManagment.Entities.Species", b =>
                 {
                     b.Navigation("Breeds");
@@ -335,6 +364,8 @@ namespace PetFamily.Infrastructure.Migrations
             modelBuilder.Entity("PetFamily.Domain.PetManagment.Root.Volunteer", b =>
                 {
                     b.Navigation("Pets");
+
+                    b.Navigation("Tests");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,21 +9,13 @@ public class DeleteVolunteerHandler(
 {
     private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<DeleteVolunteerHandler> _logger = logger;
-    public async Task<Result<Guid>> Handle(Guid volunteerId, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(Guid volunteerId, CancellationToken cancelToken)
     {
-        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
-        if (getVolunteer.IsFailure)
-        {
-            _logger.LogError("Fail get volunteer with id {Id} for deleting volunteer!Errors:{Errors}",
-                volunteerId,getVolunteer.ConcateErrorMessages());
+        var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancelToken);
+        
+        await _volunteerRepository.Delete(volunteer, cancelToken);
 
-            return Result.Fail(getVolunteer.Errors!);
-        }
-        var volunteer = getVolunteer.Data!;
-
-        await _volunteerRepository.Delete(volunteer, cancellationToken);
-
-        _logger.LogInformation("Harddelete volunteer with id:{Id} successful!",volunteerId);
+        _logger.LogInformation("Hard delete volunteer with id:{Id} successful!",volunteerId);
 
         return Result.Ok(volunteer.Id);
     }

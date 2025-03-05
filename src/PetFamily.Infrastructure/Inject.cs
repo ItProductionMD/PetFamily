@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PetFamily.Application;
 using PetFamily.Application.FilesManagment;
 using PetFamily.Application.Species;
 using PetFamily.Application.Volunteers;
@@ -19,9 +21,12 @@ public static class Inject
         services
             .AddScoped<ISpeciesRepository, SpeciesRepository>()
             .AddScoped<IVolunteerRepository, VolunteerRepository>()
+            .AddScoped<IUnitOfWork, UnitOfWork>()
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddScoped<AppDbContext>()
-            .AddHostedService<CleanupService>()
+            .AddHostedService<DbCleanupService>()
+            //.AddHostedService<MinioCleanupService>()// Disabled because use delete policy 
+            .AddAWSClient(configuration)
             .AddMinio(configuration);
         return services;
     }

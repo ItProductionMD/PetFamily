@@ -17,16 +17,8 @@ public class GetVolunteerHandler(
     private IVolunteerRepository _volunteerRepository = volunteerRepository; 
     public async Task<Result<Volunteer>> Handle(Guid volunteerId, CancellationToken cancelToken)
     {
-        var getVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancelToken);
-        if (getVolunteer.IsFailure)
-        {
-            _logger.LogError("Fail to get volunteer with id {volunteerId}!Errors:{Errors}",
-                volunteerId, getVolunteer.ConcateErrorMessages());
+        var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancelToken);
 
-            return Result.Fail(getVolunteer.Errors!);
-        }
-        _logger.LogInformation("Get volunteer with {volunteerId} succesfully!",volunteerId);
-
-        return Result.Ok(getVolunteer.Data);
+        return Result.Ok(volunteer);
     }
 }

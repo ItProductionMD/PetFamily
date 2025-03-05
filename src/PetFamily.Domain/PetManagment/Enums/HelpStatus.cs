@@ -3,6 +3,6 @@
 public enum HelpStatus
 {
     Adopted,
-    ForAdopt,
+    ForAdoption,
     ForHelp,
 }

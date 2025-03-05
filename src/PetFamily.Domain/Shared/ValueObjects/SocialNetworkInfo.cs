@@ -1,7 +1,6 @@
 ﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.Shared.Dtos;
 using PetFamily.Domain.Results;
 using System.Text.Json.Serialization;
 

@@ -6,24 +6,24 @@ using Microsoft.Extensions.Logging;
 
 namespace PetFamily.Infrastructure.Services.BackgroundServices;
 
-public class CleanupService : BackgroundService
+public class DbCleanupService : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly ILogger<CleanupService> _logger;
+    private readonly ILogger<DbCleanupService> _logger;
     private readonly IConfiguration _configuration;
-    private  int _deleteAfterDays;
-    private  int _timeDelayInHours;
+    private int _deleteAfterDays;
+    private int _timeDelayInHours;
 
-    public CleanupService(    
+    public DbCleanupService(
         IServiceScopeFactory serviceScopeFactory,
-        ILogger<CleanupService> logger,
+        ILogger<DbCleanupService> logger,
         IConfiguration configuration)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
         _configuration = configuration;
-        var cleanupOptions = _configuration.GetSection("CleanupService")
-            ?? throw new ApplicationException("CleanupService configuration wasn't found!");
+        var cleanupOptions = _configuration.GetSection("DbCleanupService")
+            ?? throw new ApplicationException("DbCleanupService configuration wasn't found!");
 
         _deleteAfterDays = cleanupOptions.GetValue<int>("DeleteAfterDays");
 
@@ -42,7 +42,7 @@ public class CleanupService : BackgroundService
         {
             try
             {
-                _logger.LogInformation("Waiting {_timeDelayInHours} hours before next cleanup cycle.", 
+                _logger.LogInformation("Waiting {_timeDelayInHours} hours before next cleanup cycle.",
                     _timeDelayInHours);
                 await Task.Delay(TimeSpan.FromHours(_timeDelayInHours), cancellationToken);
 
@@ -64,9 +64,9 @@ public class CleanupService : BackgroundService
 
             _logger.LogInformation("Starting cleanup task...");
 
-            int deletedCount = await dbContext.Volunteers.Where(v => 
+            int deletedCount = await dbContext.Volunteers.Where(v =>
                 EF.Property<bool>(v, "_isDeleted") == true
-                &&EF.Property<DateTime?>(v, "_deletedDateTime")!.Value
+                && EF.Property<DateTime?>(v, "_deletedDateTime")!.Value
                 <= DateTime.UtcNow.AddDays(-_deleteAfterDays))
             .ExecuteDeleteAsync(cancellationToken);
 

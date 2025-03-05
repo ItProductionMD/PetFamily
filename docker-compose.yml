@@ -32,7 +32,13 @@ services:
      command: server --console-address ":9001" /data
      volumes:
      - pet-family_minio_data:/data
-
+     - pet-family_minio_data:/logs 
+     environment:
+         MINIO_ROOT_USER: minioadmin
+         MINIO_ROOT_PASSWORD: minioadmin
+         MINIO_LOGGER: console 
+         MINIO_LOGGER_HTTP_TRACE: /data/logs/minio-http.log
+      
 volumes:
   pet-family_data:
   pet-family_minio_data:

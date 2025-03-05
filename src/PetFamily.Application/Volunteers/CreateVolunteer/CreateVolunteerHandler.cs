@@ -23,69 +23,62 @@ public class CreateVolunteerHandler(
     private readonly IValidator<CreateVolunteerCommand> _validator = validator;
     private readonly ILogger<CreateVolunteerHandler> _logger = logger;
 
-    public async Task<Result<Guid>> Handle(
-        CreateVolunteerCommand volunteerRequest,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<Guid>> Handle(CreateVolunteerCommand command,CancellationToken cancelToken)
     {
-        //--------------------------------------Fluent Validator----------------------------------//
-        var fluentValidationResult = await _validator.ValidateAsync(
-            volunteerRequest,
-            cancellationToken);
-        if (fluentValidationResult.IsValid == false)
+        var validate = await _validator.ValidateAsync(command, cancelToken);
+        if (validate.IsValid == false)
         {
-            _logger.LogError("Fail validate volunteerRequest!{Errors}",
-                           fluentValidationResult.Errors.Select(e=>e.ErrorMessage));
+            _logger.LogError("Fail validate volunteerRequest!{Errors}",validate.Errors.Select(e=>e.ErrorMessage));
 
-            return fluentValidationResult.ToResultFailure<Guid>();
+            return validate.ToResultFailure<Guid>();
         }
-        //-------------------------------Creating ValueObjects------------------------------------//
-        var fullName = FullName.Create(volunteerRequest.FirstName, volunteerRequest.LastName).Data!;
-
-        var phone = Phone.Create(volunteerRequest.PhoneNumber, volunteerRequest.PhoneRegionCode).Data!;
-
-        var socialNetworkList = volunteerRequest.SocialNetworksList
-            .Select(dto => SocialNetworkInfo.Create(dto.Name, dto.Url).Data!).ToList();
-
-        var requisites = volunteerRequest.Requisites
-           .Select(dto => RequisitesInfo.Create(dto.Name, dto.Description).Data!).ToList();
-
-        var volunteerCreateResult = Volunteer.Create(
-            VolunteerID.NewGuid(),
-            fullName,
-            volunteerRequest.Email,
-            phone,
-            volunteerRequest.ExperienceYears,
-            volunteerRequest.Description,
-            requisites,
-            socialNetworkList);
-
-        if (volunteerCreateResult.IsFailure)
+        var getVolunteer = CreateVolunteerProccess(command);
+        if (getVolunteer.IsFailure)
         {
-            _logger.LogError("Validate volunteer entity failure!{ volunteerCreateResult.Errors}",
-                volunteerCreateResult.ConcateErrorMessages());
-
-            return Result.Fail(volunteerCreateResult.Errors!);
+            _logger.LogError("Validate volunteer failure!{Errors}",getVolunteer.ToErrorMessages());
+            return Result.Fail(getVolunteer.Errors!);
         }
-        var volunteer = volunteerCreateResult.Data!;
-        //---------------------Verify that the email and phone number are unique------------------//
+        var volunteer = getVolunteer.Data!;
+
         var validateUniqueness = await ValidateUniqueEmailAndPhone(
             volunteer,
             _volunteerRepository,
             _logger,
-            cancellationToken);
+            cancelToken);
 
         if (validateUniqueness.IsFailure)
         {
             _logger.LogWarning("Volunteer with souch email or phone is already exists!Errors:{Errors}",
-                validateUniqueness.ConcateErrorMessages());
+                validateUniqueness.ToErrorMessages());
 
             return validateUniqueness;
         }
-        //---------------------------------Add Volunteer to repository----------------------------//
-        await _volunteerRepository.Add(volunteer, cancellationToken);
+        await _volunteerRepository.Add(volunteer, cancelToken);
 
         _logger.LogInformation("Volunteer with id:{volunteer.Id},created sucessfull!", volunteer.Id);
 
         return Result.Ok(volunteer.Id);
+    }
+    private static Result<Volunteer> CreateVolunteerProccess(CreateVolunteerCommand command)
+    {
+        var fullName = FullName.Create(command.FirstName, command.LastName).Data!;
+
+        var phone = Phone.Create(command.PhoneNumber, command.PhoneRegionCode).Data!;
+
+        var socialNetworkList = command.SocialNetworksList
+            .Select(dto => SocialNetworkInfo.Create(dto.Name, dto.Url).Data!).ToList();
+
+        var requisites = command.Requisites
+            .Select(dto => RequisitesInfo.Create(dto.Name, dto.Description).Data!).ToList();
+
+        return Volunteer.Create(
+            VolunteerID.NewGuid(),
+            fullName,
+            command.Email,
+            phone,
+            command.ExperienceYears,
+            command.Description,
+            requisites,
+            socialNetworkList);
     }
 }

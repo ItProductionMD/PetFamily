@@ -13,7 +13,7 @@ namespace PetFamily.Application.Species;
 
 public static class AddSpeciesRequestValidator
 {
-    public static UnitResult Validate(AddPetTypeRequest request)
+    public static UnitResult Validate(AddPetTypeComand request)
     {
         return UnitResult.ValidateCollection(
             () => ValidateItems(request.BreedList, b => Breed.Validate(b.Name, b.Description)),
