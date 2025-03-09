@@ -33,8 +33,11 @@ public class UpdatePetImagesHandler(
 
         var pet = volunteer.GetPet(command.PetId);
 
-        var deletedImages = pet.DeleteImages(command.DeleteCommands.Select(c => c.StoredName).ToList());
-        var addedImages = pet.AddImages(command.UploadCommands.Select(c => c.StoredName).ToList());
+        var imagesToDelete = command.DeleteCommands.Select(c => Image.Create(c.StoredName).Data!).ToList();
+        var deletedImages = pet.DeleteImages(imagesToDelete);
+
+        var imagesToAdd = command.UploadCommands.Select(c => Image.Create(c.StoredName).Data!).ToList();
+        var addedImages = pet.AddImages(imagesToAdd);
 
         List<Error> errors = [];
 
@@ -125,7 +128,8 @@ public class UpdatePetImagesHandler(
         var imagesUploadedToFileServer = uploadResult.Data ?? [];
         if(imagesUploadedToFileServer.Count < imagesAddedToPet.Count)
         {
-            var imagesToDelete = imagesAddedToPet.Except(imagesUploadedToFileServer).ToList();
+            var imageNamesToDelete = imagesAddedToPet.Except(imagesUploadedToFileServer).ToList();
+            var imagesToDelete = imageNamesToDelete.Select(n => Image.Create(n).Data!).ToList();
             pet.DeleteImages(imagesToDelete);
         }
         return FileResponseFactory.CreateUploadResponseList(imagesUploadedToFileServer, uploadCommands);

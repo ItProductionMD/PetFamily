@@ -25,15 +25,17 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public double? Height { get; private set; }
     public string? Color { get; private set; }
     public PetType PetType { get; private set; } //Species and Breed
-    public Phone OwnerPhone { get; private set; }
+    public Phone? OwnerPhone { get; private set; }
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
     public string? HealthInfo { get; private set; }
-    public Address Address { get; private set; }
+    public Address? Address { get; private set; }
     public HelpStatus HelpStatus { get; private set; }
     public IReadOnlyList<Image> Images => _images;
     private readonly List<Image> _images = [];
     private bool _isDeleted;
+    public bool IsDeleted => _isDeleted;
     private DateTime? _deletedDateTime;
+    public DateTime? DeletedDateTime => _deletedDateTime;
     private Pet(Guid id) : base(id) { }//Ef core needs this
 
     private Pet(
@@ -47,12 +49,11 @@ public class Pet : Entity<Guid>, ISoftDeletable
         double? height,
         string? color,
         PetType petType,
-        Phone ownerPhone,
+        Phone? ownerPhone,
         IReadOnlyList<RequisitesInfo> requisites,
-        List<Image> images,
         HelpStatus helpStatus,
         string? healthInfo,
-        Address address,
+        Address? address,
         PetSerialNumber serialNumber) : base(id)
     {
         DateTimeCreated = DateTime.UtcNow;
@@ -70,7 +71,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
         HealthInfo = healthInfo;
         Address = address;
         HelpStatus = helpStatus;
-        _images = images;
         SerialNumber = serialNumber;
     }
 
@@ -84,15 +84,14 @@ public class Pet : Entity<Guid>, ISoftDeletable
         double? height,
         string? color,
         PetType petType,
-        Phone ownerPhone,
+        Phone? ownerPhone,
         IReadOnlyList<RequisitesInfo> requisites,
-        List<Image> images,
         HelpStatus helpStatus,
         string? healthInfo,
-        Address address,
+        Address? address,
         PetSerialNumber serialNumber)
     {
-        var validatePetDomain = Validate(name, dateOfBirth, description, color, ownerPhone, images, healthInfo);
+        var validatePetDomain = Validate(name,description, color, healthInfo);
 
         return validatePetDomain.IsFailure
             ? validatePetDomain
@@ -109,7 +108,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
                 petType,
                 ownerPhone,
                 requisites,
-                images,
                 helpStatus,
                 healthInfo,
                 address,
@@ -117,16 +115,11 @@ public class Pet : Entity<Guid>, ISoftDeletable
     }
     public static UnitResult Validate(
         string name,
-        DateOnly? dateOfBirth,
         string? description,
         string? color,
-        Phone ownerPhone,
-        List<Image> images,
         string? healthInfo)
     {
         return UnitResult.ValidateCollection(
-
-            () => ValidateNumber(images.Count, "Images count", 0, 10),
 
             () => ValidateRequiredField(name, "Pet name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 
@@ -142,7 +135,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
         SerialNumber = serialNumber;
     }
     public PetSerialNumber GetSerialNumber() => SerialNumber;
-
     public void Delete()
     {
         _isDeleted = true;
@@ -153,21 +145,20 @@ public class Pet : Entity<Guid>, ISoftDeletable
         _isDeleted = false;
         _deletedDateTime = null;
     }
-    public List<string> AddImages(List<string> imageNames)
+    public List<string> AddImages(List<Image> images)
     {
-        if (Images.Count + imageNames.Count > MAX_IMAGES_COUNT)
+        if (Images.Count + images.Count > MAX_IMAGES_COUNT)
             return [];
 
-        var newImageList = imageNames.Select(i => Image.Create(i).Data!).ToList();
-        _images.AddRange(newImageList);
-        return imageNames;
+        _images.AddRange(images);
+        return images.Select(i=>i.Name).ToList();
     }
-    public List<string> DeleteImages(List<string> imagesToDelete)
+    public List<string> DeleteImages(List<Image> images)
     {
-        if (imagesToDelete.Count == 0)
+        if (images.Count == 0)
             return [];
 
-        var imagesToDeleteSet = new HashSet<string>(imagesToDelete); //delete reapeted images
+        var imagesToDeleteSet = new HashSet<string>(images.Select(i=>i.Name)); //delete reapeted images
         var deletedImages = new List<string>();
 
         _images.RemoveAll(image =>
@@ -182,5 +173,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
 
         return deletedImages;
     }
+
+   
 }
 

@@ -22,6 +22,7 @@ using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Application.Volunteers.ChangePetPosition;
 using PetFamily.API.Common.Utilities;
 using PetFamily.Application.Volunteers.Dtos;
+using PetFamily.Application.Volunteers.GetVolunteers;
 
 namespace PetFamily.API.Controllers;
 
@@ -321,6 +322,20 @@ public class VolunteerController(
         return result.IsFailure
             ? result.ToErrorActionResult()
             : result.ToEnvelope();
+    }
+
+    [HttpGet("list/{page:int}")]
+    public async Task<ActionResult<Envelope>> GetVolunteerListWithPagination(
+        [FromRoute]int page,
+        [FromServices] GetVolunteersHandler handler,
+        CancellationToken cancelToken)
+    {
+        var command = new GetVolunteersCommand(page, 20);
+        var response = await handler.Handle(command, cancelToken);
+
+        return response.IsFailure
+            ? response.ToErrorActionResult()
+            : response.ToEnvelope();
     }
 }
 

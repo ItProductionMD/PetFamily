@@ -4,6 +4,7 @@ using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.DomainError;
 
 namespace PetFamily.Domain.PetManagment.Entities
 {
@@ -11,7 +12,7 @@ namespace PetFamily.Domain.PetManagment.Entities
     {
         public string Name { get; private set; }
 
-        private readonly List<Breed> _breeds = [];
+        private List<Breed> _breeds = [];
         public IReadOnlyList<Breed> Breeds => _breeds;
 
         private Species(Guid id) : base(id) { }//Ef core needs this
@@ -42,5 +43,17 @@ namespace PetFamily.Domain.PetManagment.Entities
             _breeds.AddRange(breeds);
         }
 
+        public UnitResult DeleteBreedsById(List<Guid> breedIdsToDelete)
+        {
+            var removedItemsCount = _breeds.RemoveAll(b => breedIdsToDelete.Contains(b.Id));
+            if (removedItemsCount != breedIdsToDelete.Count)
+                return UnitResult.Fail(Error.Custom(
+                    "delete.breeds.error",
+                    "Delete breeds error!Some breeds with souch ids dont exist!",
+                    ErrorType.NotFound,
+                    "BreedId"));
+
+            return UnitResult.Ok();
+        }
     }
 }

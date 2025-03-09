@@ -1,4 +1,6 @@
-﻿using PetFamily.Domain.PetManagment.Entities;
+﻿using PetFamily.Application.Volunteers.Dtos;
+using PetFamily.Application.Volunteers.GetVolunteers;
+using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
@@ -25,4 +27,9 @@ public interface IVolunteerRepository
         Guid volunteerId,
         List<SocialNetworkInfo> socialNetworks,
         CancellationToken cancellation = default);
+
+    Task<GetVolunteersResponse> GetVolunteersAsync(
+        int PageNumber,
+        int maxItemsOnPage,
+        CancellationToken cancelToken = default);
 }

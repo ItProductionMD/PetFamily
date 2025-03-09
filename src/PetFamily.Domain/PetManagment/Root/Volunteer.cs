@@ -22,7 +22,6 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
     public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
     public IReadOnlyList<Pet> Pets => _pets;
-    public List<TestEntityState> Tests { get; set; } = [];
     private List<Pet> _pets { get; set; } = [];
     public bool IsDeleted => _isDeleted;
     private bool _isDeleted;
@@ -134,7 +133,6 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         PetType petType,
         Phone ownerPhone,
         IReadOnlyList<RequisitesInfo> requisites,
-        List<Image> images,
         HelpStatus helpStatus,
         string? healthInfo,
         Address address)
@@ -153,17 +151,12 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
             petType,
             ownerPhone,
             requisites,
-            images,
             helpStatus,
             healthInfo,
             address,
             serialNumber).Data!;
 
-
         _pets.Add(pet);
-
-        AddTest();
-
         return pet;
     }
     //--------------------------------------Remove Pet--------------------------------------------//
@@ -225,11 +218,6 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public void UpdateSocialNetworks(IEnumerable<SocialNetworkInfo> socialNetworks)
     {
         SocialNetworks = socialNetworks.ToList();
-    }
-
-    public void AddTest()
-    {
-        TestEntityState test = new() { Id = Guid.NewGuid(), Name = "TestName" };
     }
     public Pet GetPet(Guid petId)
     {

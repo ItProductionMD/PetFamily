@@ -1,12 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Volunteers;
+using PetFamily.Application.Volunteers.Dtos;
+using PetFamily.Application.Volunteers.GetVolunteers;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
 using Polly;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -47,7 +51,6 @@ public class VolunteerRepository(
     {
         var volunteer = await _context.Volunteers
             .Include(v => v.Pets)
-            .Include(v => v.Tests)
             .FirstOrDefaultAsync(v => v.Id == id, cancelToken);
 
         if (volunteer == null)
@@ -105,5 +108,35 @@ public class VolunteerRepository(
         {
             await Save(volunteer, cancelToken);
         });
+    }
+
+    public async Task<GetVolunteersResponse> GetVolunteersAsync(
+        int PageNumber,
+        int maxItemsOnPage,
+        CancellationToken cancelToken)
+    {
+        var query = _context.Volunteers.AsNoTracking();
+
+        var countVolunteers = await query.CountAsync(cancelToken);
+
+        var volunteers = await query
+            .OrderBy(v => v.Id)
+            .Skip((PageNumber - 1) * maxItemsOnPage)
+            .Take(maxItemsOnPage)
+            .Select(v => new VolunteerDto(
+                v.Id,
+                v.FullName.FirstName,
+                v.FullName.LastName,
+                v.Email,
+                v.Description ?? "",
+                v.PhoneNumber.RegionCode,
+                v.PhoneNumber.Number,
+                v.ExperienceYears,
+                v.Requisites,
+                v.SocialNetworks,
+                v.PetsForAdoptCount))
+            .ToListAsync(cancelToken);
+
+        return new(countVolunteers,volunteers);
     }
 }

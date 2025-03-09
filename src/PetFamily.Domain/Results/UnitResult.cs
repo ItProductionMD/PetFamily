@@ -20,7 +20,9 @@ public class UnitResult : Result
             if (result.IsFailure && result.Errors != null)
                 errors.AddRange(result.Errors);
         }
-        return errors.Count > 0 ? Fail(errors!) : Ok();
+        return errors.Count > 0 
+            ? Fail(errors) 
+            : Ok();
     }
     public  Result<T> WithData<T>(T data)
     {

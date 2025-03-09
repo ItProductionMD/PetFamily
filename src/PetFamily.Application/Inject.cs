@@ -9,6 +9,7 @@ using PetFamily.Application.Volunteers.ChangePetPosition;
 using PetFamily.Application.Volunteers.CreateVolunteer;
 using PetFamily.Application.Volunteers.DeleteVolunteer;
 using PetFamily.Application.Volunteers.GetVolunteer;
+using PetFamily.Application.Volunteers.GetVolunteers;
 using PetFamily.Application.Volunteers.RestoreVolunteer;
 using PetFamily.Application.Volunteers.UpdatePetImages;
 using PetFamily.Application.Volunteers.UpdateRequisites;
@@ -36,6 +37,7 @@ public static class Inject
         services.AddScoped<AddSpeciesHandler>();
         services.AddScoped<UpdatePetImagesHandler>();
         services.AddScoped<ChangePetPositionHandler>();
+        services.AddScoped<GetVolunteersHandler>();
         services.Configure<FileValidatorOptions>(configuration.GetSection("FileValidatorOptions"));
         services.Configure<FileFolders>(configuration.GetSection("FileFolders"));
         

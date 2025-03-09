@@ -24,7 +24,7 @@ public record Image
     }
     public static UnitResult Validate(string name)
     {
-        var validationResult = ValidateRequiredField(name, "Image Name",MAX_LENGTH_MEDIUM_TEXT);
+        var validationResult = ValidateRequiredField(name, "Image Name",MAX_LENGTH_SHORT_TEXT);
         return validationResult;
     }
 }

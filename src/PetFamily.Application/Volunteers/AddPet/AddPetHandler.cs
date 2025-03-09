@@ -102,7 +102,6 @@ public class AddPetHandler(
             petType,
             ownerPhone,
             requisites,
-            [],
             helpStatus.Value,
             command.HealthInfo,
             address);
