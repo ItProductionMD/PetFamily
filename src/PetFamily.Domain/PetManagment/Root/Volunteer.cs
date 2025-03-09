@@ -189,7 +189,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
             pet.Restore();
     }
     //------------------------------------Update Main Info----------------------------------------//
-    public bool UpdateMainInfo(
+    public UnitResult UpdateMainInfo(
         FullName fullName,
         string email,
         Phone phoneNumber,
@@ -199,7 +199,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     {
         var validationResult = Validate(fullName, email, phoneNumber, experienceYears, description);
         if (validationResult.IsFailure)
-            return false;
+            return validationResult;
 
         FullName = fullName;
         Email = email;
@@ -207,7 +207,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         ExperienceYears = experienceYears;
         Description = description;
 
-        return true;
+        return UnitResult.Ok();
     }
     //------------------------------------Update Requisites---------------------------------------//
     public void UpdateRequisites(IEnumerable<RequisitesInfo> requisites)
