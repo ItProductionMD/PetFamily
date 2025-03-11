@@ -28,8 +28,7 @@ public class CreateVolunteerHandler(
         var validate = await _validator.ValidateAsync(command, cancelToken);
         if (validate.IsValid == false)
         {
-            _logger.LogError("Fail validate volunteerRequest!{Errors}",validate.Errors.Select(e=>e.ErrorMessage));
-
+            _logger.LogError("Fail validate volunteer command!{Errors}",validate.Errors.Select(e=>e.ErrorMessage));
             return validate.ToResultFailure<Guid>();
         }
         var getVolunteer = CreateVolunteerProccess(command);
@@ -63,7 +62,7 @@ public class CreateVolunteerHandler(
     {
         var fullName = FullName.Create(command.FirstName, command.LastName).Data!;
 
-        var phone = Phone.Create(command.PhoneNumber, command.PhoneRegionCode).Data!;
+        var phone = Phone.CreateNotEmpty(command.PhoneNumber, command.PhoneRegionCode).Data!;
 
         var socialNetworkList = command.SocialNetworksList
             .Select(dto => SocialNetworkInfo.Create(dto.Name, dto.Url).Data!).ToList();

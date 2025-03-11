@@ -5,7 +5,7 @@ namespace PetFamily.API.Dtos;
 
 public record AddPetRequest(
    string PetName,
-   DateOnly DateOfBirth,
+   DateOnly? DateOfBirth,
    string Description,
    bool IsVaccinated,
    bool IsSterilized,
@@ -26,7 +26,7 @@ public record AddPetRequest(
 {
     public AddPetCommand ToCommand(Guid volunteerId) =>
         new AddPetCommand(
-           Guid.NewGuid(),
+           volunteerId,
            PetName,
            DateOfBirth,
            Description,
@@ -45,6 +45,5 @@ public record AddPetRequest(
            Region,
            Street,
            HomeNumber,
-           DonateDetails);
-    
+           DonateDetails);   
 }   

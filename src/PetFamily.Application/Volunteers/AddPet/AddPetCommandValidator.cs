@@ -20,8 +20,9 @@ public static class AddPetCommandValidator
     public static UnitResult Validate(AddPetCommand command)
     {
         return UnitResult.ValidateCollection(
+            ()=> ValidateIfGuidIsNotEpmty(command.VolunteerId,"Volunteer id"),
 
-            () => ValidateRequiredField(command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT),
+            () => ValidateRequiredField(command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
 
             () => ValidateNonRequiredField(
                 command.Description, "Pet description", MAX_LENGTH_LONG_TEXT),
@@ -30,23 +31,23 @@ public static class AddPetCommandValidator
 
             () => ValidateNumber(command.Height, "Pet height", 0, 500),
 
-            () => ValidateNonRequiredField(command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT),
+            () => ValidateNonRequiredField(command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
 
-            () => Phone.Validate(command.OwnerPhoneNumber, command.OwnerPhoneRegion),
+            () => Phone.ValidateNonRequired(command.OwnerPhoneNumber, command.OwnerPhoneRegion),
 
             () => ValidateNonRequiredField(
                 command.HealthInfo, "Pet info about health", MAX_LENGTH_LONG_TEXT),
 
             () => ValidateNumber(
-                command.HelpStatus, "Pet HelpStatus", 0, Enum.GetValues(typeof(HelpStatus)).Length),
+                command.HelpStatus, "Pet HelpStatus", 0, Enum.GetValues<HelpStatus>().Length),
 
-            () => Address.Validate(
+            () => Address.ValidateNonRequired(
                 command.Region, command.City, command.Street, command.HomeNumber),
 
             () => ValidateItems(
                 command.Requisites, r => RequisitesInfo.Validate(r.Name, r.Description)),
 
             () => PetType.Validate(
-                BreedID.SetValue(command.BreedId), SpeciesID.SetValue(Guid.NewGuid())));
+                BreedID.SetValue(command.BreedId), SpeciesID.SetValue(command.SpeciesId)));
     }
 }

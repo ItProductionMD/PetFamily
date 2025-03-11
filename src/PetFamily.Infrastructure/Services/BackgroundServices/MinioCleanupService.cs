@@ -13,77 +13,64 @@ using PetFamily.Application.FilesManagment;
 using PetFamily.Infrastructure.Services.MinioService;
 using Minio.DataModel.Args;
 using PetFamily.Application.FilesManagment.Dtos;
+using System.Collections;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PetFamily.Infrastructure.Services.BackgroundServices;
 
 public class MinioCleanupService(
-    IOptions<MinioOptions> minioOptions,
-    IOptions<FileFolders> fileFoders,
-    IMinioClient client,
-    ILogger<MinioCleanupService> logger) : BackgroundService
+    ILogger<MinioCleanupService> logger,
+    FilesProcessingQueue filesProcessingQueue,
+    IServiceScopeFactory scopeFactory) : BackgroundService
 {
     private readonly ILogger<MinioCleanupService> _logger = logger;
-    private readonly IMinioClient _minioClient = client;
-    private readonly MinioOptions _mionioOptions = minioOptions.Value;
-    private readonly FileFolders _fileFolders = fileFoders.Value;
-    private string deletionBucket => _fileFolders.PendingDeletion;
-    private readonly TimeSpan _fileLifetime = TimeSpan.FromMinutes(10);
-    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(24*60); 
-
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly FilesProcessingQueue _filesQueue = filesProcessingQueue;
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        await foreach (var fileList in _filesQueue.DeleteChannel.Reader.ReadAllAsync(stoppingToken))
         {
-            try
-            {
-                _logger.LogInformation("Minio Background Cleanup Service started!");
-                await CleanupOldFilesAsync();
-                _logger.LogInformation("Minio Background Cleanup Service ended!");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Minio Background Cleanup Service error!");
-            }
-            await Task.Delay(_checkInterval, stoppingToken); 
+            _logger.LogInformation("Minio Background Cleanup Service started!");
+
+            await CleanupOldFilesAsync(fileList,stoppingToken);
+
+            _logger.LogInformation("Minio Background Cleanup Service ended!");
         }
+
     }
 
-    private async Task CleanupOldFilesAsync()
-    {     
-        bool bucketExists = await _minioClient.BucketExistsAsync(
-            new BucketExistsArgs().WithBucket(deletionBucket));
-        if (bucketExists == false)      
+    private async Task CleanupOldFilesAsync(List<AppFile> fileList,CancellationToken stoppingToken)
+    {
+        if (stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogWarning("Minio Background Cleanup Service is stopping.");
             return;
+        }
 
-        var now = DateTime.UtcNow;
-        List<string> filesToDelete = new();
+        using var scope = _scopeFactory.CreateScope();
+        var fileService = scope.ServiceProvider.GetRequiredService<IFileRepository>();
 
-        var listObjectsArgs = new ListObjectsArgs()
-            .WithBucket(deletionBucket)
-            .WithRecursive(true);
-        IAsyncEnumerable<Item> items = _minioClient.ListObjectsEnumAsync(listObjectsArgs);
-
-        await foreach (var item in items)
+        var result = await fileService.SoftDeleteFileListAsync(fileList, stoppingToken);
+        if (result.IsFailure)
         {
-            var lastModifiedUtc = item.LastModifiedDateTime!.Value.ToUniversalTime();
-            if (now - lastModifiedUtc > _fileLifetime)
+            if (result.Data != null && result.Data.Count != 0)
             {
-                filesToDelete.Add(item.Key);
+                var undeletedFiles = fileList
+                    .Select(f => f.Name)
+                    .Except(result.Data).ToList();
+
+                string names = string.Join(";", result.Data);
+
+                _logger.LogCritical("UndeletedFiles:{fileNames}", names);
             }
+            _logger.LogCritical("MinioBackgroundCleanup service error!Errors:{error}"
+                , result.ToErrorMessages());
         }
-
-        foreach (var file in filesToDelete)
+        else
         {
-            var removeObjectArgs = new RemoveObjectArgs()
-                .WithBucket(deletionBucket)
-                .WithObject(file);
-
-            await _minioClient.RemoveObjectAsync(removeObjectArgs);
-
-            _logger.LogInformation("Deleted File {file}",file);
+            string names = string.Join(";", fileList.Select(f=>f.Name));
+            _logger.LogInformation("Minio Background Cleanup Service removed files:{names}", names);
         }
-
-        _logger.LogInformation("Minio Background Cleanup service deleted: {Count} files",filesToDelete.Count);
     }
 }
 

@@ -12,7 +12,7 @@ namespace PetFamily.Application.Volunteers.AddPet
     public record AddPetCommand(
        Guid VolunteerId,
        string PetName,
-       DateOnly DateOfBirth,
+       DateOnly? DateOfBirth,
        string Description,
        bool IsVaccinated,
        bool IsSterilized,

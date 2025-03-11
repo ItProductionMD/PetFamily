@@ -18,7 +18,7 @@ public record Address
     public string Number { get; }
 
     private Address() { }//EF core need this
-
+   
     private Address(string region, string city, string street, string number)
     {
         Region = region;
@@ -26,13 +26,13 @@ public record Address
         Street = street;
         Number = number;
     }
-
-    public static Result<Address> Create(string? region, string? city, string? street, string? number)
+    public static Address CreateEmpty() => new Address("","","","");
+    public static Result<Address> CreatePossibleEmpty(string? region, string? city, string? street, string? number)
     {
         if (IsAdressEmpty(region, city, street, number))
-            return UnitResult.Ok();
+            return Result.Ok(CreateEmpty());
  
-        var validationResult = Validate(region, city, street, number);
+        var validationResult = ValidateNonRequired(region, city, street, number);
 
         if (validationResult.IsFailure)
             return validationResult;
@@ -40,7 +40,7 @@ public record Address
         return Result.Ok(new Address(region!, city!, street!, number!));
     }
 
-    public static UnitResult Validate(string? region, string? city, string? street, string? number)
+    public static UnitResult ValidateNonRequired(string? region, string? city, string? street, string? number)
     {
         if (IsAdressEmpty(region, city, street, number))
             return UnitResult.Ok();

@@ -40,7 +40,7 @@ public class MinioFilesHandler
 
         await Task.WhenAll(tasks);
 
-        if (errors.Count > 0)
+        if (errors.IsEmpty == false)
             return Result
                 .Fail(errors.ToList())
                 .WithData(handledFiles.ToList());

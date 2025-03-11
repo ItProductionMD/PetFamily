@@ -25,10 +25,10 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public double? Height { get; private set; }
     public string? Color { get; private set; }
     public PetType PetType { get; private set; } //Species and Breed
-    public Phone? OwnerPhone { get; private set; }
+    public Phone OwnerPhone { get; private set; }
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
     public string? HealthInfo { get; private set; }
-    public Address? Address { get; private set; }
+    public Address Address { get; private set; }
     public HelpStatus HelpStatus { get; private set; }
     public IReadOnlyList<Image> Images => _images;
     private readonly List<Image> _images = [];
@@ -49,11 +49,11 @@ public class Pet : Entity<Guid>, ISoftDeletable
         double? height,
         string? color,
         PetType petType,
-        Phone? ownerPhone,
+        Phone ownerPhone,
         IReadOnlyList<RequisitesInfo> requisites,
         HelpStatus helpStatus,
         string? healthInfo,
-        Address? address,
+        Address address,
         PetSerialNumber serialNumber) : base(id)
     {
         DateTimeCreated = DateTime.UtcNow;
@@ -92,7 +92,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
         PetSerialNumber serialNumber)
     {
         var validatePetDomain = Validate(name,description, color, healthInfo);
-
         return validatePetDomain.IsFailure
             ? validatePetDomain
             : Result.Ok(new Pet(
@@ -106,11 +105,11 @@ public class Pet : Entity<Guid>, ISoftDeletable
                 height,
                 color,
                 petType,
-                ownerPhone,
+                ownerPhone??Phone.CreateEmpty(),
                 requisites,
                 helpStatus,
                 healthInfo,
-                address,
+                address?? Address.CreateEmpty(),
                 serialNumber));
     }
     public static UnitResult Validate(

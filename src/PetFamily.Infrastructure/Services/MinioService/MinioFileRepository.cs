@@ -144,10 +144,11 @@ public class MinioFileRepository(
                 file.Folder, file.Name);
             throw new InvalidOperationException($"Bucket '{file.Folder}' does not exist.");
         }
+        //DELETE ALL VERSIONS of FILE FOR HARD DELETE
         var removeArgs = new RemoveObjectArgs().WithBucket(file.Folder).WithObject(file.Name);
 
         await _client.RemoveObjectAsync(removeArgs, cancelToken);
-
+       
         _logger.LogInformation(
             "Deleted file {ObjectName} from MinIO bucket {BucketName}", file.Name, file.Folder);
     }
@@ -190,11 +191,11 @@ public class MinioFileRepository(
                 file.Folder, file.Name);
             throw new InvalidOperationException($"Bucket '{file.Folder}' does not exist.");
         }
-        var deleteMarkerArgs = new RemoveObjectArgs()
+        var removeArgs = new RemoveObjectArgs()
             .WithBucket(file.Folder)
             .WithObject(file.Name);
 
-        await _client.RemoveObjectAsync(deleteMarkerArgs, cancelToken);
+        await _client.RemoveObjectAsync(removeArgs, cancelToken);
 
         _logger.LogInformation("File '{Name}' in bucket '{Folder}' has been marked as deleted",
             file.Name, file.Folder);

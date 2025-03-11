@@ -35,7 +35,7 @@ public class UpdateVolunteerHandler(
         //-------------------------------Creating ValueObjects------------------------------------//
         var fullName = FullName.Create(command.FirstName, command.LastName).Data!;
 
-        var phone = Phone.Create(command.PhoneNumber, command.PhoneRegionCode).Data!;
+        var phone = Phone.CreateNotEmpty(command.PhoneNumber, command.PhoneRegionCode).Data!;
 
         //----------------------------Get Volunteer from database--------------------------------//
         var volunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);

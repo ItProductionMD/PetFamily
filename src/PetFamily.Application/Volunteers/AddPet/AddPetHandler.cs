@@ -43,7 +43,7 @@ public class AddPetHandler(
         
         var volunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
 
-        var newPet = CreatingPetProccess(command, volunteer);
+        var newPet = CreatingPetProcess(command, volunteer);
 
         await _volunteerRepository.Save(volunteer, cancelToken);
 
@@ -69,21 +69,13 @@ public class AddPetHandler(
         return UnitResult.Ok();
     }
 
-    private Pet CreatingPetProccess(AddPetCommand command, Volunteer volunteer)
+    private Pet CreatingPetProcess(AddPetCommand command, Volunteer volunteer)
     {
-        var address = Address.Create(command.Region, command.City, command.Street, command.HomeNumber).Data!;
-        var ownerPhone = Phone.Create(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;
+        var address = Address.CreatePossibleEmpty(command.Region, command.City, command.Street, command.HomeNumber).Data!;
+        var ownerPhone = Phone.CreatePossibbleEmpty(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;
 
-        HelpStatus? helpStatus = Enum.IsDefined(typeof(HelpStatus), command.HelpStatus)
-            ? (HelpStatus)command.HelpStatus
-            : null;
-
-        if (helpStatus == null)
-        {
-            _logger.LogError("Help status with value:{HelpStatus} not found!" +
-                "Set help status to default!", command.HelpStatus);
-            helpStatus = HelpStatus.ForAdoption;
-        }
+        var helpStatus = (HelpStatus)command.HelpStatus;
+        
         var requisites = command.Requisites
             .Select(d => RequisitesInfo.Create(d.Name, d.Description).Data!).ToList();
 
@@ -102,7 +94,7 @@ public class AddPetHandler(
             petType,
             ownerPhone,
             requisites,
-            helpStatus.Value,
+            helpStatus,
             command.HealthInfo,
             address);
     }

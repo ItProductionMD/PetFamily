@@ -38,6 +38,7 @@ public static class Inject
         services.AddScoped<UpdatePetImagesHandler>();
         services.AddScoped<ChangePetPositionHandler>();
         services.AddScoped<GetVolunteersHandler>();
+        services.AddSingleton<FilesProcessingQueue>();
         services.Configure<FileValidatorOptions>(configuration.GetSection("FileValidatorOptions"));
         services.Configure<FileFolders>(configuration.GetSection("FileFolders"));
         

@@ -96,11 +96,11 @@ public class VolunteerTests
             null,
             null,
             PetType.Create(BreedID.NewGuid(),SpeciesID.NewGuid()).Data!,
-            Phone.Create("67777745222","+373").Data!,
+            Phone.CreateNotEmpty("67777745222","+373").Data!,
             [],
             HelpStatus.ForHelp,
             null,
-            Address.Create("","Florence","Barca","11A").Data!);
+            Address.CreatePossibleEmpty("","Florence","Barca","11A").Data!);
 
         //ASSERT
         Assert.NotNull(pet);
@@ -130,7 +130,7 @@ public class VolunteerTests
         var validationResult = Volunteer.Validate(
             FullName.Create(FirstName, LastName).Data,
             email,
-            Phone.Create(phoneNumber, phoneRegionCode).Data,
+            Phone.CreateNotEmpty(phoneNumber, phoneRegionCode).Data,
             experienceYears,
             description);
 
@@ -174,7 +174,7 @@ public class VolunteerTests
         var validationResult = Volunteer.Validate(
             FullName.Create(FirstName, LastName).Data,
             email,
-            Phone.Create(phoneNumber, phoneRegionCode).Data,
+            Phone.CreateNotEmpty(phoneNumber, phoneRegionCode).Data,
             experienceYears,
             description);
 
@@ -222,7 +222,7 @@ public class VolunteerTests
         //ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(10);
         var newFullName = FullName.Create(FirstName,LastName).Data!;
-        var phone = Phone.Create(PhoneNumber, RegionCode).Data!;
+        var phone = Phone.CreateNotEmpty(PhoneNumber, RegionCode).Data!;
         //ACT
         var updateResult = volunteer.UpdateMainInfo(newFullName,email, phone, experienceYears, description);
         //ASSERT
@@ -250,7 +250,7 @@ public class VolunteerTests
         //ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(10);
         var newFullName = FullName.Create(FirstName, LastName).Data!;
-        var phone = Phone.Create(PhoneNumber, RegionCode).Data!;
+        var phone = Phone.CreateNotEmpty(PhoneNumber, RegionCode).Data!;
         //ACT
         var updateResult = volunteer.UpdateMainInfo(newFullName, email, phone, experienceYears, description);
         //ASSERT

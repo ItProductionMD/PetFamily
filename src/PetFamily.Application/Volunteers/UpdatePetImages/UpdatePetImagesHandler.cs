@@ -19,12 +19,14 @@ public class UpdatePetImagesHandler(
     IFileRepository fileRepository,
     IVolunteerRepository volunteerRepository,
     ILogger<UpdatePetImagesHandler> logger,
-    IOptions<FileFolders> fileFolders)
+    IOptions<FileFolders> fileFolders,
+    FilesProcessingQueue filesProcessingQueue)
 {
     private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
     private readonly IFileRepository _fileRepository = fileRepository;
     private readonly ILogger<UpdatePetImagesHandler> _logger = logger;
     private readonly FileFolders _fileFolders = fileFolders.Value;
+    private readonly FilesProcessingQueue _filesProcessingQueue = filesProcessingQueue;
     public async Task<Result<UpdateFilesResponse>> Handle(
         UpdatePetImagesCommand command,
         CancellationToken cancelToken)
@@ -56,7 +58,15 @@ public class UpdatePetImagesHandler(
 
         try
         {
+            //throw new ApplicationException("Test exception");
             await _volunteerRepository.SaveWithRetry(volunteer, cancelToken);
+
+            var response = new UpdateFilesResponse(deletedFilesResponse, uploadedFilesResponse);
+
+            if (uploadedFilesResponse.Any(r => r.IsUploaded) || deletedFilesResponse.Any(r => r.IsDeleted))
+                return Result.Ok(response);
+
+            return Result.Fail(errors);
         }
         catch (Exception ex)
         {
@@ -68,17 +78,14 @@ public class UpdatePetImagesHandler(
             var filesToDelete = uploadedFilesResponse.Select(r => 
                 new AppFile(r.StoredName, _fileFolders.Images)).ToList();
 
-            _ = Task.Run(() =>
-                _fileRepository.RollBackFilesAsync(filesToRestore, filesToDelete, cancelToken));
+            await _fileRepository.RestoreFileListAsync(filesToRestore,CancellationToken.None);
+
+            await _filesProcessingQueue.DeleteChannel.Writer
+                .WriteAsync(filesToDelete,CancellationToken.None);
 
             return Result.Fail(Error.Exception(ex));
         }
-        var response = new UpdateFilesResponse(deletedFilesResponse, uploadedFilesResponse);
-
-        if (uploadedFilesResponse.Any(r => r.IsUploaded) || deletedFilesResponse.Any(r => r.IsDeleted))
-            return Result.Ok(response);
-
-        return Result.Fail(errors);
+        
     }
 
     private async Task<List<FileDeleteResponse>> FileDeleteResponses(

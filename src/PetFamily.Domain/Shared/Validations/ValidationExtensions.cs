@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using PetFamily.Domain.Results;
 using static PetFamily.Domain.DomainError.Error;
 using PetFamily.Domain.DomainError;
+using System.Globalization;
 
 namespace PetFamily.Domain.Shared.Validations;
 
@@ -36,7 +37,7 @@ public static class ValidationExtensions
     {
         return string.IsNullOrWhiteSpace(valueToValidate)
             ? UnitResult.Ok()
-            : ValidateRequiredField(valueToValidate, valueName, maxLength, pattern);     
+            : ValidateRequiredField(valueToValidate, valueName, maxLength, pattern);
     }
 
     public static UnitResult ValidateRequiredObject<T>(T? objToValidate, string valueName) =>
@@ -61,6 +62,12 @@ public static class ValidationExtensions
             return UnitResult.Fail(InvalidFormat(valueName));
 
         return UnitResult.Ok();
+    }
+    public static UnitResult ValidateIfGuidIsNotEpmty(Guid id, string valueName)
+    {
+        return id == Guid.Empty
+            ? UnitResult.Fail(Error.InvalidFormat(valueName))
+            : UnitResult.Ok();
     }
     /// <summary>
     /// Validates a collection of objects using a provided validation delegate for each item.

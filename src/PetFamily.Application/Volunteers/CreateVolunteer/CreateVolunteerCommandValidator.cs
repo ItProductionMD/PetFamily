@@ -8,9 +8,9 @@ using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
 namespace PetFamily.Application.Volunteers.CreateVolunteer;
 
-public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteerCommand>
+public class CreateVolunteerCommandValidator : AbstractValidator<CreateVolunteerCommand>
 {
-    public CreateVolunteerRequestValidator()
+    public CreateVolunteerCommandValidator()
     {
         RuleFor(c => c.Email)
             .NotEmpty()

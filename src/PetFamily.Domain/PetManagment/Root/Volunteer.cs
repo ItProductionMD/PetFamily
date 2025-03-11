@@ -226,4 +226,12 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
             throw new KeyNotFoundException($"Pet with id {petId} not found");
         return pet;
     }
+    public void DeleteImagesFromPets(List<string> namesToDelete)
+    {
+        var imagesToDelete = namesToDelete.Select(n => Image.Create(n).Data!).ToList();
+        foreach (var pet in Pets)
+        {
+            pet.DeleteImages(imagesToDelete);
+        }
+    }
 }

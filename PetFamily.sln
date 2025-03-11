@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Domain.Tests", "t
 		{B446A927-9727-4396-BFDB-67C8328E1DC0} = {B446A927-9727-4396-BFDB-67C8328E1DC0}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Application.Tests", "tests\PetFamily.Application.Tests\PetFamily.Application.Tests\PetFamily.Application.Tests.csproj", "{51688B88-A865-4075-85AD-D904B926BAA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{68EBE1D2-A10D-430D-0811-61F7D33DDD46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68EBE1D2-A10D-430D-0811-61F7D33DDD46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68EBE1D2-A10D-430D-0811-61F7D33DDD46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51688B88-A865-4075-85AD-D904B926BAA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51688B88-A865-4075-85AD-D904B926BAA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51688B88-A865-4075-85AD-D904B926BAA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51688B88-A865-4075-85AD-D904B926BAA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

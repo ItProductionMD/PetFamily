@@ -7,12 +7,12 @@ namespace TestPetFamilyDomain;
 
 public static class TestDataFactory
 {
-    public static Phone ValidPhoneNumber = Phone.Create("695556621", "+39").Data!;
+    public static Phone ValidPhoneNumber = Phone.CreateNotEmpty("695556621", "+39").Data!;
     public static Volunteer CreateVolunteer(int numberOfPets)
     {
         //
         var fullName = FullName.Create("John", "Doe").Data!;
-        var phoneNumber = Phone.Create("123456789", "+373").Data!;
+        var phoneNumber = Phone.CreateNotEmpty("123456789", "+373").Data!;
         var email = "testemail@m.com";
 
         var volunteerId = VolunteerID.NewGuid();
@@ -82,11 +82,11 @@ public static class TestDataFactory
                 1.00,
                 "",
                 PetType.Create(BreedID.NewGuid(), SpeciesID.NewGuid()).Data!,
-                Phone.Create("+373", "123456789").Data!,
+                Phone.CreateNotEmpty("+373", "123456789").Data!,
                 [RequisitesInfo.Create("Bank1", "Nr. 765753757835157").Data!],
                 HelpStatus.ForHelp,
                 "",
-                Address.Create("", "", "", "11").Data!);
+                Address.CreatePossibleEmpty("", "", "", "11").Data!);
         }
     }
 

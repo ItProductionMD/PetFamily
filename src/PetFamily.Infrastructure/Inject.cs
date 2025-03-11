@@ -25,7 +25,7 @@ public static class Inject
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddScoped<AppDbContext>()
             .AddHostedService<DbCleanupService>()
-            //.AddHostedService<MinioCleanupService>()// Disabled because use delete policy 
+            .AddHostedService<MinioCleanupService>()
             .AddAWSClient(configuration)
             .AddMinio(configuration);
         return services;
