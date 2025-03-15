@@ -32,4 +32,6 @@ public record FullName
             () => ValidateRequiredField(lastName, "LastName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 
             () => ValidateRequiredField(firstName, "FirstName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN));
+
+    public override string ToString()=> string.Join(' ',LastName,FirstName);  
 }

@@ -172,7 +172,10 @@ public class Pet : Entity<Guid>, ISoftDeletable
 
         return deletedImages;
     }
-
+    public void ChangePetStatus(HelpStatus helpStatus)
+    {
+        HelpStatus = helpStatus;
+    }
    
 }
 

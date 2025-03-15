@@ -1,8 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using PetFamily.Application.FilesManagment;
-using PetFamily.Application.FilesManagment.Commands;
-using PetFamily.Application.FilesManagment.Dtos;
+using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
 using Polly;

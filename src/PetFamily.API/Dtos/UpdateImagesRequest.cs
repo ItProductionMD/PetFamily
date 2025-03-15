@@ -1,5 +1,5 @@
-﻿using PetFamily.Application.FilesManagment.Commands;
-using PetFamily.Application.Volunteers.UpdatePetImages;
+﻿using PetFamily.Application.Commands.FilesManagment.Commands;
+using PetFamily.Application.Commands.PetManagment.UpdatePetImages;
 
 namespace PetFamily.API.Dtos;
 

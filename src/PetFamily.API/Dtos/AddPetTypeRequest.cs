@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Species;
+﻿using PetFamily.Application.Commands.PetTypeManagment;
 
 namespace PetFamily.API.Dtos;
 

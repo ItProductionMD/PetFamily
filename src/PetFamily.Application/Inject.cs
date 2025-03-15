@@ -1,20 +1,21 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.FilesManagment;
+using PetFamily.Application.Commands.PetTypeManagment;
+using PetFamily.Application.Commands.PetManagment.AddPet;
+using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
+using PetFamily.Application.Commands.PetManagment.UpdatePetImages;
+using PetFamily.Application.Commands.PetManagment.UpdateSocialNetworks;
+using PetFamily.Application.Queries;
 using PetFamily.Application.SharedValidations;
-using PetFamily.Application.Species;
-using PetFamily.Application.Volunteers.AddPet;
-using PetFamily.Application.Volunteers.ChangePetPosition;
-using PetFamily.Application.Volunteers.CreateVolunteer;
-using PetFamily.Application.Volunteers.DeleteVolunteer;
-using PetFamily.Application.Volunteers.GetVolunteer;
-using PetFamily.Application.Volunteers.GetVolunteers;
-using PetFamily.Application.Volunteers.RestoreVolunteer;
-using PetFamily.Application.Volunteers.UpdatePetImages;
-using PetFamily.Application.Volunteers.UpdateRequisites;
-using PetFamily.Application.Volunteers.UpdateSocialNetworks;
-using PetFamily.Application.Volunteers.UpdateVolunteer;
+using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
+using PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
+using PetFamily.Application.Commands.VolunteerManagment.GetVolunteers;
+using PetFamily.Application.Commands.VolunteerManagment.GetVolunteer;
+using PetFamily.Application.Commands.VolunteerManagment.RestoreVolunteer;
+using PetFamily.Application.Commands.VolunteerManagment.UpdateRequisites;
+using PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
+using PetFamily.Application.Commands.FilesManagment;
 
 namespace PetFamily.Application;
 
@@ -36,9 +37,10 @@ public static class Inject
         services.AddScoped<UpdateRequisitesHandler>();
         services.AddScoped<AddSpeciesHandler>();
         services.AddScoped<UpdatePetImagesHandler>();
-        services.AddScoped<ChangePetPositionHandler>();
+        services.AddScoped<ChangePetsOrder>();
         services.AddScoped<GetVolunteersHandler>();
         services.AddSingleton<FilesProcessingQueue>();
+        services.AddScoped<GetVolunteersQueryHandler>();
         services.Configure<FileValidatorOptions>(configuration.GetSection("FileValidatorOptions"));
         services.Configure<FileFolders>(configuration.GetSection("FileFolders"));
         

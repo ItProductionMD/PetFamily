@@ -1,5 +1,4 @@
-﻿using PetFamily.Application.Volunteers.GetVolunteer;
-using PetFamily.Domain.PetManagment.Root;
+﻿using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared.ValueObjects;
 using System;

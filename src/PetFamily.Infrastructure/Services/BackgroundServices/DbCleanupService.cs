@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PetFamily.Infrastructure.Contexts;
 
 namespace PetFamily.Infrastructure.Services.BackgroundServices;
 
@@ -60,7 +61,7 @@ public class DbCleanupService : BackgroundService
         try
         {
             using var scope = _serviceScopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
 
             _logger.LogInformation("Starting cleanup task...");
 

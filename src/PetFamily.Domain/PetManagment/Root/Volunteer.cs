@@ -8,7 +8,9 @@ using PetFamily.Domain.PetManagment.Enums;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using PetFamily.Domain.DomainError;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PetFamily.Domain.PetManagment.Root;
 
@@ -19,6 +21,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public Phone PhoneNumber { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? Description { get; private set; }
+    public int Rating { get; private set; }
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
     public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
     public IReadOnlyList<Pet> Pets => _pets;
@@ -176,7 +179,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
 
-        foreach (var pet in Pets)
+        foreach (var pet in _pets)
             pet.Delete();
     }
     //------------------------------Set is Deleted true(for soft deleting)-----------------------//
@@ -185,7 +188,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         _isDeleted = false;
         _deletedDateTime = null;
 
-        foreach (var pet in Pets)
+        foreach (var pet in _pets)
             pet.Restore();
     }
     //------------------------------------Update Main Info----------------------------------------//
@@ -229,9 +232,48 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public void DeleteImagesFromPets(List<string> namesToDelete)
     {
         var imagesToDelete = namesToDelete.Select(n => Image.Create(n).Data!).ToList();
-        foreach (var pet in Pets)
+        foreach (var pet in _pets)
         {
             pet.DeleteImages(imagesToDelete);
         }
     }
+    //------------------------------------ChangePetsOrder-----------------------------------------//
+    public UnitResult ChangePetsOrder(List<Guid> petsIds)
+    {
+        if (_pets.Count != petsIds.Count)
+            return UnitResult.Fail(Error.InvalidLength("Pets order Ids list"));
+
+        foreach(var id in petsIds)
+        {
+            var pet = _pets.FirstOrDefault(p => p.Id == id);
+            if (pet == null)
+                return UnitResult.Fail(Error.NotFound($"Pet with id {id}"));
+
+            var newSerialNumber = PetSerialNumber.Create(petsIds.IndexOf(id)+1,this).Data;
+            if (newSerialNumber == null)
+                return UnitResult.Fail(Error.InvalidFormat("pet serial number"));
+
+            pet.SetSerialNumber(newSerialNumber);
+        }
+        return UnitResult.Ok();
+    }
+
+    public UnitResult UpdatePetStatus(Guid petId,HelpStatus helpStatus)
+    {
+        var pet = Pets.FirstOrDefault(p => p.Id == petId);
+        if (pet == null)
+            return UnitResult.Fail(Error.NotFound("Pet with id:{petId}"));
+
+        pet.ChangePetStatus(helpStatus);
+        if (helpStatus == HelpStatus.Adopted)
+            UpdateRating();
+
+        return UnitResult.Ok();
+    }
+
+    private void UpdateRating()
+    {
+        Rating = PetsAdoptedCount;
+    }
+
 }

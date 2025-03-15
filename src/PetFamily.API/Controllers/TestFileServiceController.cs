@@ -5,9 +5,9 @@ using Microsoft.Extensions.Options;
 using PetFamily.API.Dtos;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
-using PetFamily.Application.FilesManagment;
-using PetFamily.Application.FilesManagment.Commands;
-using PetFamily.Application.FilesManagment.Dtos;
+using PetFamily.Application.Commands.FilesManagment;
+using PetFamily.Application.Commands.FilesManagment.Commands;
+using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.SharedValidations;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
@@ -22,6 +22,7 @@ public class TestFileServiceController : ControllerBase
     public readonly FileFolders _fileFolders;
     private readonly IFileRepository _fileService;
     private readonly FileValidatorOptions _fileValidatorOptions;
+
     public TestFileServiceController(
         IFileRepository fileService,
         IOptions<FileFolders> fileFolders,
@@ -73,6 +74,7 @@ public class TestFileServiceController : ControllerBase
 
         return Ok(Envelope.Success(command.StoredName));
     }
+
     //-----------------------------------------UploadFiles-----------------------------------------//
     /// <summary>
     /// Upload files
@@ -119,10 +121,11 @@ public class TestFileServiceController : ControllerBase
         }
         finally
         {
-            foreach (var file in uploadCommands )
+            foreach (var file in uploadCommands)
                 file.Stream?.Dispose();
         }
     }
+
     //-----------------------------------------GetFileUrl-----------------------------------------//
     /// <summary>
     /// Get file url
@@ -152,7 +155,7 @@ public class TestFileServiceController : ControllerBase
         CancellationToken cancelToken)
     {
         DeleteFileCommand command = new(fileName);
-        await _fileService.SoftDeleteFileAsync(new(fileName,_fileFolders.Images), cancelToken);
+        await _fileService.SoftDeleteFileAsync(new(fileName, _fileFolders.Images), cancelToken);
 
         return Ok(Envelope.Success("File deleted successfully!"));
     }
@@ -174,12 +177,20 @@ public class TestFileServiceController : ControllerBase
         foreach (var name in fileNames)
         {
             if (result.Data!.FirstOrDefault(f => f == name) == null)
-                responseList.Add(new(string.Empty,name) { IsUploaded = false });
+                responseList.Add(new(string.Empty, name) { IsUploaded = false });
             else
-                responseList.Add(new(string.Empty,name) { IsUploaded = true });
+                responseList.Add(new(string.Empty, name) { IsUploaded = true });
         }
         return Result.Ok(responseList).ToEnvelope();
     }
+
+    //----------------------------------Restore files---------------------------------------------//
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
     [HttpPost("{fileName}/restore")]
     public async Task<ActionResult<Result<Envelope>>> RestoreFile(
         [FromRoute] string fileName,
@@ -190,6 +201,7 @@ public class TestFileServiceController : ControllerBase
 
         return Ok(Envelope.Success("File Restored successfully!"));
     }
+
     //-----------------------------------Private methods------------------------------------------//
     private List<AppFile> CreatingDataForUpload(
         IFormFileCollection files,
@@ -231,7 +243,7 @@ public class TestFileServiceController : ControllerBase
                 fileForResponse.Error = "Uploadind file server error";
             }
 
-            responseList.Add(fileForResponse);           
+            responseList.Add(fileForResponse);
         }
         return commandsForUpload.Select(c =>
                new AppFile(

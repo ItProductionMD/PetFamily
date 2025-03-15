@@ -53,7 +53,7 @@ public record Error
 
     //-----------------------------------Other Errors---------------------------------------------//
     public static Error NotFound(string message) =>
-        new("data.not.found", message, ErrorType.NotFound);
+        new("data.not.found", message + " not found!", ErrorType.NotFound);
 
     public static Error Exception(Exception ex) =>
         new("exception", ex.ToString(), ErrorType.Exception);

@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Volunteers.UpdateVolunteer;
+﻿using PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
 
 namespace PetFamily.API.Dtos;
 

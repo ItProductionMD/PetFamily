@@ -9,12 +9,12 @@ using Minio.DataModel;
 using System.Collections.Generic;
 using Minio.ApiEndpoints;
 using Microsoft.Extensions.Options;
-using PetFamily.Application.FilesManagment;
 using PetFamily.Infrastructure.Services.MinioService;
 using Minio.DataModel.Args;
-using PetFamily.Application.FilesManagment.Dtos;
 using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
+using PetFamily.Application.Commands.FilesManagment;
+using PetFamily.Application.Commands.FilesManagment.Dtos;
 
 namespace PetFamily.Infrastructure.Services.BackgroundServices;
 

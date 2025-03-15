@@ -16,7 +16,7 @@ namespace PetFamily.API.Responce
             Errors = errors ?? [];
         }
 
-        public static Envelope Success(Object data) => new(data,null);
+        public static Envelope Success(Object? data) => new(data,null);
 
         public static Envelope Failure(List<Error>? errors,Object? data = null) => new(data, errors);
 
