@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
@@ -17,12 +18,13 @@ using System.Threading;
 namespace PetFamily.Application.Commands.PetManagment.UpdatePetImages;
 public class UpdatePetImagesHandler(
     IFileRepository fileRepository,
-    IVolunteerRepository volunteerRepository,
+    IVolunteerWriteRepository volunteerRepository,
     ILogger<UpdatePetImagesHandler> logger,
     IOptions<FileFolders> fileFolders,
-    FilesProcessingQueue filesProcessingQueue)
+    FilesProcessingQueue filesProcessingQueue) 
+    : ICommandHandler<UpdateFilesResponse,UpdatePetImagesCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
+    private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
     private readonly IFileRepository _fileRepository = fileRepository;
     private readonly ILogger<UpdatePetImagesHandler> _logger = logger;
     private readonly FileFolders _fileFolders = fileFolders.Value;
@@ -31,21 +33,39 @@ public class UpdatePetImagesHandler(
         UpdatePetImagesCommand command,
         CancellationToken cancelToken)
     {
-        var volunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
+        if (getVolunteer.IsFailure)
+            return Result.Fail(getVolunteer.Error);
+
+        var volunteer = getVolunteer.Data!;
 
         var pet = volunteer.GetPet(command.PetId);
 
         var imagesToDelete = command.DeleteCommands.Select(c => Image.Create(c.StoredName).Data!).ToList();
         var deletedImages = pet.DeleteImages(imagesToDelete);
+        if(command.DeleteCommands.Count > deletedImages.Count)
+        {
+            foreach(var commandFile in command.DeleteCommands)
+            {
+                if(deletedImages.Contains(commandFile.StoredName) == false)
+                {
+                    _logger.LogWarning("Delete image:{name} from pet with id:{Id} error!File not found",
+                        commandFile.StoredName, pet.Id);
+                }
+            }
+        }
+
 
         var imagesToAdd = command.UploadCommands.Select(c => Image.Create(c.StoredName).Data!).ToList();
         var addedImages = pet.AddImages(imagesToAdd);
 
         List<Error> errors = [];
 
-        var deleteTask = deletedImages.Count > 0
-            ? FileDeleteResponses(command.DeleteCommands, errors,deletedImages,pet.Id, cancelToken)
-            : Task.FromResult(new List<FileDeleteResponse>());
+        var deleteTask = DeleteFilesFromFileServer(
+            errors, 
+            deletedImages,
+            pet.Id, 
+            cancelToken);
 
         var uploadTask = addedImages.Count > 0
             ? FileUploadResponses(command.UploadCommands, errors,addedImages, pet, cancelToken)
@@ -53,8 +73,12 @@ public class UpdatePetImagesHandler(
 
         await Task.WhenAll(deleteTask, uploadTask);
 
-        var deletedFilesResponse = await deleteTask;
+        var deletedFiles = await deleteTask;
         var uploadedFilesResponse = await uploadTask;
+
+        var deletedFilesResponse = FileResponseFactory.CreateDeleteResponseList(
+            deletedFiles,
+            command.DeleteCommands);
 
         try
         {
@@ -70,7 +94,7 @@ public class UpdatePetImagesHandler(
         }
         catch (Exception ex)
         {
-            _logger.LogCritical("Update pet images - save volunteer failed!");
+            _logger.LogCritical("Update pet images - save volunteer failed!Ex{exception}", ex);
 
             var filesToRestore = deletedFilesResponse.Select(r => 
                 new AppFile(r.Name, _fileFolders.Images)).ToList();
@@ -83,13 +107,12 @@ public class UpdatePetImagesHandler(
             await _filesProcessingQueue.DeleteChannel.Writer
                 .WriteAsync(filesToDelete,CancellationToken.None);
 
-            return Result.Fail(Error.Exception(ex));
+            return Result.Fail(Error.InternalServerError("Update images for pet unexpected failure!"));
         }
         
     }
 
-    private async Task<List<FileDeleteResponse>> FileDeleteResponses(
-        List<DeleteFileCommand> deleteCommands,
+    private async Task<List<string>> DeleteFilesFromFileServer(
         List<Error> errors,
         List<string> imagesDeletedFromPet,
         Guid petId,
@@ -101,12 +124,12 @@ public class UpdatePetImagesHandler(
         var deleteResult = await _fileRepository.SoftDeleteFileListAsync(files, cancelToken);
         if (deleteResult.IsFailure)
         {
-            errors.AddRange(deleteResult.Errors);
-            _logger.LogWarning("Fail delete some files from pet with id:{Id}!Errors:{Errors}",
-                petId, deleteResult.ToErrorMessages());
+            errors.AddRange(deleteResult.Error);
+
+            _logger.LogWarning("Fail delete some files from file server for pet with id:{Id}!Errors:{Errors}",
+                petId, deleteResult.Error.Message);
         }
-        var imagesDeletedFromFileServer = deleteResult.Data ?? [];
-        return FileResponseFactory.CreateDeleteResponseList(imagesDeletedFromFileServer, deleteCommands);
+        return deleteResult.Data ?? [];
     }
 
     private async Task<List<FileUploadResponse>> FileUploadResponses(
@@ -128,9 +151,9 @@ public class UpdatePetImagesHandler(
         var uploadResult = await _fileRepository.UploadFileListAsync(files, cancelToken);
         if (uploadResult.IsFailure)
         {
-            errors.AddRange(uploadResult.Errors);
-            _logger.LogError("Fail upload some images to pet with id:{Id}!Errors:{Errors}",
-                pet.Id, uploadResult.ToErrorMessages());
+            errors.AddRange(uploadResult.Error);
+            _logger.LogError("Fail upload some images to file server for pet with id:{Id}!",
+                pet.Id);
         }
         var imagesUploadedToFileServer = uploadResult.Data ?? [];
         if(imagesUploadedToFileServer.Count < imagesAddedToPet.Count)

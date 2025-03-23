@@ -120,7 +120,7 @@ public class MinioFileRepository(
         List<AppFile> files,
         CancellationToken cancelToken)
     {
-        var minioFilesHandler = new MinioFilesHandler(_minioOptions.CountForSemaphore, cancelToken);
+        var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, cancelToken);
 
         return await minioFilesHandler.ProcessFilesAsync(files, UploadFileWithRetryAsync);
     }
@@ -174,7 +174,7 @@ public class MinioFileRepository(
         List<AppFile> files,
         CancellationToken cancelToken)
     {
-        var minioFilesHandler = new MinioFilesHandler(_minioOptions.CountForSemaphore, cancelToken);
+        var minioFilesHandler = new MinioFilesHandler(_logger,_minioOptions.CountForSemaphore, cancelToken);
 
         return await minioFilesHandler.ProcessFilesAsync(files, DeleteFileWithRetryAsync);
     }
@@ -220,7 +220,7 @@ public class MinioFileRepository(
     List<AppFile> files,
     CancellationToken cancelToken)
     {
-        var minioFilesHandler = new MinioFilesHandler(_minioOptions.CountForSemaphore, cancelToken);
+        var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, cancelToken);
 
         return await minioFilesHandler.ProcessFilesAsync(files, SoftDeleteFileWithRetryAsync);
     }
@@ -311,7 +311,7 @@ public class MinioFileRepository(
         List<AppFile> files,
         CancellationToken cancelToken)
     {
-        var minioFilesHandler = new MinioFilesHandler(_minioOptions.CountForSemaphore, cancelToken);
+        var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, cancelToken);
         return await minioFilesHandler.ProcessFilesAsync(files, RestoreFileWithRetryAsync);
     }
     //----------------------------------RollBack files--------------------------------------------//
@@ -324,16 +324,16 @@ public class MinioFileRepository(
         var restoreResult = await RestoreFileListAsync(filesToRestore, cancelToken);
         if (restoreResult.IsFailure)
         {
-            errors.AddRange(restoreResult.Errors);
+            errors.AddRange(restoreResult.Error);
             _logger.LogCritical("Fail restore some files! Errors:{Errors}",
-                restoreResult.ToErrorMessages());
+                restoreResult.Error.Message);
         }
         var deleteResult = await DeleteFileListAsync(filesToDelete, cancelToken);
         if (deleteResult.IsFailure)
         {
-            errors.AddRange(deleteResult.Errors);
+            errors.AddRange(deleteResult.Error);
             _logger.LogCritical("Fail delete some files!Errors:{Errors}",
-             deleteResult.ToErrorMessages());
+             deleteResult.Error.Message);
         }
         return errors.Count > 0
             ? UnitResult.Fail(errors)

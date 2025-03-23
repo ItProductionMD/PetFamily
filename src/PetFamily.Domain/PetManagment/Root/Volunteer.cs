@@ -11,14 +11,19 @@ using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using PetFamily.Domain.DomainError;
 using System.Collections.Generic;
 using System.Numerics;
+using PetFamily.Domain.Shared.Interfaces;
+using System.Reflection.Metadata;
+using System.Security.Cryptography.X509Certificates;
 
 namespace PetFamily.Domain.PetManagment.Root;
 
-public class Volunteer : Entity<Guid>, ISoftDeletable
+public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 {
     public FullName FullName { get; private set; }
+    [Unique]
     public string Email { get; private set; }
-    public Phone PhoneNumber { get; private set; }
+    [Unique]
+    public Phone Phone { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? Description { get; private set; }
     public int Rating { get; private set; }
@@ -35,7 +40,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
 
     public int PetsForAdoptCount => Pets.Where(p => p.HelpStatus == HelpStatus.ForAdoption).Count();
     public int PetsForHelpCount => Pets.Where(p => p.HelpStatus == HelpStatus.ForHelp).Count();
-    public int PetsAdoptedCount => Pets.Where(p => p.HelpStatus == HelpStatus.Adopted).Count();
+    public int PetsAdoptedCount => Pets.Where(p => p.HelpStatus == HelpStatus.Helped).Count();
+    public static List<string> UniquenessFieldsName { get => ["Email", "PhoneNumber"]; }
 
     private Volunteer(
         Guid id,
@@ -50,7 +56,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     {
         FullName = fullName;
         Email = email.Trim();
-        PhoneNumber = phoneNumber;
+        Phone = phoneNumber;
         ExperienceYears = experienceYears;
         Description = description?.Trim();
         Requisites = requisites; // List Can be empty
@@ -69,10 +75,10 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
         )
     {
         var validationResult = Validate(fullName, email, phoneNumber, expirienceYears, description);
+        if(validationResult.IsFailure) 
+            return validationResult;
 
-        return validationResult.IsFailure
-            ? validationResult
-            : Result.Ok(new Volunteer(
+        return Result.Ok(new Volunteer(
                 id.Value, fullName!,
                 email!, phoneNumber!,
                 expirienceYears,
@@ -206,7 +212,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
 
         FullName = fullName;
         Email = email;
-        PhoneNumber = phoneNumber;
+        Phone = phoneNumber;
         ExperienceYears = experienceYears;
         Description = description;
 
@@ -241,7 +247,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     public UnitResult ChangePetsOrder(List<Guid> petsIds)
     {
         if (_pets.Count != petsIds.Count)
-            return UnitResult.Fail(Error.InvalidLength("Pets order Ids list"));
+            return UnitResult.Fail(Error.ValueOutOfRange("Count of pets in PetsOrder"));
 
         foreach(var id in petsIds)
         {
@@ -265,7 +271,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
             return UnitResult.Fail(Error.NotFound("Pet with id:{petId}"));
 
         pet.ChangePetStatus(helpStatus);
-        if (helpStatus == HelpStatus.Adopted)
+        if (helpStatus == HelpStatus.Helped)
             UpdateRating();
 
         return UnitResult.Ok();
@@ -274,6 +280,42 @@ public class Volunteer : Entity<Guid>, ISoftDeletable
     private void UpdateRating()
     {
         Rating = PetsAdoptedCount;
+    }
+    public static List<string> VolunteerUniqness() => Volunteer.UniquenessFieldsName;
+
+    public static string[] GetUniqueFields()
+    {
+        return typeof(Volunteer).GetProperties()
+        .Where(prop => Attribute.IsDefined(prop, typeof(UniqueAttribute))) 
+        .Select(prop => prop.Name.ToLower()) 
+        .ToArray();
+    }
+
+    public static UniqueProps[] GetUniqueProps()
+    {
+        var props = typeof(Volunteer).GetProperties();
+        List<UniqueProps> uniqueProps = [];
+        foreach (var prop in props)
+        {
+            if (Attribute.IsDefined(prop, typeof(UniqueAttribute)))
+            {
+                UniqueProps uniqueProp = new () { Field = prop.Name };
+                if(typeof(IValueObject).IsAssignableFrom(prop.PropertyType))
+                {
+                    var vProps = prop.PropertyType.GetProperties();
+                    foreach (var valueObjectProp in vProps  )
+                    {
+                        uniqueProp.Values.Add(valueObjectProp.Name.ToLower());
+                    }
+                }
+                else
+                {
+                    uniqueProp.Values.Add(prop.Name);
+                }
+                uniqueProps.Add(uniqueProp);
+            }
+        }
+        return uniqueProps.ToArray();
     }
 
 }

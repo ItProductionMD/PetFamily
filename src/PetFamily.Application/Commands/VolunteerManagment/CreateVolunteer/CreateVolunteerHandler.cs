@@ -1,8 +1,6 @@
 ﻿using FluentValidation;
 using PetFamily.Application.Validations;
 using PetFamily.Domain.Shared.ValueObjects;
-using static PetFamily.Application.Validations.ValidationExtensions;
-using static PetFamily.Application.Commands.PetManagment.VolunteerValidationExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Shared;
 using System.Security.AccessControl;
@@ -10,57 +8,59 @@ using PetFamily.Domain.Results;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Application.IRepositories;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Shared.Validations;
+using PetFamily.Application.Abstractions;
 
 
 //-------------------------------Handler,UseCases,Services----------------------------------------//
 namespace PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
 
 public class CreateVolunteerHandler(
-    IVolunteerRepository volunteerRepository,
+    IVolunteerWriteRepository volunteerWriteRepository,
+    IVolunteerReadRepository volunteerReadRepository,
     IValidator<CreateVolunteerCommand> validator,
-    ILogger<CreateVolunteerHandler> logger)
+    ILogger<CreateVolunteerHandler> logger):ICommandHandler<Guid,CreateVolunteerCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
+    private readonly IVolunteerWriteRepository _volunteerWriteRepository = volunteerWriteRepository;
+    private readonly IVolunteerReadRepository _volunteerReadRepository = volunteerReadRepository;
     private readonly IValidator<CreateVolunteerCommand> _validator = validator;
     private readonly ILogger<CreateVolunteerHandler> _logger = logger;
 
-    public async Task<Result<Guid>> Handle(CreateVolunteerCommand command,CancellationToken cancelToken)
+    public async Task<Result<Guid>> Handle(CreateVolunteerCommand command, CancellationToken cancelToken)
     {
-        var validate = await _validator.ValidateAsync(command, cancelToken);
-        if (validate.IsValid == false)
+        var fluentValidationResult = await _validator.ValidateAsync(command, cancelToken);
+        if (fluentValidationResult.IsValid == false)
         {
-            _logger.LogError("Fail validate volunteer command!{Errors}",validate.Errors.Select(e=>e.ErrorMessage));
-            return validate.ToResultFailure<Guid>();
-        }
-        var createVolunteer = CreateVolunteerProccess(command);
-        if (createVolunteer.IsFailure)
-        {
-            _logger.LogError("Validate volunteer failure!{Errors}",createVolunteer.ToErrorMessages());
-            return Result.Fail(createVolunteer.Errors!);
-        }
-        var volunteer = createVolunteer.Data!;
+            var errorResult = fluentValidationResult.ToResultFailure<Guid>();
+            _logger.LogError("Fail validate volunteer command!{Errors}",
+                errorResult.ValidationMessagesToString());
 
-        var validateUniqueness = await ValidateUniqueEmailAndPhone(
-            volunteer,
-            _volunteerRepository,
-            _logger,
+            return errorResult;
+        }
+
+        var checkUniqueness = await _volunteerReadRepository.CheckUniqueFields(
+            Guid.Empty,
+            command.PhoneRegionCode,
+            command.PhoneNumber,
+            command.Email,
             cancelToken);
+        if(checkUniqueness.IsFailure)
+            return checkUniqueness;
 
-        if (validateUniqueness.IsFailure)
-        {
-            _logger.LogWarning("Volunteer with souch email or phone is already exists!Errors:{Errors}",
-                validateUniqueness.ToErrorMessages());
+        var volunteer = CreateVolunteerProccess(command);
 
-            return validateUniqueness;
-        }
-        await _volunteerRepository.Add(volunteer, cancelToken);
+        var addResult = await _volunteerWriteRepository.AddAsync(volunteer, cancelToken);
+
+        if (addResult.IsFailure)
+            return addResult;
 
         _logger.LogInformation("Volunteer with id:{Id},created sucessfull!", volunteer.Id);
 
-        return Result.Ok(volunteer.Id);
+        return addResult;
     }
 
-    private static Result<Volunteer> CreateVolunteerProccess(CreateVolunteerCommand command)
+    private static Volunteer CreateVolunteerProccess(CreateVolunteerCommand command)
     {
         var fullName = FullName.Create(command.FirstName, command.LastName).Data!;
 
@@ -80,6 +80,6 @@ public class CreateVolunteerHandler(
             command.ExperienceYears,
             command.Description,
             requisites,
-            socialNetworkList);
+            socialNetworkList).Data!;
     }
 }

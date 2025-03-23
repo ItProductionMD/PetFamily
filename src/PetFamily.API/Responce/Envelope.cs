@@ -6,20 +6,17 @@ namespace PetFamily.API.Responce
     {
         public Object? Data { get;}
         public DateTime Timestamp { get;}
+        public Error? Errors { get; }
 
-        public List<Error> Errors { get; } = [];
-
-        private Envelope(object? data,List<Error>? errors)
+        private Envelope(object? data,Error? error)
         {
             Data = data;
             Timestamp = DateTime.UtcNow;
-            Errors = errors ?? [];
+            Errors = error;
         }
-
         public static Envelope Success(Object? data) => new(data,null);
 
-        public static Envelope Failure(List<Error>? errors,Object? data = null) => new(data, errors);
-
+        public static Envelope Failure(Error error,Object? data = default) => new(data, error);
     }
 
 }

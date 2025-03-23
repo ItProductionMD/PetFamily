@@ -1,5 +1,8 @@
-﻿namespace PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
+﻿
+using PetFamily.Application.Abstractions;
 
-public record ChangePetsOrderCommand(Guid VolunteerId,List<Guid> petsNewOrder);
+namespace PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
+
+public record ChangePetsOrderCommand(Guid VolunteerId,List<Guid> petsNewOrder) :ICommand;
 
 

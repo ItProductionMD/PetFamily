@@ -20,20 +20,26 @@ public static class AddPetCommandValidator
     public static UnitResult Validate(AddPetCommand command)
     {
         return UnitResult.ValidateCollection(
+
             ()=> ValidateIfGuidIsNotEpmty(command.VolunteerId,"Volunteer id"),
 
-            () => ValidateRequiredField(command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
+            () => ValidateRequiredField(
+                command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
 
             () => ValidateNonRequiredField(
                 command.Description, "Pet description", MAX_LENGTH_LONG_TEXT),
 
-            () => ValidateNumber(command.Weight, "Pet weight", 0, 500),
+            () => ValidateNumber(
+                command.Weight, "Pet weight", 0, 500),
 
-            () => ValidateNumber(command.Height, "Pet height", 0, 500),
+            () => ValidateNumber(
+                command.Height, "Pet height", 0, 500),
 
-            () => ValidateNonRequiredField(command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
+            () => ValidateNonRequiredField(
+                command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
 
-            () => Phone.ValidateNonRequired(command.OwnerPhoneNumber, command.OwnerPhoneRegion),
+            () => Phone.ValidateNonRequired(
+                command.OwnerPhoneNumber, command.OwnerPhoneRegion),
 
             () => ValidateNonRequiredField(
                 command.HealthInfo, "Pet info about health", MAX_LENGTH_LONG_TEXT),

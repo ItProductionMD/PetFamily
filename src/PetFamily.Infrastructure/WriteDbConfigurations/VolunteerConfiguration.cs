@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Infrastructure.Contexts;
 using System.Reflection.Emit;
 using System.Text.Json;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
@@ -30,7 +31,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .HasMaxLength(MAX_LENGTH_MEDIUM_TEXT);
 
         // Value Objects
-        builder.ComplexProperty(v => v.FullName,fn =>
+        builder.ComplexProperty(v => v.FullName, fn =>
         {
             fn.Property(f => f.FirstName)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
@@ -41,7 +42,21 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 .HasColumnName("last_name");
         });
 
-        builder.ComplexProperty(v => v.PhoneNumber, pn =>
+        builder.OwnsOne(v => v.Phone, pn =>
+        {
+            pn.Property(p => p.RegionCode)
+                .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
+                .HasColumnName("phone_region_code");
+
+            pn.Property(p => p.Number)
+                .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
+                .HasColumnName("phone_number");
+
+            //pn.HasIndex(p => new { p.Number, p.RegionCode })
+             // .IsUnique();
+        });
+
+       /* builder.ComplexProperty(v => v.Phone, pn =>
         {
             pn.Property(p => p.RegionCode)
                .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
@@ -50,14 +65,16 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             pn.Property(p => p.Number)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
                 .HasColumnName("phone_number");
-        });
+        });*/
 
         builder.Property(v => v.Requisites)
             .HasConversion(new ReadOnlyListConverter<RequisitesInfo>())
+            .HasColumnType("jsonb")
             .Metadata.SetValueComparer(new ReadOnlyListComparer<RequisitesInfo>());
 
         builder.Property(v => v.SocialNetworks)
            .HasConversion(new ReadOnlyListConverter<SocialNetworkInfo>())
+           .HasColumnType("jsonb")
            .Metadata.SetValueComparer(new ReadOnlyListComparer<SocialNetworkInfo>());
 
         //For soft deleting
@@ -75,6 +92,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .HasForeignKey("volunteer_id") 
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.ApplyUniqueConstraints();
     }
 }
 

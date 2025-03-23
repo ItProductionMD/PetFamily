@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.Shared.Validations;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationMessages;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using PetFamily.API.Dtos;
 using PetFamily.Application.Commands.PetTypeManagment;
 
@@ -31,8 +26,6 @@ public class PetTypeController : ControllerBase
         [FromServices]AddSpeciesHandler handler
         ,CancellationToken cancellationToken)
     {
-        List<Error> validationErrors = [];
-
         var addPetType = await handler.Handle(request.ToCommand(),cancellationToken);
 
          return addPetType.IsFailure

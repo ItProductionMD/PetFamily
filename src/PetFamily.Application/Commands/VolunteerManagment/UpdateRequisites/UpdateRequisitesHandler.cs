@@ -4,40 +4,45 @@ using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using PetFamily.Domain.Shared.ValueObjects;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.IRepositories;
-using PetFamily.Application.Commands.PetManagment.Dtos;
+using PetFamily.Application.Dtos;
+using PetFamily.Application.Abstractions;
 
 namespace PetFamily.Application.Commands.VolunteerManagment.UpdateRequisites;
 
 public class UpdateRequisitesHandler(
-    IVolunteerRepository repository,
-    ILogger<UpdateRequisitesHandler> logger)
+    IVolunteerWriteRepository repository,
+    ILogger<UpdateRequisitesHandler> logger) : ICommandHandler<UpdateRequisitesCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository = repository;
+    private readonly IVolunteerWriteRepository _volunteerRepository = repository;
     private readonly ILogger<UpdateRequisitesHandler> _logger = logger;
     public async Task<UnitResult> Handle(
-        Guid volunteerId,
-        IEnumerable<RequisitesDto> dtos,
-        CancellationToken cancellationToken = default)
+        UpdateRequisitesCommand command,
+        CancellationToken cancelToken = default)
     {
         var validateRequisites = ValidateItems(
-            dtos, r => RequisitesInfo.Validate(r.Name, r.Description));
+            command.RequisitesDtos, r => RequisitesInfo.Validate(r.Name, r.Description));
         if (validateRequisites.IsFailure)
         {
             _logger.LogWarning("Validate Requisites for volunteer failure!Errors:{Errors}",
-                validateRequisites.ToErrorMessages());
+                validateRequisites.ValidationMessagesToString());
 
             return validateRequisites;
         }
-        var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
+        if (getVolunteer.IsFailure)
+            return UnitResult.Fail(getVolunteer.Error);
 
-        var requisites = dtos.Select(c => RequisitesInfo.Create(c.Name, c.Description).Data!);
+        var volunteer = getVolunteer.Data!;
+
+        var requisites = command.RequisitesDtos.Select(c =>
+            RequisitesInfo.Create(c.Name, c.Description).Data!);
 
         volunteer.UpdateRequisites(requisites);
 
-        await _volunteerRepository.Save(volunteer, cancellationToken);
+        await _volunteerRepository.Save(volunteer, cancelToken);
 
         _logger.LogInformation("Update requisites for volunteer with id:{Id} successful!",
-            volunteerId);
+            command.VolunteerId);
 
         return UnitResult.Ok();
     }

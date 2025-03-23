@@ -12,6 +12,7 @@ public interface IFileRepository
     public Task<Result<List<string>>> UploadFileListAsync(
         List<AppFile> file,
         CancellationToken cancelToken);
+
     public Task DeleteFileAsync(AppFile file,CancellationToken cancelToken);
 
     public Task<Result<List<string>>> DeleteFileListAsync(
@@ -25,10 +26,12 @@ public interface IFileRepository
         CancellationToken cancelToken);
 
     public Task RestoreFileAsync(AppFile file, CancellationToken cancelToken);
+
     public Task RestoreFileWithRetryAsync(AppFile file, CancellationToken cancelToken = default);
+
     public Task<Result<List<string>>> RestoreFileListAsync(
         List<AppFile> files,
-        CancellationToken cancelToken);
+        CancellationToken cancelToken = default);
 
     public Task<UnitResult> RollBackFilesAsync(
         List<AppFile> filesToRestore,

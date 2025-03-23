@@ -21,7 +21,9 @@ namespace PetFamily.Application.Tests;
 
 public class CreateVolunteerHandlerTests
 {
-    private readonly Mock<IVolunteerRepository> _volunteerRepositoryMock;
+    private readonly Mock<IVolunteerWriteRepository> _volunteerRepositoryMock;
+    private readonly Mock<IVolunteerReadRepository> _volunteerReadRepositoryMock;
+
     private readonly Mock<IValidator<CreateVolunteerCommand>> _validatorMock;
     private readonly Mock<ILogger<CreateVolunteerHandler>> _loggerMock;
     private readonly CreateVolunteerHandler _handler;
@@ -29,12 +31,14 @@ public class CreateVolunteerHandlerTests
 
     public CreateVolunteerHandlerTests()
     {
-        _volunteerRepositoryMock = new Mock<IVolunteerRepository>();
+        _volunteerRepositoryMock = new Mock<IVolunteerWriteRepository>();
         _validatorMock = new Mock<IValidator<CreateVolunteerCommand>>();
         _loggerMock = new Mock<ILogger<CreateVolunteerHandler>>();
         _validator = new CreateVolunteerCommandValidator();
+        _volunteerReadRepositoryMock = new Mock<IVolunteerReadRepository>();
         _handler = new CreateVolunteerHandler(
             _volunteerRepositoryMock.Object,
+            _volunteerReadRepositoryMock.Object,
             _validatorMock.Object,
             _loggerMock.Object);
     }
@@ -71,7 +75,6 @@ public class CreateVolunteerHandlerTests
         var unitResult = validationResult.ToResultFailure();
         // Assert
         Assert.False(validationResult.IsValid);
-        Assert.Single(unitResult.Errors);
 
     }
     [Theory]
@@ -103,7 +106,6 @@ public class CreateVolunteerHandlerTests
         var unitResult = validationResult.ToResultFailure();
         // Assert
         Assert.False(validationResult.IsValid);
-        Assert.Single(unitResult.Errors);
 
     }
     [Fact]
@@ -158,16 +160,13 @@ public class CreateVolunteerHandlerTests
             []);
 
         var volunteer = TestDataFactory.CreateVolunteer();
+        var addResult = Result.Ok(volunteer.Id);
 
         _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
 
-        _volunteerRepositoryMock.Setup(x => x.Add(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _volunteerRepositoryMock
-            .Setup(x=>x.GetByEmailOrPhone(It.IsAny<string>(),It.IsAny<Phone>(),It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result.Fail(Error.NotFound("Volunteer")));
+        _volunteerRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(addResult);
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 

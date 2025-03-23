@@ -12,18 +12,19 @@ using System.Reflection.Metadata.Ecma335;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.Commands.PetTypeManagment;
+using PetFamily.Application.Abstractions;
 
 
 namespace PetFamily.Application.Commands.PetManagment.AddPet;
 
 public class AddPetHandler(
     ILogger<AddPetHandler> logger,
-    IVolunteerRepository volunteerRepository,
-    ISpeciesRepository speciesRepository)
+    IVolunteerWriteRepository volunteerRepository,
+    ISpeciesRepository speciesRepository) : ICommandHandler<AddPetResponse, AddPetCommand>
 {
     private readonly ISpeciesRepository _speciesRepository = speciesRepository;
     private readonly ILogger<AddPetHandler> _logger = logger;
-    private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
+    private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
 
     public async Task<Result<AddPetResponse>> Handle(
         AddPetCommand command,
@@ -32,18 +33,24 @@ public class AddPetHandler(
         var validate = AddPetCommandValidator.Validate(command);
         if (validate.IsFailure)
         {
-            _logger.LogWarning("Validate add pet command errors:{Errors}", validate.ToErrorMessages());
+            _logger.LogWarning("Validate add pet command errors:{Errors}", validate.ValidationMessagesToString());
             return validate;
         }
         var checkPetType = await CheckPetTypeAsync(command.SpeciesId, command.BreedId, cancelToken);
         if (checkPetType.IsFailure)
-            return checkPetType;      
-        
-        var volunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
+            return checkPetType;
+
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
+        if (getVolunteer.IsFailure)
+            return UnitResult.Fail(getVolunteer.Error);
+
+        var volunteer = getVolunteer.Data!;
 
         var newPet = CreatingPetProcess(command, volunteer);
 
-        await _volunteerRepository.Save(volunteer, cancelToken);
+        var result = await _volunteerRepository.Save(volunteer, cancelToken);
+        if (result.IsFailure)
+            return result;
 
         _logger.LogInformation("Pet with id:{petId} was added to volunteer with id:{Id} successful!",
             newPet.Id, command.VolunteerId);
@@ -73,7 +80,7 @@ public class AddPetHandler(
         var ownerPhone = Phone.CreatePossibbleEmpty(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;
 
         var helpStatus = (HelpStatus)command.HelpStatus;
-        
+
         var requisites = command.Requisites
             .Select(d => RequisitesInfo.Create(d.Name, d.Description).Data!).ToList();
 

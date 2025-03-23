@@ -1,44 +1,74 @@
 ﻿using PetFamily.Domain.DomainError;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace PetFamily.Domain.Results;
 public abstract class Result
 {
     public bool IsSuccess { get; set; }
     public bool IsFailure => !IsSuccess;
-    private List<Error> _errors = [];
-    public List<Error> Errors => _errors;
+
+    public Error Error { get; set; }
+
     protected Result() { }
+
     public static Result<T> Ok<T>(T? data = default) => new() { IsSuccess = true, Data = data };
+
     public static Result<T> Ok<T>() => new() { IsSuccess = true };
-    public static UnitResult Fail(Error error) => new() { IsSuccess = false, Errors = { error } };
+
+    public static UnitResult Fail(Error error) => new() { IsSuccess = false, Error =  error  };
+
     public static UnitResult Fail(List<Error> errors)
     {
         var result = new UnitResult();
-        result.AddErrors(errors!);
+        result.AddValidationErrors(errors!);
         return result;
     }
-    public string ToErrorMessages() => string.Join("; ", Errors.Select(e => e.Message));
+
     public void SetToFailure()
     {
         IsSuccess = false;
     }
-    public void AddError(Error error)
+
+    public void AddValidationError(Error error)
     {
-        _errors.Add(error);
-        SetToFailure();
+        Error.ValidationErrors.AddRange(error.ValidationErrors);
+
+        if (Error.ValidationErrors.Count > 0)
+            SetToFailure();
     }
-    public void AddErrors(List<Error> errors)
+
+    public string ValidationMessagesToString()
+    {
+        var sb = new StringBuilder();
+
+        foreach (var validationError in Error.ValidationErrors)
+        {
+            sb.Append(validationError.ValidationObjectType)
+              .Append(' ')
+              .Append(validationError.ObjectName)
+              .Append(' ')
+              .Append(validationError.ErrorCode)
+              .Append("; ");
+        }
+        return sb.Length > 0 
+            ? sb.ToString().TrimEnd(' ', ';') 
+            : string.Empty;
+    }
+    public void AddValidationErrors(List<Error> errors)
     {
         foreach (var error in errors)
         {
             if (error != null)
-                _errors.Add(error);
+                Error.ValidationErrors.AddRange(error.ValidationErrors);
         }
-        if (_errors.Count > 0)
+        if (Error.ValidationErrors.Count > 0)
             SetToFailure();
     }
 }
+
+
 public class Result<T> : Result
 {
     public T? Data { get; set; }
@@ -47,27 +77,12 @@ public class Result<T> : Result
         Data = data;
         return this;
     }
-    public Result<T> WithError(Error error)
-    {
-        AddError(error);
-        return this;
-    }
-    public Result<T> WithErrorList(List<Error> errors)
-    {
-        AddErrors(errors);
-        return this;
-    }
-    public static Result<T> Fail(Error error) => new() { IsSuccess = false, Errors = { error } };
-    public static Result<T> Fail(List<Error> errors)
-    {
-        var result = new Result<T>();
-        result.AddErrors(errors!);
-        return result;
-    }
+    public static Result<T> Fail(Error error) => new() { IsSuccess = false, Error= error };
+
     public static Result<T> FailureWithData(T Object, Error error)
     {
         var result = Result<T>.Ok(Object);
-        result.AddError(error);
+        result.AddValidationError(error);
         return result;
     }
 
@@ -75,7 +90,8 @@ public class Result<T> : Result
     {
         Result<T> tResult = new() { IsSuccess = result.IsSuccess };
         if (result.IsFailure)
-            tResult.AddErrors(result.Errors);
+            tResult.Error = result.Error;
+
         return tResult;
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace PetFamily.Application.Commands.FilesManagment.Commands;
+﻿using PetFamily.Application.Abstractions;
 
-public class DeleteFileCommand
+namespace PetFamily.Application.Commands.FilesManagment.Commands;
+
+public class DeleteFileCommand : ICommand
 {
     public string StoredName { get; init; }
     public DeleteFileCommand(string name)

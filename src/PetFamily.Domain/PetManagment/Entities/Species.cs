@@ -46,13 +46,6 @@ namespace PetFamily.Domain.PetManagment.Entities
         public UnitResult DeleteBreedsById(List<Guid> breedIdsToDelete)
         {
             var removedItemsCount = _breeds.RemoveAll(b => breedIdsToDelete.Contains(b.Id));
-            if (removedItemsCount != breedIdsToDelete.Count)
-                return UnitResult.Fail(Error.Custom(
-                    "delete.breeds.error",
-                    "Delete breeds error!Some breeds with souch ids dont exist!",
-                    ErrorType.NotFound,
-                    "BreedId"));
-
             return UnitResult.Ok();
         }
     }

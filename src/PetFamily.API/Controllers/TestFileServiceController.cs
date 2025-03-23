@@ -11,6 +11,7 @@ using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.SharedValidations;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.Validations;
 using System.Runtime.CompilerServices;
 
 namespace PetFamily.API.Controllers;
@@ -19,7 +20,7 @@ namespace PetFamily.API.Controllers;
 [ApiController]
 public class TestFileServiceController : ControllerBase
 {
-    public readonly FileFolders _fileFolders;
+    private readonly FileFolders _fileFolders;
     private readonly IFileRepository _fileService;
     private readonly FileValidatorOptions _fileValidatorOptions;
 
@@ -95,16 +96,27 @@ public class TestFileServiceController : ControllerBase
         if (validateCount.IsFailure)
             return validateCount.ToErrorActionResult();
         //-----------------Get Validation Errors,commandsForUpload and listForResponse------------//
-        var filesForUpload = CreatingDataForUpload(files, out var uploadCommands, out var responseList, out var validationErrors);
+        var filesForUpload = CreatingDataForUpload(
+            files, 
+            out var uploadCommands, 
+            out var responseList, 
+            out var errorsAfterValidation);
 
-        if (validationErrors.Count == files.Count)
-            return Result.Fail(validationErrors).ToErrorActionResult();
+        foreach(var error in errorsAfterValidation)
+        {
+            
+        }
+        if (errorsAfterValidation.Count == files.Count)
+        {
+            var result = UnitResult.Fail(errorsAfterValidation);
+            return result.ToEnvelope();
+        }
         try
         {
             var uploadResult = await _fileService.UploadFileListAsync(filesForUpload, cancelToken);
 
-            if (validationErrors.Count > 0)
-                uploadResult.AddErrors(validationErrors!);
+            if (errorsAfterValidation.Count > 0)
+                uploadResult.AddValidationErrors(errorsAfterValidation!);
 
             var uploadedFileNames = uploadResult.Data ?? [];
 
@@ -139,7 +151,7 @@ public class TestFileServiceController : ControllerBase
     {
         var result = await _fileService.GetFileUrlAsync(new(fileName, _fileFolders.Images), cancelToken);
         return result.IsFailure
-            ? NotFound(Envelope.Failure(result.Errors))
+            ? NotFound(Envelope.Failure(result.Error))
             : Ok(Envelope.Success(result.Data!));
     }
 
@@ -207,9 +219,9 @@ public class TestFileServiceController : ControllerBase
         IFormFileCollection files,
         out List<UploadFileCommand> commandsForUpload,
         out List<FileUploadResponse> responseList,
-        out List<Error> validationErrors)
+        out List<Error> errors)
     {
-        validationErrors = [];
+        errors = [];
         commandsForUpload = [];
         responseList = [];
         foreach (var file in files)
@@ -226,16 +238,16 @@ public class TestFileServiceController : ControllerBase
 
             var fileForResponse = new FileUploadResponse(file.Name, fileDto.StoredName);
             //-----------------------------Validate fileDto---------------------------//
-            var validateFileDto = FileValidator.Validate(fileDto, _fileValidatorOptions);
-            if (validateFileDto.IsFailure)
+            var validationFileResult = FileValidator.Validate(fileDto, _fileValidatorOptions);
+            if (validationFileResult.IsFailure)
             {
                 stream.Dispose();
 
-                validationErrors.AddRange(validateFileDto.Errors);
+                errors.AddRange(validationFileResult.Error);
 
                 fileForResponse.Error = string.Join(
                     "|",
-                    validateFileDto.Errors.Select(e => e.Message).ToList());
+                    validationFileResult.Error.ValidationErrors.Select(e => e.ToErrorMessage()).ToList());
             }
             else
             {

@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Dtos;
 using PetFamily.Application.IRepositories;
-using PetFamily.Application.Queries;
+using PetFamily.Application.Queries.Volunteer.GetVolunteers;
 using PetFamily.Domain.PetManagment.Root;
+using PetFamily.Domain.Results;
 using PetFamily.Infrastructure.Contexts;
 using PetFamily.Infrastructure.Contexts.ReadDbContext;
 
@@ -12,6 +13,17 @@ namespace PetFamily.Infrastructure.Repositories.Read;
 public class VolunteerReadRepository(ReadDbContext context) : IVolunteerReadRepository
 {
     private readonly ReadDbContext _context = context;
+
+    public Task<UnitResult> GetVolunteerByPhoneOrEmail(string phoneRegionCode, string phone, string email, CancellationToken cancelToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<VolunteerDto>> GetByIdAsync(Guid volunteerId, CancellationToken cancellToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<GetVolunteersResponse> GetVolunteers(
         GetVolunteersQuery query,
         CancellationToken cancelToken = default)
@@ -48,5 +60,15 @@ public class VolunteerReadRepository(ReadDbContext context) : IVolunteerReadRepo
             : (query.pageNumber - 1) * query.pageSize + volunteersList.Count;
 
         return new(totalCount, volunteersList);
+    }
+
+    public Task<UnitResult> CheckUniqueFields(
+        Guid volunteerId, 
+        string phoneRegionCode,
+        string phoneNuber, 
+        string email,
+        CancellationToken cancelToken = default)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using PetFamily.API.Responce;
 using PetFamily.Domain.DomainError;
+using System.Diagnostics;
 
 namespace PetFamily.API.Middlewares;
 
@@ -21,17 +22,20 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}-ExceptionMiddleware caught an exception");
+           
             _logger.LogError(ex,message:"Exception:{Exception}",ex.Message);
 
-            var error = Error.InternalServerError(ex.Message);
+            var error = Error.InternalServerError("Unexpected error!");
 
-            var envelope = Envelope.Failure([error]);
+            var envelope = Envelope.Failure(error);
 
             context.Response.ContentType = "application/json";
 
             context.Response.StatusCode = (int)StatusCodes.Status500InternalServerError;
 
             await context.Response.WriteAsJsonAsync(envelope);
+         
         }
     }
 }

@@ -1,16 +1,15 @@
-﻿namespace PetFamily.Domain.PetManagment.ValueObjects
+﻿namespace PetFamily.Domain.PetManagment.ValueObjects;
+
+public record BreedID
 {
-    public record BreedID
+    public Guid Value;
+
+    private BreedID(Guid id)
     {
-        public Guid Value;
-
-        private BreedID(Guid id)
-        {
-            Value = id;
-        }
-
-        public static BreedID NewGuid() => new(Guid.NewGuid());
-        public static BreedID SetValue(Guid id) => new(id);
-
+        Value = id;
     }
+
+    public static BreedID NewGuid() => new(Guid.NewGuid());
+    public static BreedID SetValue(Guid id) => new(id);
+
 }

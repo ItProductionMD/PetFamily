@@ -1,4 +1,5 @@
-﻿using PetFamily.Application.Commands.FilesManagment.Commands;
+﻿using PetFamily.Application.Abstractions;
+using PetFamily.Application.Commands.FilesManagment.Commands;
 
 namespace PetFamily.Application.Commands.PetManagment.UpdatePetImages;
 
@@ -6,4 +7,4 @@ public record UpdatePetImagesCommand(
     Guid VolunteerId, 
     Guid PetId,
     List<DeleteFileCommand> DeleteCommands,
-    List<UploadFileCommand> UploadCommands);
+    List<UploadFileCommand> UploadCommands) : ICommand;

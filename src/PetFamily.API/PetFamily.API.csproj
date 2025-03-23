@@ -28,8 +28,4 @@
     <ProjectReference Include="..\PetFamily.Infrastructure\PetFamily.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mappers\" />
-  </ItemGroup>
-
 </Project>

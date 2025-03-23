@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
+using PetFamily.Domain.Shared;
 using PetFamily.Infrastructure.Constants;
+using System.Reflection;
 
 
 namespace PetFamily.Infrastructure.Contexts;
@@ -35,4 +37,5 @@ public class WriteDbContext : DbContext
 
         base.OnModelCreating(modelBuilder); 
     }
+
 }

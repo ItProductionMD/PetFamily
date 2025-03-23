@@ -41,11 +41,11 @@ public static class ValidationExtensions
     }
 
     public static UnitResult ValidateRequiredObject<T>(T? objToValidate, string valueName) =>
-
-        objToValidate != null ? UnitResult.Ok() : UnitResult.Fail(ValueIsRequired(valueName));
+        objToValidate != null
+            ? UnitResult.Ok() 
+            : UnitResult.Fail(Error.StringIsNullOrEmpty(valueName));
 
     public static bool HasOnlyEmptyStrings(params string?[] strings) =>
-
          !strings.Any(s => !string.IsNullOrWhiteSpace(s));
 
     public static UnitResult ValidateIntegerNumber(int number, string valueName, int minValue, int maxValue)
@@ -80,13 +80,15 @@ public static class ValidationExtensions
     /// </returns>
     public static UnitResult ValidateItems<T>(IEnumerable<T> items, Func<T, UnitResult> itemValidator)
     {
-        var errors = new List<Error>();
+        var validationErrors = new List<ValidationError>();
         foreach (var item in items)
         {
-            var validationResult = itemValidator(item);
-            if (validationResult.IsFailure)
-                errors.AddRange(validationResult.Errors);
+            var unitResult = itemValidator(item);
+            if (unitResult.IsFailure)
+                validationErrors.AddRange(unitResult.Error.ValidationErrors);
         }
-        return errors.Count > 0 ? UnitResult.Fail(errors) : UnitResult.Ok();
+        return validationErrors.Count > 0 
+            ? UnitResult.Fail(Error.ValidationError(validationErrors)) 
+            : UnitResult.Ok();
     }
 }

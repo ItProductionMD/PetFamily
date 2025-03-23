@@ -1,5 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text;
+using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Logging;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
@@ -13,11 +16,14 @@ public class MinioFilesHandler
 {
     private readonly SemaphoreSlim _semaphore;
     private readonly CancellationToken _cancelToken;
+    private readonly ILogger<MinioFileRepository> _logger;
 
     public MinioFilesHandler(
+        ILogger<MinioFileRepository> logger,
         int maxParallelTasks,
         CancellationToken cancellationToken)
     {
+        _logger = logger;
         _semaphore = new SemaphoreSlim(maxParallelTasks);
         _cancelToken = cancellationToken;
     }
@@ -39,9 +45,21 @@ public class MinioFilesHandler
         await Task.WhenAll(tasks);
 
         if (errors.IsEmpty == false)
+        {
+            var errorsMessage = errors.Select(e=> e.Message).ToList();
+
+            var sb = new StringBuilder();
+            foreach (var error in errors)
+            {
+                sb.AppendLine(error.Message);
+                sb.AppendLine(";");
+            }
+            _logger.LogError("ProcessFiles  error:{errors}",sb);
+
             return Result
-                .Fail(errors.ToList())
+                .Fail(Error.InternalServerError("Some files were not handled!"))
                 .WithData(handledFiles.ToList());
+        }
 
         return Result.Ok(handledFiles.ToList());
     }
@@ -65,7 +83,11 @@ public class MinioFilesHandler
         }
         catch (Exception ex)
         {
-            errors.Add(Error.Exception(ex));
+            _logger.LogCritical(
+                "Error while Proccess File with MinioFilesHandler!FileName:{Name};Exception:{ex}",
+                file.Name, ex.Message);
+
+            errors.Add(Error.InternalServerError($"ProcessFile: {file.Name} unexpected error!"));
         }
         finally
         {

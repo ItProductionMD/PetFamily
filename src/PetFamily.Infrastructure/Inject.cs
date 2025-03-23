@@ -10,12 +10,15 @@ using PetFamily.Infrastructure.Repositories.Read;
 using PetFamily.Infrastructure.Repositories.Write;
 using PetFamily.Infrastructure.Services.BackgroundServices;
 using PetFamily.Infrastructure.Services.MinioService;
-using Dapper;
+//using Dapper;
 using System.Data;
 using Npgsql;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.Commands.PetTypeManagment;
 using PetFamily.Application.Commands.FilesManagment;
+using PetFamily.Application.Dtos;
+using static PetFamily.Infrastructure.Dapper.Convertors;
+using PetFamily.Infrastructure.Dapper;
 
 namespace PetFamily.Infrastructure;
 
@@ -26,12 +29,13 @@ public static class Inject
         IConfiguration configuration)
     {
         var postgresConnection = configuration.GetConnectionString(ConnectionStringName.POSTGRESQL);
+        DapperConfigurations.ConfigDapper();
 
         services
             .AddScoped<IVolunteerReadRepository, VolunteerReadRepositoryWithDapper>()
             .AddScoped<ISpeciesRepository, SpeciesRepository>()
-            .AddScoped<IVolunteerRepository, VolunteerRepository>()
             .AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddScoped<IVolunteerWriteRepository, VolunteerWriteRepository>()
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddDbContext<ReadDbContext>(options => options.UseNpgsql(postgresConnection))
             .AddScoped<IDbConnection>(sp => new NpgsqlConnection(postgresConnection))
@@ -40,6 +44,7 @@ public static class Inject
             .AddHostedService<MinioCleanupService>()
             .AddAWSClient(configuration)
             .AddMinio(configuration);
+
 
         return services;
     }

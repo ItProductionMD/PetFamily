@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared;
@@ -8,10 +9,10 @@ using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 namespace PetFamily.Application.Commands.PetManagment.UpdateSocialNetworks;
 
 public class UpdateSocialNetworkHandler(
-    IVolunteerRepository volunteerRepository,
-    ILogger<UpdateSocialNetworkHandler> logger)
+    IVolunteerWriteRepository volunteerRepository,
+    ILogger<UpdateSocialNetworkHandler> logger) : ICommandHandler<UpdateSocialNetworksCommand>
 {
-    private readonly IVolunteerRepository _volunteerRepository = volunteerRepository;
+    private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<UpdateSocialNetworkHandler> _logger = logger;
     public async Task<UnitResult> Handle(
         UpdateSocialNetworksCommand command,
@@ -19,19 +20,22 @@ public class UpdateSocialNetworkHandler(
     {
         var validationResult = ValidateItems(
             command.SocialNetworksDtos,
-            (s)=>SocialNetworkInfo.Validate(s.Name,s.Url));
+            (s) => SocialNetworkInfo.Validate(s.Name, s.Url));
 
         if (validationResult.IsFailure)
         {
             _logger.LogError(
-                "UpdateSocialNetworkHandler socials validation failure!{validationResult.Errors}",
-                validationResult.ToErrorMessages());
+                "UpdateSocialNetworkHandler socials validation failure!{Errors}",
+                validationResult.ValidationMessagesToString());
 
             return validationResult;
         }
-        //------------------------------------Get Volunteer---------------------------------------//
-        var volunteer = await _volunteerRepository.GetByIdAsync(command.volunteerId, cancelToken);
-        
+        var getVolunteer = await _volunteerRepository.GetByIdAsync(command.volunteerId, cancelToken);
+        if (getVolunteer.IsFailure)
+            return UnitResult.Fail(getVolunteer.Error);
+
+        var volunteer = getVolunteer.Data!;
+
         var socialNetworks = command.SocialNetworksDtos
             .Select(social => SocialNetworkInfo.Create(social.Name, social.Url).Data) ?? [];
 
@@ -39,7 +43,7 @@ public class UpdateSocialNetworkHandler(
 
         await _volunteerRepository.Save(volunteer, cancelToken);
 
-        _logger.LogInformation("Udate SocialNetworks for volunteer with id:{Id} successful.",
+        _logger.LogInformation("Update SocialNetworks for volunteer with id:{Id} successfull.",
             command.volunteerId);
 
         return UnitResult.Ok();

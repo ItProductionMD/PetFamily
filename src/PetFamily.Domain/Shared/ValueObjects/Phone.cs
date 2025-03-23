@@ -3,9 +3,10 @@ using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using PetFamily.Domain.Results;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
-public record Phone
+public record Phone:IValueObject
 {
     public string Number { get; }
     public string RegionCode { get; }
@@ -66,5 +67,9 @@ public record Phone
         return HasOnlyEmptyStrings(regionCode, number);
     }
 
-
+    public IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Number;
+        yield return RegionCode;
+    }
 }

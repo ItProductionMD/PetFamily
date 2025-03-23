@@ -2,7 +2,7 @@
 
 public enum HelpStatus
 {
-    Adopted,
+    Helped,
     ForAdoption,
     ForHelp,
 }

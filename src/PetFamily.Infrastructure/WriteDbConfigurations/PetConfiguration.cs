@@ -59,8 +59,9 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         });
 
         builder.Property(p => p.Requisites)
-                .HasConversion(new ReadOnlyListConverter<RequisitesInfo>())
-                .Metadata.SetValueComparer(new ReadOnlyListComparer<RequisitesInfo>());
+            .HasConversion(new ReadOnlyListConverter<RequisitesInfo>())
+            .HasColumnType("jsonb")
+            .Metadata.SetValueComparer(new ReadOnlyListComparer<RequisitesInfo>());
 
         builder.ComplexProperty(p => p.Address, address =>
         {
@@ -80,7 +81,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         });
 
         builder.Property(p => p.Images)
-            .HasConversion(new ReadOnlyListConverter<Image>())
+           .HasConversion(new ReadOnlyListConverter<Image>())
+           .HasColumnType("jsonb")
            .Metadata.SetValueComparer(new ReadOnlyListComparer<Image>());
 
         // For soft delete

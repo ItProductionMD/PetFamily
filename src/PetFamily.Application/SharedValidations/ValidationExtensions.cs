@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Application.Validations;
@@ -19,13 +20,13 @@ public static class ValidationExtensions
             if (result.IsSuccess)
                 return;
 
-            foreach (var error in result.Errors)
+            foreach (var validationError in result.Error.ValidationErrors)
             {
-                if (error != null)
+                if (validationError != null)
                 {
-                    var failure = new ValidationFailure(error.FieldName, error.Message)
+                    var failure = new ValidationFailure(validationError.ObjectName, validationError.ErrorCode)
                     {
-                        ErrorCode = error.Code
+                        ErrorCode = validationError.ErrorCode
                     };
                     context.AddFailure(failure);
                 }
@@ -36,39 +37,37 @@ public static class ValidationExtensions
     {
         var errors = validationResult.Errors;
 
-        List<Error> myErrors = [];
+        List<ValidationError> validationErrors = [];
 
         //convert fluentvalidation error in error from Result 
         foreach (var item in errors)
         {
-            var customError = Error.Custom(
-                item.ErrorCode,
-                item.ErrorMessage,
-                ErrorType.Validation,
-                item.PropertyName);
+            var validationError = new ValidationError(
+                ValidationErrorType.General,
+                item.PropertyName,
+                item.ErrorCode);
 
-            myErrors.Add(customError);
+            validationErrors.Add(validationError);
         }
-        return Result.Fail(myErrors!);
+        return Result.Fail(Error.ValidationError(validationErrors));
     }
 
     public static UnitResult ToResultFailure(this ValidationResult validationResult)
     {
         var errors = validationResult.Errors;
 
-        List<Error> myErrors = [];
+        List<ValidationError> validationErrors = [];
 
         //convert fluentvalidation error in error from Result 
         foreach (var item in errors)
         {
-            var customError = Error.Custom(
-                item.ErrorCode,
-                item.ErrorMessage,
-                ErrorType.Validation,
-                item.PropertyName);
+            var validationError = new ValidationError(
+                ValidationErrorType.General,
+                item.PropertyName,
+                item.ErrorCode);
 
-            myErrors.Add(customError);
+            validationErrors.Add(validationError);
         }
-        return UnitResult.Fail(myErrors!);
+        return Result.Fail(Error.ValidationError(validationErrors));
     }
 }

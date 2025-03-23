@@ -1,8 +1,9 @@
-﻿using PetFamily.Domain.Shared.ValueObjects;
+﻿using PetFamily.Application.Abstractions;
+using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Application.Commands.FilesManagment.Commands;
 
-public class UploadFileCommand
+public class UploadFileCommand : ICommand
 {
     public string OriginalName { get; init; }
     public string StoredName { get; private set; }

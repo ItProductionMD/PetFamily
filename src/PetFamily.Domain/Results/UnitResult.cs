@@ -1,36 +1,34 @@
 ﻿using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Shared.Validations;
 using System.Runtime.CompilerServices;
 
 namespace PetFamily.Domain.Results;
 public class UnitResult : Result
 {
-    public UnitResult WithError(Error error)
-    {
-        AddError(error);
-        return this;
-    }
     public static UnitResult Ok() => new() { IsSuccess = true };
+
     public static UnitResult ValidateCollection(params Func<UnitResult>[] validators)
     {
-        var errors = new List<Error>();
+        
+        var validationErrors = new List<ValidationError>();
         for (int i = 0; i < validators.Length; i++)
         {
             var result = validators[i]();
 
-            if (result.IsFailure && result.Errors != null)
-                errors.AddRange(result.Errors);
+            if (result.IsFailure && result.Error != null && result.Error.ValidationErrors.Any())
+                validationErrors.AddRange(result.Error.ValidationErrors);
         }
-        return errors.Count > 0 
-            ? Fail(errors) 
+        return validationErrors.Count > 0 
+            ? Fail(Error.ValidationError(validationErrors)) 
             : Ok();
     }
+
     public  Result<T> WithData<T>(T data)
     {
         Result<T> result = new Result<T>() { Data = data };
         if (IsFailure)
         {
             result.IsSuccess = false;
-            result.AddErrors(Errors);
         }
         return result;
     }

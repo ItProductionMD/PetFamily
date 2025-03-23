@@ -52,8 +52,7 @@ public class PetTests
         var validateResult = Pet.Validate(name, description, color, healthInfo);
         // ASSERT
         Assert.False(validateResult.IsSuccess);
-        Assert.Single(validateResult.Errors);
-        Assert.Equal(Error.InvalidLength(fieldNameWithError).Type,validateResult.Errors.FirstOrDefault()!.Type);
+        Assert.Equal(Error.InvalidLength(fieldNameWithError).Type,validateResult.Error!.Type);
     }
 
     [Theory]
@@ -71,9 +70,8 @@ public class PetTests
 
         // ASSERT
         Assert.False(validateResult.IsSuccess);
-        Assert.Single(validateResult.Errors);
 
-        var error = validateResult.Errors.First();
+        var error = validateResult.Error;
         Assert.Equal(Error.InvalidFormat("name").Type, error.Type);
     }
 
@@ -89,9 +87,8 @@ public class PetTests
 
         // ASSERT
         Assert.False(validateResult.IsSuccess);
-        Assert.Single(validateResult.Errors);
 
-        var error = validateResult.Errors.First();
+        var error = validateResult.Error;
         Assert.Equal(Error.InvalidFormat("name").Type, error.Type);
     }
 

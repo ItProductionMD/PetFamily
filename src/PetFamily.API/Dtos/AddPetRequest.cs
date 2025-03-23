@@ -1,5 +1,5 @@
 ﻿using PetFamily.Application.Commands.PetManagment.AddPet;
-using PetFamily.Application.Commands.PetManagment.Dtos;
+using PetFamily.Application.Dtos;
 
 namespace PetFamily.API.Dtos;
 

@@ -8,6 +8,7 @@ using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using System.Collections.Generic;
+using PetFamily.Domain.Shared.Interfaces;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 

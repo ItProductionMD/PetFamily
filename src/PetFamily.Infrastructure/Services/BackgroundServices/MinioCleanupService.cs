@@ -64,7 +64,7 @@ public class MinioCleanupService(
                 _logger.LogCritical("UndeletedFiles:{fileNames}", names);
             }
             _logger.LogCritical("MinioBackgroundCleanup service error!Errors:{error}"
-                , result.ToErrorMessages());
+                , result.Error.Message);
         }
         else
         {

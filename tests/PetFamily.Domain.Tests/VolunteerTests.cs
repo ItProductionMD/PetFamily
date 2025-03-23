@@ -136,7 +136,6 @@ public class VolunteerTests
 
         //ASSERT
         Assert.True(validationResult.IsSuccess);
-        Assert.Empty(validationResult.Errors);
     }
     [Theory]
     [InlineData("", "LastName", "aaa@gmail.com", "+373", "699656666", 1, "description")]//FirstName
@@ -180,7 +179,6 @@ public class VolunteerTests
 
         //ASSERT
         Assert.True(validationResult.IsFailure);
-        Assert.Single(validationResult.Errors);
     }
     [Fact]
     public void DeleteVolunteer_ShouldSetVolunteerAndAllPetsAsDeleted() 
@@ -228,7 +226,7 @@ public class VolunteerTests
         //ASSERT
         Assert.Equal(newFullName, volunteer.FullName);
         Assert.Equal(email, volunteer.Email);
-        Assert.Equal(phone, volunteer.PhoneNumber);
+        Assert.Equal(phone, volunteer.Phone);
         Assert.Equal(experienceYears, volunteer.ExperienceYears);
         Assert.Equal(description, volunteer.Description);
         Assert.True(updateResult.IsSuccess);

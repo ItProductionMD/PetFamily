@@ -1,6 +1,7 @@
 ﻿using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.Validations;
 
 namespace PetFamily.Application.SharedValidations;
 
@@ -8,38 +9,39 @@ public static class FileValidator
 {
     public static UnitResult Validate(UploadFileCommand fileDto, FileValidatorOptions options)
     {
-        List<Error> errors = [];
+        List<ValidationError> validationErrors = [];
 
         if (fileDto.Stream == null || fileDto.Size == 0)
-            errors.Add(Error.Custom(
-                "file.is.invalid",
-                "File is null or empty",
-                ErrorType.Validation,
-                "File"));
+            validationErrors.Add(
+                Error.FileValidation(
+                    fileDto.OriginalName,
+                    ValidationErrorCodes.FILE_IS_EMPTY)
+                .ValidationErrors.FirstOrDefault()!);
 
         if (fileDto.Size > options.MaxSize)
-            errors.Add(Error.Custom(
-                "file.is.invalid",
-                $"The size of file is bigger than {options.MaxSize} !",
-                ErrorType.Validation,
-                "File"));
+            validationErrors.Add(
+                Error.FileValidation(
+                    fileDto.OriginalName,
+                    ValidationErrorCodes.FILE_TOO_LARGE)
+                .ValidationErrors.FirstOrDefault()!);
 
         if (!options.AllowedExtensions.Contains(fileDto.Extension))
-            errors.Add(Error.Custom(
-                "file.is.invalid",
-                $"The file {fileDto.StoredName} format(extension) is not permited",
-                ErrorType.Validation,
-                "File"));
+            validationErrors.Add(
+                 Error.FileValidation(
+                     fileDto.OriginalName,
+                     ValidationErrorCodes.FILE_INVALID_EXTENSION)
+                 .ValidationErrors.FirstOrDefault()!);
+
 
         if (!options.AllowedMimeTypes.Contains(fileDto.MimeType))
-            errors.Add(Error.Custom(
-               "file.is.invalid",
-               $"The file {fileDto.StoredName} format(mimeType) is not permited",
-               ErrorType.Validation,
-               "File"));
+            validationErrors.Add(
+                 Error.FileValidation(
+                     fileDto.OriginalName,
+                     ValidationErrorCodes.FILE_INVALID_EXTENSION)
+                 .ValidationErrors.FirstOrDefault()!);
 
-        if (errors.Count > 0)
-            return UnitResult.Fail(errors!);
+        if (validationErrors.Count > 0)
+            return UnitResult.Fail(Error.ValidationError(validationErrors));
 
         return UnitResult.Ok();
     }
@@ -47,11 +49,7 @@ public static class FileValidator
     {
         if (filesCount > options.MaxFilesCount)
         {
-            return UnitResult.Fail(Error.Custom(
-                     "files.count.invalid",
-                     $"Count of files is bigger than {options.MaxFilesCount}",
-                     ErrorType.Validation,
-                     "Files"));
+            return UnitResult.Fail(Error.ValueOutOfRange("Count of files is out of range"));
         }
         return UnitResult.Ok();
     }

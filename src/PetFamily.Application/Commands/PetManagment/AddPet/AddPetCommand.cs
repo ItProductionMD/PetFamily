@@ -1,4 +1,5 @@
-﻿using PetFamily.Application.Commands.PetManagment.Dtos;
+﻿using PetFamily.Application.Abstractions;
+using PetFamily.Application.Dtos;
 using PetFamily.Domain.Shared.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -28,5 +29,5 @@ namespace PetFamily.Application.Commands.PetManagment.AddPet
        string Region,
        string Street,
        string HomeNumber,
-       IEnumerable<RequisitesDto> Requisites);
+       IEnumerable<RequisitesDto> Requisites): ICommand;
 }
