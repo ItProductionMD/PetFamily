@@ -244,9 +244,13 @@ public class AddPetHandlerTests
         _speciesRepositoryMock.Setup(x => x.GetAsync(species.Id, _token))
             .ReturnsAsync(species);
 
-        /*_volunteerReadRepositoryMock
+        _volunteerRepositoryMock
            .Setup(x => x.GetByIdAsync(command.VolunteerId, _token))
-           .ReturnsAsync(resultGetVolunteer); ;*/
+           .ReturnsAsync(resultGetVolunteer);
+
+        _volunteerRepositoryMock
+            .Setup(x => x.Save(resultGetVolunteer.Data!, _token))
+            .ReturnsAsync(UnitResult.Ok());
 
         var result = await _handler.Handle(command, _token);
 

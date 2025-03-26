@@ -45,18 +45,37 @@ public static class FileValidator
 
         return UnitResult.Ok();
     }
-    public static UnitResult ValidateMaxCount(int filesCount, FileValidatorOptions options)
+
+    public static UnitResult ValidateFilesCount(int filesCount, FileValidatorOptions options)
     {
+        if (filesCount == 0)        
+            return UnitResult.Fail(Error.FilesCountIsNull());
+        
         if (filesCount > options.MaxFilesCount)
-        {
             return UnitResult.Fail(Error.ValueOutOfRange("Count of files is out of range"));
-        }
+ 
         return UnitResult.Ok();
     }
 
+    public static UnitResult ValidateList(
+        List<UploadFileCommand> fileDtos,
+        FileValidatorOptions fileValidatorOptions )
+    {
+        var validateCounts = ValidateFilesCount(fileDtos.Count, fileValidatorOptions);
+        if(validateCounts.IsFailure)
+            return validateCounts;
 
-    /// <summary>
-    /// Получение полного расширения файла (учитывает двойные расширения типа .tar.gz)
-    /// </summary>
-    
+        List<ValidationError> validationErrors = [];
+
+        foreach (var fileDto in fileDtos)
+        {
+            var validationResult = Validate(fileDto, fileValidatorOptions);
+            if (validationResult.IsFailure)
+                validationErrors.AddRange(validationResult.Error.ValidationErrors);
+        }
+        if (validationErrors.Count > 0)
+            return UnitResult.Fail(Error.ValidationError(validationErrors));
+
+        return UnitResult.Ok();
+    }
 }

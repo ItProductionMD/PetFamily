@@ -51,7 +51,9 @@ public class CreateVolunteerHandlerTests
     [InlineData("phoneRegion", "firstName", "lastName", "rubon@gmail.com", "6767678876", "+37D3", 0)]
     [InlineData("expirienceYears", "firstName", "lastName", "rubon@gmail.com", "6767678876", "+373", 345)]
     public void ValidateCreateVolunteerCommand_WithValidationError_ShouldReturnFailure(
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         string invalidFieldName,
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
         string firstName,
         string lastName,
         string email,
@@ -82,7 +84,9 @@ public class CreateVolunteerHandlerTests
     [InlineData("lastName", 5, 1000, 5)]
     [InlineData("email", 5, 5, 1000)]
     public void ValidateCreateVolunteerCommand_WithValidationErrorTextLength_ShouldReturnFailure(
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         string invalidFieldName,
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
         int firstNameSize,
         int lastNameSize,
         int emailSize)
@@ -138,7 +142,7 @@ public class CreateVolunteerHandlerTests
         _loggerMock.Verify(x => x.Log(
             LogLevel.Error,
             It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Fail validate volunteer command")),
+            It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Fail validate volunteer command")),
             null,
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -162,10 +166,21 @@ public class CreateVolunteerHandlerTests
         var volunteer = TestDataFactory.CreateVolunteer();
         var addResult = Result.Ok(volunteer.Id);
 
-        _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
+        _validatorMock
+            .Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
 
-        _volunteerRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
+        _volunteerReadRepositoryMock
+            .Setup(v => v.CheckUniqueFields(
+                Guid.Empty,
+                command.PhoneRegionCode,
+                command.PhoneNumber,
+                command.Email,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(UnitResult.Ok());
+
+        _volunteerRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(addResult);
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -173,10 +188,10 @@ public class CreateVolunteerHandlerTests
         // Assert
         Assert.True(result.IsSuccess);
 
-        _loggerMock.Verify(x => 
+        _loggerMock.Verify(x =>
         x.Log(LogLevel.Information, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) =>
-            v.ToString().Contains("Volunteer with id:")), 
-            null, 
+            v.ToString()!.Contains("Volunteer with id:")),
+            null,
             It.IsAny<Func<It.IsAnyType, Exception?,
             string>>()), Times.Once);
     }

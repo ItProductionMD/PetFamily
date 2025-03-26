@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Commands.PetTypeManagment;
 using PetFamily.Application.Commands.PetManagment.AddPet;
 using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
-using PetFamily.Application.Commands.PetManagment.UpdatePetImages;
 using PetFamily.Application.Commands.PetManagment.UpdateSocialNetworks;
 using PetFamily.Application.SharedValidations;
 using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;

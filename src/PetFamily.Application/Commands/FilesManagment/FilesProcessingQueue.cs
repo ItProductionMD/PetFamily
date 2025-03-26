@@ -10,9 +10,9 @@ namespace PetFamily.Application.Commands.FilesManagment;
 
 public class FilesProcessingQueue
 {
-    public Channel<List<AppFile>> DeleteChannel { get; }
+    public Channel<List<AppFileDto>> DeleteChannel { get; }
     public FilesProcessingQueue()
     {
-        DeleteChannel = Channel.CreateUnbounded<List<AppFile>>();
+        DeleteChannel = Channel.CreateUnbounded<List<AppFileDto>>();
     }
 }

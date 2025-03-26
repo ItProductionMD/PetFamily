@@ -23,6 +23,7 @@ namespace PetFamily.Domain.Shared.Validations
         public const string FILE_RESTORE_FAILED = "file.restore.failed";
         public const string FILES_COUNT_OUT_OF_RANGE = "files.count.out.of.range";
         public const string FILE_INVALID_MIME_TYPE = "file.invalid.mime.type";
+        public const string FILES_COUNT_IS_NULL = "files.count.is.null";
 
 
     }

@@ -12,8 +12,8 @@ using Minio.DataModel.Args;
 using Minio.DataModel.ILM;
 using Minio.DataModel.Notification;
 using Minio.Exceptions;
-using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
+using PetFamily.Application.IRepositories;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
 using Polly;
@@ -41,7 +41,7 @@ public class MinioFileRepository(
     private readonly MinioOptions _minioOptions = minioOptions.Value;
 
     //-------------------------------------------Get File-----------------------------------------//
-    public async Task<Result<Uri>> GetFileUrlAsync(AppFile file, CancellationToken cancelToken)
+    public async Task<Result<Uri>> GetFileUrlAsync(AppFileDto file, CancellationToken cancelToken)
     {
         var existArgs = new BucketExistsArgs().WithBucket(file.Folder);
         var bucketExist = await _client.BucketExistsAsync(existArgs, cancelToken);
@@ -76,13 +76,13 @@ public class MinioFileRepository(
     }
 
     //------------------------------------------Upload File---------------------------------------//
-    public async Task UploadFileAsync(AppFile file, CancellationToken cancelToken)
+    public async Task UploadFileAsync(AppFileDto file, CancellationToken cancelToken)
     {
         bool bucketExists = await _client.BucketExistsAsync(
             new BucketExistsArgs().WithBucket(file.Folder), cancelToken);
         if (bucketExists == false)
         {
-            await CreateBucketWithLifecyclePolicy(file.Folder,cancelToken);
+            await CreateBucketWithLifecyclePolicy(file.Folder, cancelToken);
         }
         var putObjectArgs = new PutObjectArgs()
             .WithBucket(file.Folder)
@@ -97,7 +97,7 @@ public class MinioFileRepository(
         _logger.LogInformation("Uploaded file {Name} to MinIO bucket {Folder}", file.Name, file.Folder);
     }
     //--------------------------------------Upload File With Retry--------------------------------//
-    public async Task UploadFileWithRetryAsync(AppFile file, CancellationToken cancelToken)
+    public async Task UploadFileWithRetryAsync(AppFileDto file, CancellationToken cancelToken)
     {
         var retryPolicy = Policy.Handle<MinioException>().WaitAndRetryAsync(
             _minioOptions.FileRetryCount,
@@ -116,13 +116,33 @@ public class MinioFileRepository(
     }
 
     //------------------------------------------Upload FileList-----------------------------------//
-    public async Task<Result<List<string>>> UploadFileListAsync(
-        List<AppFile> files,
+    public async Task<Result<List<FileUploadResponse>>> UploadFileListAsync(
+        List<AppFileDto> files,
         CancellationToken cancelToken)
     {
         var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, cancelToken);
 
-        return await minioFilesHandler.ProcessFilesAsync(files, UploadFileWithRetryAsync);
+        var uploadResult = await minioFilesHandler.ProcessFilesAsync(files, UploadFileWithRetryAsync);
+
+        if (uploadResult.Data == null || uploadResult.Data.Count == 0)
+            return UnitResult.Fail(uploadResult.Error);
+
+        var response = new List<FileUploadResponse>();
+
+        foreach (var file in files)
+        {
+            if (uploadResult.Data.Contains(file.Name))
+            {
+                FileUploadResponse uploadResponse = new(file.OriginalName, file.Name, true, string.Empty);
+                response.Add(uploadResponse);
+            }
+            else
+            {
+                FileUploadResponse uploadResponse = new(file.OriginalName, file.Name, false, string.Empty);
+                response.Add(uploadResponse);
+            }
+        }
+        return Result.Ok(response);
     }
     //--------------------------------------------Delete File-------------------------------------//
     /// <summary>
@@ -133,7 +153,7 @@ public class MinioFileRepository(
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task DeleteFileAsync(AppFile file, CancellationToken cancelToken)
+    public async Task DeleteFileAsync(AppFileDto file, CancellationToken cancelToken)
     {
         bool bucketExists = await _client.BucketExistsAsync(
             new BucketExistsArgs().WithBucket(file.Folder), cancelToken);
@@ -147,12 +167,12 @@ public class MinioFileRepository(
         var removeArgs = new RemoveObjectArgs().WithBucket(file.Folder).WithObject(file.Name);
 
         await _client.RemoveObjectAsync(removeArgs, cancelToken);
-       
+
         _logger.LogInformation(
             "Deleted file {ObjectName} from MinIO bucket {BucketName}", file.Name, file.Folder);
     }
     //---------------------------------------Delete File with retry------------------------------//
-    public async Task DeleteFileWithRetryAsync(AppFile file, CancellationToken cancelToken)
+    public async Task DeleteFileWithRetryAsync(AppFileDto file, CancellationToken cancelToken)
     {
         var retryPolicy = Policy.Handle<MinioException>().WaitAndRetryAsync(_minioOptions.FileRetryCount,
             retryAttempt =>
@@ -170,17 +190,37 @@ public class MinioFileRepository(
         });
     }
     //-------------------------------------------Delete FileList----------------------------------//
-    public async Task<Result<List<string>>> DeleteFileListAsync(
-        List<AppFile> files,
+    public async Task<Result<List<FileDeleteResponse>>> DeleteFileListAsync(
+        List<AppFileDto> files,
         CancellationToken cancelToken)
     {
-        var minioFilesHandler = new MinioFilesHandler(_logger,_minioOptions.CountForSemaphore, cancelToken);
+        var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, cancelToken);
 
-        return await minioFilesHandler.ProcessFilesAsync(files, DeleteFileWithRetryAsync);
+        var deleteResult = await minioFilesHandler.ProcessFilesAsync(files, DeleteFileWithRetryAsync);
+
+        if (deleteResult.Data == null || deleteResult.Data.Count == 0)
+            return UnitResult.Fail(deleteResult.Error);
+
+        var response = new List<FileDeleteResponse>();
+
+        foreach (var file in files)
+        {
+            if (deleteResult.Data.Contains(file.Name))
+            {
+                FileDeleteResponse uploadResponse = new(file.Name, true);
+                response.Add(uploadResponse);
+            }
+            else
+            {
+                FileDeleteResponse uploadResponse = new(file.Name, false);
+                response.Add(uploadResponse);
+            }
+        }
+        return Result.Ok(response);
     }
 
     //-------------------------------------Soft delete file --------------------------------------//
-    public async Task SoftDeleteFileAsync(AppFile file, CancellationToken cancelToken)
+    public async Task SoftDeleteFileAsync(AppFileDto file, CancellationToken cancelToken)
     {
         bool bucketExists = await _client.BucketExistsAsync(
             new BucketExistsArgs().WithBucket(file.Folder), cancelToken);
@@ -200,7 +240,7 @@ public class MinioFileRepository(
             file.Name, file.Folder);
     }
     //---------------------------------Soft delete file with retry--------------------------------//
-    public async Task SoftDeleteFileWithRetryAsync(AppFile file, CancellationToken cancelToken)
+    public async Task SoftDeleteFileWithRetryAsync(AppFileDto file, CancellationToken cancelToken)
     {
         var retryPolicy = Policy.Handle<MinioException>().WaitAndRetryAsync(
             _minioOptions.FileRetryCount,
@@ -217,7 +257,7 @@ public class MinioFileRepository(
     }
     //------------------------------------Soft delete file list-----------------------------------//    
     public async Task<Result<List<string>>> SoftDeleteFileListAsync(
-    List<AppFile> files,
+    List<AppFileDto> files,
     CancellationToken cancelToken)
     {
         var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, cancelToken);
@@ -225,7 +265,7 @@ public class MinioFileRepository(
         return await minioFilesHandler.ProcessFilesAsync(files, SoftDeleteFileWithRetryAsync);
     }
     //--------------------------------------Restore file------------------------------------------//
-    public async Task RestoreFileAsync(AppFile file, CancellationToken cancelToken)
+    public async Task RestoreFileAsync(AppFileDto file, CancellationToken cancelToken)
     {
         bool bucketExists = await _client.BucketExistsAsync(
             new BucketExistsArgs().WithBucket(file.Folder), cancelToken);
@@ -257,12 +297,13 @@ public class MinioFileRepository(
     }
 
 
-    public async Task RestoreFileAsyncV2(AppFile file, CancellationToken cancelToken)
+    public async Task RestoreFileAsyncV2(AppFileDto file, CancellationToken cancelToken)
     {
         bool bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_amazonClient, file.Folder);
         if (!bucketExists)
         {
-            _logger.LogWarning("Bucket '{BucketName}' does not exist. Cannot restore file '{FileName}'", file.Folder, file.Name);
+            _logger.LogWarning("Bucket '{BucketName}' does not exist. Cannot restore file '{FileName}'"
+                , file.Folder, file.Name);
             throw new InvalidOperationException($"Bucket '{file.Folder}' does not exist.");
         }
         var request = new ListVersionsRequest
@@ -292,7 +333,7 @@ public class MinioFileRepository(
         }
     }
     //-----------------------------------Restore file with retry----------------------------------//
-    public async Task RestoreFileWithRetryAsync(AppFile file, CancellationToken cancelToken)
+    public async Task RestoreFileWithRetryAsync(AppFileDto file, CancellationToken cancelToken)
     {
         var retryPolicy = Policy.Handle<MinioException>().WaitAndRetryAsync(
             _minioOptions.FileRetryCount,
@@ -308,7 +349,7 @@ public class MinioFileRepository(
     }
     //-----------------------------------Restore file list----------------------------------------//
     public async Task<Result<List<string>>> RestoreFileListAsync(
-        List<AppFile> files,
+        List<AppFileDto> files,
         CancellationToken cancelToken)
     {
         var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, cancelToken);
@@ -316,8 +357,8 @@ public class MinioFileRepository(
     }
     //----------------------------------RollBack files--------------------------------------------//
     public async Task<UnitResult> RollBackFilesAsync(
-       List<AppFile> filesToRestore,
-       List<AppFile> filesToDelete,
+       List<AppFileDto> filesToRestore,
+       List<AppFileDto> filesToDelete,
        CancellationToken cancelToken)
     {
         List<Error> errors = [];
@@ -340,26 +381,6 @@ public class MinioFileRepository(
             : UnitResult.Ok();
     }
 
-    public async Task RolleBackeFileFithTimeOutControl(
-       List<AppFile> filesToRestore,
-       List<AppFile> filesToDelete)
-    {
-        var cts = new CancellationTokenSource();
-        var timeOutTask = Task.Delay(10000, cts.Token);
-        var rollbackTask = RollBackFilesAsync(filesToRestore, filesToDelete, cts.Token);
-        var completedTask = await Task.WhenAny(timeOutTask, rollbackTask);
-        if (rollbackTask.IsCompletedSuccessfully)
-        {
-            _logger.LogInformation("Rollback files completed successfully!");
-            cts.Cancel();
-        }
-        else
-        {
-            _logger.LogCritical("Rollback files failed! Timeout!");
-            cts.Cancel();
-        }
-    }
-
 
     //MinIO uses a scanner process to check objects against all configured lifecycle management
     //rules. Slow scanning due to high IO workloads or limited system resources may delay application
@@ -374,7 +395,7 @@ public class MinioFileRepository(
     private async Task CreateBucketWithLifecyclePolicy(string bucket, CancellationToken cancelToken)
     {
         _logger.LogWarning("Bucket '{Folder}' does not exist!Creating bucket...", bucket);
-        
+
         await _client.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucket), cancelToken);
 
         var setVersioningArgs = new SetVersioningArgs().WithBucket(bucket).WithVersioningEnabled();

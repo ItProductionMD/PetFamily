@@ -29,10 +29,10 @@ public class DeleteVolunteerHandler(
 
         var volunteer = getVolunteer.Data!;
 
-        List<AppFile> imagesToDelete = [];
+        List<AppFileDto> imagesToDelete = [];
 
         foreach (var pet in volunteer.Pets)
-            imagesToDelete.AddRange(pet.Images.Select(x => new AppFile(x.Name,_fileFolders.Images)));   
+            imagesToDelete.AddRange(pet.Images.Select(x => new AppFileDto(x.Name,_fileFolders.Images)));   
         
 
         await _volunteerRepository.Delete(volunteer, cancelToken);

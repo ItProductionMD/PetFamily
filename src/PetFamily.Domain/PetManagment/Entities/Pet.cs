@@ -9,12 +9,14 @@ using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using System.Collections.Generic;
 using PetFamily.Domain.Shared.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
+using Image = PetFamily.Domain.Shared.ValueObjects.Image;
+using PetFamily.Domain.DomainError;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
 public class Pet : Entity<Guid>, ISoftDeletable
 {
-    public const int MAX_IMAGES_COUNT = 10;
     public string Name { get; private set; }
     public DateOnly? DateOfBirth { get; private set; }
     public DateTime DateTimeCreated { get; private set; }
@@ -92,7 +94,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
         Address? address,
         PetSerialNumber serialNumber)
     {
-        var validatePetDomain = Validate(name,description, color, healthInfo);
+        var validatePetDomain = Validate(name, description, color, healthInfo);
         return validatePetDomain.IsFailure
             ? validatePetDomain
             : Result.Ok(new Pet(
@@ -106,11 +108,11 @@ public class Pet : Entity<Guid>, ISoftDeletable
                 height,
                 color,
                 petType,
-                ownerPhone??Phone.CreateEmpty(),
+                ownerPhone ?? Phone.CreateEmpty(),
                 requisites,
                 helpStatus,
                 healthInfo,
-                address?? Address.CreateEmpty(),
+                address ?? Address.CreateEmpty(),
                 serialNumber));
     }
     public static UnitResult Validate(
@@ -145,20 +147,38 @@ public class Pet : Entity<Guid>, ISoftDeletable
         _isDeleted = false;
         _deletedDateTime = null;
     }
-    public List<string> AddImages(List<Image> images)
-    {
-        if (Images.Count + images.Count > MAX_IMAGES_COUNT)
-            return [];
 
-        _images.AddRange(images);
-        return images.Select(i=>i.Name).ToList();
+    public void AddImages(List<string> imageNames)
+    {
+        foreach (string imageName in imageNames)
+        {
+            var image = Image.Create(imageName).Data!;
+            _images.Add(image);
+        }
+    }
+    public List<string> DeleteImages(List<string> imageNames)
+    {
+        var imagesToDeleteSet = new HashSet<string>(imageNames); //delete reapeted images
+        var deletedImages = new List<string>();
+
+        _images.RemoveAll(image =>
+        {
+            if (imagesToDeleteSet.Contains(image.Name))
+            {
+                deletedImages.Add(image.Name);
+                return true;
+            }
+            return false;
+        });
+
+        return deletedImages;
     }
     public List<string> DeleteImages(List<Image> images)
     {
         if (images.Count == 0)
             return [];
 
-        var imagesToDeleteSet = new HashSet<string>(images.Select(i=>i.Name)); //delete reapeted images
+        var imagesToDeleteSet = new HashSet<string>(images.Select(i => i.Name)); //delete reapeted images
         var deletedImages = new List<string>();
 
         _images.RemoveAll(image =>
@@ -177,6 +197,5 @@ public class Pet : Entity<Guid>, ISoftDeletable
     {
         HelpStatus = helpStatus;
     }
-   
 }
 

@@ -29,8 +29,8 @@ public class MinioFilesHandler
     }
 
     public async Task<Result<List<string>>> ProcessFilesAsync(
-        List<AppFile> files,
-        Func<AppFile, CancellationToken, Task> fileAction)
+        List<AppFileDto> files,
+        Func<AppFileDto, CancellationToken, Task> fileAction)
     {
         var handledFiles = new ConcurrentBag<string>();
         var errors = new ConcurrentBag<Error>();
@@ -65,8 +65,8 @@ public class MinioFilesHandler
     }
 
     private async Task ProcessFileAsync(
-        AppFile file,
-        Func<AppFile, CancellationToken, Task> fileAction,
+        AppFileDto file,
+        Func<AppFileDto, CancellationToken, Task> fileAction,
         ConcurrentBag<string> handledFiles,
         ConcurrentBag<Error> errors)
     {

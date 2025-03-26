@@ -20,7 +20,6 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Amazon.S3.Model.Internal.MarshallTransformations;
 using PetFamily.Application.Commands.PetManagment.AddPet;
 using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
-using PetFamily.Application.Commands.PetManagment.UpdatePetImages;
 using PetFamily.Application.Commands.PetManagment.UpdateSocialNetworks;
 using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
 using PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
@@ -32,6 +31,10 @@ using PetFamily.Application.Dtos;
 using PetFamily.Application.Queries.Volunteer.GetVolunteers;
 using PetFamily.Application.Queries.Volunteer.GetVolunteer;
 using PetFamily.Application.Commands.SharedCommands;
+using PetFamily.Application.Commands.PetManagment.DeletePetImages;
+using PetFamily.Application.Commands.PetManagment.AddPetImages;
+using PetFamily.API.Common.AppiValidators;
+using PetFamily.Application.Commands.FilesManagment;
 
 namespace PetFamily.API.Controllers;
 
@@ -59,7 +62,7 @@ public class VolunteerController(
         CancellationToken cancelToken = default)
     {
         var command = volunteerRequest.ToCommand();
-        
+
         var handlerResult = await handler.Handle(command, cancelToken);
 
         return handlerResult.IsFailure
@@ -84,7 +87,7 @@ public class VolunteerController(
         CancellationToken cancellationToken = default)
     {
         var command = request.ToCommand(volunteerId);
-            
+
         var handlerResult = await handler.Handle(command, cancellationToken);
 
         return handlerResult.IsFailure
@@ -177,9 +180,9 @@ public class VolunteerController(
         [FromRoute] Guid volunteerId,
         CancellationToken cancelToken = default)
     {
-        var command =  new UpdateSocialNetworksCommand(volunteerId,dtos);
+        var command = new UpdateSocialNetworksCommand(volunteerId, dtos);
 
-        var handlerResult = await handler.Handle(command,cancelToken);
+        var handlerResult = await handler.Handle(command, cancelToken);
 
         return handlerResult.IsFailure
             ? handlerResult.ToErrorActionResult()
@@ -202,7 +205,7 @@ public class VolunteerController(
         [FromRoute] Guid volunteerId,
         CancellationToken cancelToken = default)
     {
-        var command = new UpdateRequisitesCommand(volunteerId,dtos);
+        var command = new UpdateRequisitesCommand(volunteerId, dtos);
 
         var handlerResult = await handler.Handle(command, cancelToken);
 
@@ -264,59 +267,69 @@ public class VolunteerController(
             : Ok(addPetResult.ToEnvelope());
     }
 
-    //------------------------------------Update pet images---------------------------------------//
+    //------------------------------------DeletePetImages-----------------------------------------//
     /// <summary>
-    /// Update pet images
+    /// Delete images from Pet
     /// </summary>
-    /// <param name="handler">Handler for updating pet images</param>
-    /// <param name="petId">The unique identifier of the pet</param>
-    /// <param name="imagesRequest">Request containing images to upload and delete</param>
-    /// <param name="cancelToken">Token to cancel the request</param>
-    /// <returns>
-    /// Returns an <see cref="Envelope"/> containing the update result:
-    /// - 200 OK with the updated pet images if successful.
-    /// - 400 Bad Request if validation fails.
-    /// - 500 Internal Server Error in case of an unexpected error.
-    /// </returns>
-    [HttpPost("{volunteerId:Guid}/pets/{petId:Guid}/images")]
+    /// <param name="handler"></param>
+    /// <param name="volunteerId"></param>
+    /// <param name="petId"></param>
+    /// <param name="images"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    [HttpDelete("{volunteerId:Guid}/pets/{petId:Guid}/images")]
     public async Task<ActionResult<Envelope>> UpdateImages(
-        [FromServices] UpdatePetImagesHandler handler,
+        [FromServices] DeletePetImagesHandler handler,
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
-        [FromForm] UpdateImagesRequest imagesRequest,
+        [FromBody] List<string> images,
         CancellationToken cancelToken)
     {
-        if (imagesRequest.ImagesToUpload.Count > Domain.PetManagment.Entities.Pet.MAX_IMAGES_COUNT)
-        {
-            _logger.LogWarning(
-            "UpdateImages failed: Upload file count ({Count}) exceeds the maximum allowed" +
-            " ({MAX_IMAGES_COUNT})",
-            imagesRequest.ImagesToUpload.Count, Domain.PetManagment.Entities.Pet.MAX_IMAGES_COUNT);
+        if (images.Count == 0)
+            return UnitResult.Fail(Error.FilesCountIsNull()).ToErrorActionResult();
 
-            return Result.Fail(Error.InvalidLength("Upload images count"))
-                .ToErrorActionResult();
-        }
-        if (imagesRequest.ImagesToUpload.Count > 0)
-        {
-            var validateResult = ValidateFiles(imagesRequest.ImagesToUpload, _fileValidatorOptions);
-            if (validateResult.IsFailure)
-            {
-                _logger.LogWarning("Update images validation failed!Errors: {Errors}",
-                     validateResult.ValidationMessagesToString());
+        var command = new DeletePetImagesCommand(volunteerId, petId, images);
 
-                return validateResult.ToErrorActionResult();
-            }
-        }
-        var command = imagesRequest.ToUpdateCommand(volunteerId,petId);
+        var deletePetImages = await handler.Handle(command, cancelToken);
 
-        await using var disposableStreams = new AsyncDisposableCollection(
-            command.UploadCommands.Select(c => c.Stream));
+        return deletePetImages.IsFailure
+            ? deletePetImages.ToErrorActionResult()
+            : deletePetImages.ToEnvelope();
+    }
 
-        var updatePetImages = await handler.Handle(command, cancelToken);
+    //------------------------------------AddPetImages-----------------------------------------//
+    /// <summary>
+    /// Delete images from Pet
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="volunteerId"></param>
+    /// <param name="petId"></param>
+    /// <param name="images"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    [HttpPost("{volunteerId:Guid}/pets/{petId:Guid}/images")]
+    public async Task<ActionResult<Envelope>> AddImages(
+        [FromServices] AddPetImagesHandler handler,
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromForm] List<IFormFile> files,
+        CancellationToken cancelToken)
+    {
+        var validate = Validators.ValidateFiles(files, _fileValidatorOptions);
+        if (validate.IsFailure)
+            return validate.ToErrorActionResult();
 
-        return updatePetImages.IsFailure
-            ? updatePetImages.ToErrorActionResult()
-            : updatePetImages.ToEnvelope();
+        await using var disposableStreams = new AsyncDisposableCollection();
+
+        var uploadfileCommands = Mappers.IFormFilesToUploadCommands(files, disposableStreams);
+
+        var command = new AddPetImagesCommand(volunteerId, petId, uploadfileCommands);
+
+        var uploadPetImages = await handler.Handle(command, cancelToken);
+
+        return uploadPetImages.IsFailure
+            ? uploadPetImages.ToErrorActionResult()
+            : uploadPetImages.ToEnvelope();
     }
 
     //------------------------------------Change pets order---------------------------------------//
@@ -363,7 +376,7 @@ public class VolunteerController(
         [FromServices] GetVolunteersQueryHandler handler,
         CancellationToken cancelToken)
     {
-        var query = new GetVolunteersQuery(pageSize,page,orderBy,orderDirection);
+        var query = new GetVolunteersQuery(pageSize, page, orderBy, orderDirection);
 
         var response = await handler.Handle(query, cancelToken);
 
@@ -386,11 +399,11 @@ public class VolunteerController(
         var random = new Random();
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         List<CreateVolunteerCommand> commands = [];
-        for(int i = 0;i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             var builder = new StringBuilder();
             var reverseBuilder = new StringBuilder();
-            for (int j = 0; j < 10; j++) 
+            for (int j = 0; j < 10; j++)
             {
                 builder.Append(chars[random.Next(chars.Length)]);
             }
@@ -401,22 +414,22 @@ public class VolunteerController(
             var randomPhoneNumber = randomNumber.Next(10000000, 100000000).ToString();
             string randomPhoneRegion = "+" + randomNumber.Next(20, 400).ToString();
             CreateVolunteerCommand command = new(firstName,
-                lastName, 
+                lastName,
                 fakeEmail,
-                string.Empty, 
+                string.Empty,
                 randomPhoneNumber,
                 randomPhoneRegion,
-                0, 
+                0,
                 [],
-                []);  
+                []);
 
             commands.Add(command);
         }
-        foreach(var command in commands)
+        foreach (var command in commands)
         {
             var result = await handler.Handle(command, CancellationToken.None);
             Console.WriteLine($"Task Result:{result.IsSuccess}");
-            if( result.IsFailure)
+            if (result.IsFailure)
                 Console.WriteLine($"Error:{result.Error.Message},ValidationErrors:" +
                     $"{result.ValidationMessagesToString()}");
         }

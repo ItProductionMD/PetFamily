@@ -2,17 +2,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.Extensions.Options;
+using PetFamily.API.Common.AppiValidators;
+using PetFamily.API.Common.Utilities;
 using PetFamily.API.Dtos;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
+using PetFamily.Application.IRepositories;
 using PetFamily.Application.SharedValidations;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.Validations;
 using System.Runtime.CompilerServices;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PetFamily.API.Controllers;
 
@@ -46,34 +50,17 @@ public class TestFileServiceController : ControllerBase
         IFormFile file,
         CancellationToken cancellationToken = default)
     {
-        var fileExtension = UploadFileCommand.GetFullExtension(file.FileName);
+        var validateFile = Validators.ValidateFile(file, _fileValidatorOptions);
+        if (validateFile.IsFailure)
+            return validateFile.ToErrorActionResult();
 
         using var stream = file.OpenReadStream();
-        if (stream == null)
-            return Result.Fail(Error.InvalidFormat("File stream is null"))
-                .ToErrorActionResult();
 
-        UploadFileCommand command = new(
-               string.Concat(Guid.NewGuid(), fileExtension),
-               file.ContentType.ToLower(),
-               file.Length,
-               fileExtension,
-               stream);
-        //------------------------------Validate fileDto------------------------------------------//
-        var validateFile = FileValidator.Validate(command, _fileValidatorOptions);
-        if (validateFile.IsFailure)
-            return BadRequest(validateFile.ToErrorActionResult());
-        AppFile appFile = new(
-            command.StoredName,
-            _fileFolders.Images,
-            command.Stream,
-            command.Extension,
-            command.MimeType,
-            command.Size);
+        AppFileDto appFile = Mappers.IFormFileToAppFileDto(file, _fileFolders.Images, stream);
 
         await _fileService.UploadFileAsync(appFile, cancellationToken);
 
-        return Ok(Envelope.Success(command.StoredName));
+        return Ok(Envelope.Success(appFile.Name));
     }
 
     //-----------------------------------------UploadFiles-----------------------------------------//
@@ -83,59 +70,24 @@ public class TestFileServiceController : ControllerBase
     /// <param name="file"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
-    [HttpPost("(files)")]
+    [HttpPost("files")]
     public async Task<ActionResult<Envelope>> UploadFiles(
-        [FromForm] IFormFileCollection files,
+        [FromForm] List<IFormFile> files,
         CancellationToken cancelToken = default)
     {
-        if (files.Count == 0)
-            return Result.Ok("No files for uploading found").ToEnvelope();
+        var validate = Validators.ValidateFiles(files, _fileValidatorOptions);
+        if (validate.IsFailure)
+            return validate.ToErrorActionResult();
 
-        //--------------------------------Validate max files count--------------------------------//
-        var validateCount = FileValidator.ValidateMaxCount(files.Count, _fileValidatorOptions);
-        if (validateCount.IsFailure)
-            return validateCount.ToErrorActionResult();
-        //-----------------Get Validation Errors,commandsForUpload and listForResponse------------//
-        var filesForUpload = CreatingDataForUpload(
-            files, 
-            out var uploadCommands, 
-            out var responseList, 
-            out var errorsAfterValidation);
+        await using var disposableStreams = new AsyncDisposableCollection();
 
-        foreach(var error in errorsAfterValidation)
-        {
-            
-        }
-        if (errorsAfterValidation.Count == files.Count)
-        {
-            var result = UnitResult.Fail(errorsAfterValidation);
-            return result.ToEnvelope();
-        }
-        try
-        {
-            var uploadResult = await _fileService.UploadFileListAsync(filesForUpload, cancelToken);
+        var fileDtos = Mappers.IFormFilesToAppFileDtos(files, _fileFolders.Images, disposableStreams);
 
-            if (errorsAfterValidation.Count > 0)
-                uploadResult.AddValidationErrors(errorsAfterValidation!);
+        var uploadResult = await _fileService.UploadFileListAsync(fileDtos, cancelToken);
+        if (uploadResult.IsFailure)
+            return uploadResult.ToErrorActionResult();
 
-            var uploadedFileNames = uploadResult.Data ?? [];
-
-            if (uploadedFileNames.Count == 0)
-                return uploadResult.ToErrorActionResult();
-
-            foreach (var name in uploadedFileNames)
-            {
-                var fileResponse = responseList.FirstOrDefault(f => f.StoredName == name)!;
-                fileResponse.Error = string.Empty;
-                fileResponse.IsUploaded = true;
-            }
-            return Ok(Envelope.Success(responseList));
-        }
-        finally
-        {
-            foreach (var file in uploadCommands)
-                file.Stream?.Dispose();
-        }
+        return Ok(Envelope.Success(uploadResult.Data));
     }
 
     //-----------------------------------------GetFileUrl-----------------------------------------//
@@ -167,33 +119,32 @@ public class TestFileServiceController : ControllerBase
         CancellationToken cancelToken)
     {
         DeleteFileCommand command = new(fileName);
+
         await _fileService.SoftDeleteFileAsync(new(fileName, _fileFolders.Images), cancelToken);
 
         return Ok(Envelope.Success("File deleted successfully!"));
     }
 
-    [HttpDelete("{fileNames}/files")]
+    /// <summary>
+    /// DeleteFiles
+    /// </summary>
+    /// <param name="fileNames"></param>
+    /// <param name="cancelToken"></param>
+    /// <returns></returns>
+    [HttpDelete("files")]
     public async Task<ActionResult<Envelope>> DeleteFiles(
         [FromBody] List<string> fileNames,
         CancellationToken cancelToken)
     {
-        List<AppFile> files = fileNames.Select(f => new AppFile(f, _fileFolders.Images)).ToList();
+        List<AppFileDto> files = fileNames
+            .Select(f => new AppFileDto(f, _fileFolders.Images))
+            .ToList();
+
         var result = await _fileService.DeleteFileListAsync(files, cancelToken);
         if (result.IsFailure)
-        {
-            if (result.Data == null || result.Data.Count == 0)
-                return result.ToErrorActionResult();
+            return result.ToErrorActionResult();
 
-        }
-        List<FileUploadResponse> responseList = [];
-        foreach (var name in fileNames)
-        {
-            if (result.Data!.FirstOrDefault(f => f == name) == null)
-                responseList.Add(new(string.Empty, name) { IsUploaded = false });
-            else
-                responseList.Add(new(string.Empty, name) { IsUploaded = true });
-        }
-        return Result.Ok(responseList).ToEnvelope();
+        return Result.Ok(result.Data).ToEnvelope();
     }
 
     //----------------------------------Restore files---------------------------------------------//
@@ -209,61 +160,9 @@ public class TestFileServiceController : ControllerBase
         CancellationToken cancelToken)
     {
         DeleteFileCommand command = new(fileName);
+
         await _fileService.RestoreFileAsync(new(fileName, _fileFolders.Images), cancelToken);
 
         return Ok(Envelope.Success("File Restored successfully!"));
-    }
-
-    //-----------------------------------Private methods------------------------------------------//
-    private List<AppFile> CreatingDataForUpload(
-        IFormFileCollection files,
-        out List<UploadFileCommand> commandsForUpload,
-        out List<FileUploadResponse> responseList,
-        out List<Error> errors)
-    {
-        errors = [];
-        commandsForUpload = [];
-        responseList = [];
-        foreach (var file in files)
-        {
-            var fileExtension = UploadFileCommand.GetFullExtension(file.FileName);
-            var stream = file.OpenReadStream();
-
-            UploadFileCommand fileDto = new(
-                string.Concat(Guid.NewGuid(), fileExtension),
-                file.ContentType.ToLower(),
-                file.Length,
-                fileExtension,
-                stream);
-
-            var fileForResponse = new FileUploadResponse(file.Name, fileDto.StoredName);
-            //-----------------------------Validate fileDto---------------------------//
-            var validationFileResult = FileValidator.Validate(fileDto, _fileValidatorOptions);
-            if (validationFileResult.IsFailure)
-            {
-                stream.Dispose();
-
-                errors.AddRange(validationFileResult.Error);
-
-                fileForResponse.Error = string.Join(
-                    "|",
-                    validationFileResult.Error.ValidationErrors.Select(e => e.ToErrorMessage()).ToList());
-            }
-            else
-            {
-                commandsForUpload.Add(fileDto);
-                fileForResponse.Error = "Uploadind file server error";
-            }
-
-            responseList.Add(fileForResponse);
-        }
-        return commandsForUpload.Select(c =>
-               new AppFile(
-                   c.StoredName,
-                   _fileFolders.Images,
-                   c.Stream,
-                   c.Extension,
-                   c.MimeType,
-                   c.Size)).ToList();
     }
 }

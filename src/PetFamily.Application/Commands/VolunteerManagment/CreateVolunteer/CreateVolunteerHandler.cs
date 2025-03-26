@@ -51,7 +51,6 @@ public class CreateVolunteerHandler(
         var volunteer = CreateVolunteerProccess(command);
 
         var addResult = await _volunteerWriteRepository.AddAsync(volunteer, cancelToken);
-
         if (addResult.IsFailure)
             return addResult;
 

@@ -25,6 +25,10 @@ public record Error
     {
         ValidationErrors.Add(validationError);
     }
+    public void AddValidationErrors(List<ValidationError> validationErrors)
+    {
+        ValidationErrors.AddRange(validationErrors);
+    }
     //--------------------------------------Validation Errors-------------------------------------//
     public static Error ValidationError(List<ValidationError> validationErrors) =>
         new(ErrorCodes.VALIDATION_ERROR,
@@ -93,7 +97,13 @@ public record Error
         new(ErrorCodes.VALIDATION_ERROR, 
             message,
             ErrorType.Validation, 
-            [new(ValidationErrorType.File, "count", ValidationErrorCodes.VALUE_OUT_OF_RANGE)]);
+            [new(ValidationErrorType.Field, "count", ValidationErrorCodes.VALUE_OUT_OF_RANGE)]);
 
+
+    public static Error FilesCountIsNull() =>
+       new(ErrorCodes.VALIDATION_ERROR,
+           "File list to handle is empty!",
+           ErrorType.Validation,
+           [new(ValidationErrorType.File, "count", ValidationErrorCodes.FILES_COUNT_IS_NULL)]);
 }
 

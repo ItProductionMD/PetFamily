@@ -15,6 +15,7 @@ using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
+using PetFamily.Application.IRepositories;
 
 namespace PetFamily.Infrastructure.Services.BackgroundServices;
 
@@ -39,7 +40,7 @@ public class MinioCleanupService(
 
     }
 
-    private async Task CleanupOldFilesAsync(List<AppFile> fileList,CancellationToken stoppingToken)
+    private async Task CleanupOldFilesAsync(List<AppFileDto> fileList,CancellationToken stoppingToken)
     {
         if (stoppingToken.IsCancellationRequested)
         {

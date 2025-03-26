@@ -15,7 +15,6 @@ using System.Data;
 using Npgsql;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.Commands.PetTypeManagment;
-using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Dtos;
 using static PetFamily.Infrastructure.Dapper.Convertors;
 using PetFamily.Infrastructure.Dapper;

@@ -124,16 +124,16 @@ public class PetTests
     {
         // ARRANGE
         Volunteer volunteer = TestDataFactory.CreateVolunteer(1);
+
         var pet = volunteer.Pets[0];
-        var images = new List<Image>
-        {
-            Image.Create(Guid.NewGuid().ToString()).Data!,
-            Image.Create(Guid.NewGuid().ToString()).Data!
-        };
+
+        var imageName1 = Guid.NewGuid().ToString();
+        var imageName2 = Guid.NewGuid().ToString();
+   
         // ACT
-        var addedImages = pet.AddImages(images);
+        pet.AddImages([imageName1,imageName2]);
         // ASSERT
-        Assert.Equal(2, addedImages.Count);
+        Assert.Equal(2, pet.Images.Count);
     }
 
     [Fact]
@@ -141,21 +141,17 @@ public class PetTests
     {
         //ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(1);
+
         var pet = volunteer.Pets[0];
+
         var imageName1 = Guid.NewGuid().ToString();
         var imageName2 = Guid.NewGuid().ToString();
-        var images = new List<Image>
-        {
-            Image.Create(imageName1).Data!,
-            Image.Create(imageName2).Data!
-        };
-        pet.AddImages(images);
+
+        pet.AddImages([imageName1,imageName2]);
         //ACT
-        var deleteImages = pet.DeleteImages(images);
+        var deleteImages = pet.DeleteImages([imageName1,imageName2]);
         //ASSERT
-        Assert.Equal(imageName2, deleteImages[1]);
-        Assert.Equal(imageName1, deleteImages[0]);
-        Assert.Equal(0, pet.Images.Count);
+        Assert.Empty(pet.Images);
     }
 
     [Fact]
@@ -163,21 +159,18 @@ public class PetTests
     {
         //ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(1);
+
         var pet = volunteer.Pets[0];
+
         var imageName1 = Guid.NewGuid().ToString();
         var imageName2 = Guid.NewGuid().ToString();
         var imageName3 = Guid.NewGuid().ToString();
-        var images = new List<Image>
-        {
-            Image.Create(imageName1).Data!,
-            Image.Create(imageName2).Data!,
-            Image.Create(imageName3).Data!
-        };
-        pet.AddImages(images);
+
+        pet.AddImages([imageName1,imageName2,imageName3]);
         //ACT
-        var deleteImages = pet.DeleteImages([images[2]]);
+        var deleteImages = pet.DeleteImages([imageName1]);
         //ASSERT
-        Assert.Equal(deleteImages[0], images[2].Name);
+        Assert.Equal(deleteImages[0], imageName1);
         Assert.Equal(2, pet.Images.Count);
     }
 }

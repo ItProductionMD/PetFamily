@@ -31,11 +31,11 @@ IOptions<FileFolders> fileFoldersOptions):ICommandHandler<VolunteerIdCommand>
 
         var pets = volunteer.Pets;
 
-        List<AppFile> imagesToRestore = [];
+        List<AppFileDto> imagesToRestore = [];
 
         foreach (var pet in pets)
             imagesToRestore.AddRange(pet.Images
-                .Select(x => new AppFile(x.Name, _fileFolders.Images)));
+                .Select(x => new AppFileDto(x.Name, _fileFolders.Images)));
 
         var restoreResult = await _volunteerRepository.Save(volunteer, cancelToken);
         if(restoreResult.IsFailure)

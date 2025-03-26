@@ -26,10 +26,10 @@ public class SoftDeleteVolunteerHandler(
 
         var volunteer = getVolunteer.Data!;
 
-        List<AppFile> imagesToDelete = [];
+        List<AppFileDto> imagesToDelete = [];
 
         foreach (var pet in volunteer.Pets)
-            imagesToDelete.AddRange(pet.Images.Select(x => new AppFile(x.Name, _fileFolders.Images)));
+            imagesToDelete.AddRange(pet.Images.Select(x => new AppFileDto(x.Name, _fileFolders.Images)));
         
         volunteer.Delete();// set is delete true fore volunteer and pets
 
