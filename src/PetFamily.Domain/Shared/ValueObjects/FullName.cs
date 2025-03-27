@@ -1,7 +1,7 @@
-﻿using PetFamily.Domain.Shared.DomainResult;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -19,18 +19,19 @@ public record FullName
     public static Result<FullName> Create(string? firstName, string? lastName)
     {
         var validationResult = Validate(firstName, lastName);
-
         if (validationResult.IsFailure)
-            return Result<FullName>.Failure(validationResult.Errors!);
+            return validationResult;
 
-        return Result<FullName>.Success(new FullName(firstName!, lastName!));
+        return Result.Ok(new FullName(firstName!, lastName!));
     }
 
-    public static Result Validate(string? firstName, string? lastName) =>
+    public static UnitResult Validate(string? firstName, string? lastName) =>
 
-        Result.ValidateCollection(
+        UnitResult.ValidateCollection(
 
             () => ValidateRequiredField(lastName, "LastName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 
             () => ValidateRequiredField(firstName, "FirstName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN));
+
+    public override string ToString()=> string.Join(' ',LastName,FirstName);  
 }

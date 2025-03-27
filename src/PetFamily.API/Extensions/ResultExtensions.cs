@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Responce;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.DomainResult;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.API.Extensions
 {
     public static class ResultExtensions
     {
-        public static ActionResult ToErrorActionResult(this Result result)
+        public static ActionResult ToErrorActionResult(this UnitResult result)
         {
-            if (result.Errors is null || result.Errors.Count==0)
+            if (result.Error is null)
                 throw new InvalidOperationException("Result Errors is null or empty ");
 
-            var statusCode = result.Errors.FirstOrDefault()!.Type switch
+            var statusCode = result.Error.Type switch
             {
                 ErrorType.Validation => StatusCodes.Status400BadRequest,
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
@@ -21,17 +21,17 @@ namespace PetFamily.API.Extensions
                 _=>StatusCodes.Status500InternalServerError
             };
 
-            var envelope = Envelope.Failure(result.Errors);
+            var envelope = Envelope.Failure(result.Error);
 
             return new ObjectResult(envelope) { StatusCode= statusCode };
         }
 
         public static ActionResult ToErrorActionResult<T>(this Result<T> result)
         {
-            if (result.Errors is null)
+            if (result.Error is null)
                 throw new InvalidOperationException("Result Error is null ");
 
-            var statusCode = result.Errors.FirstOrDefault()!.Type switch
+            var statusCode = result.Error.Type switch
             {
                 ErrorType.Validation => StatusCodes.Status400BadRequest,
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
@@ -40,7 +40,7 @@ namespace PetFamily.API.Extensions
                 _ => StatusCodes.Status500InternalServerError
             };
 
-            var envelope = Envelope.Failure(result.Errors);
+            var envelope = Envelope.Failure(result.Error,result.Data);
 
             return new ObjectResult(envelope) { StatusCode = statusCode };
         }
@@ -51,7 +51,7 @@ namespace PetFamily.API.Extensions
             return envelope;
         }
 
-        public static Envelope ToEnvelope(this Result result)
+        public static Envelope ToEnvelope(this UnitResult result)
         {
             var envelope = Envelope.Success(null);
             return envelope;
