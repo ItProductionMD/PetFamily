@@ -7,7 +7,7 @@ namespace PetFamily.API.Common.Utilities
     public class FileProcessingResult<T,TResponse>where T : ICommand
     {
         public List<AppFileDto> AppFileDtos { get; }
-        public List<T> commands { get; }
+        public List<T> Commands { get; }
         public List<TResponse> Responses { get; }
 
         public FileProcessingResult(
@@ -16,7 +16,7 @@ namespace PetFamily.API.Common.Utilities
             List<TResponse> responses)
         {
             AppFileDtos = fileDtosForHandle;
-            this.commands = commands;
+            this.Commands = commands;
             Responses = responses;
         }
     }
