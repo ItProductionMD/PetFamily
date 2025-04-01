@@ -16,23 +16,28 @@ using System.Collections.Generic;
 using Bogus.DataSets;
 using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.PetManagment.Root;
+using Microsoft.Extensions.Options;
+using PetFamily.Infrastructure.Dapper;
 
 namespace PetFamily.Infrastructure.Repositories.Read;
 
 public class VolunteerReadRepositoryWithDapper(
     IDbConnection dbConnection,
+    IOptions<DapperOptions> options,
     ILogger<VolunteerReadRepositoryWithDapper> logger) : IVolunteerReadRepository
 {
     private readonly IDbConnection _dbConnection = dbConnection;
+    private readonly DapperOptions _options = options.Value;
     private readonly ILogger<VolunteerReadRepositoryWithDapper> _logger = logger;
+
 
     public async Task<UnitResult> CheckUniqueFields(
         Guid volunteerId,
         string phoneRegionCode,
         string phoneNumber,
         string email,
-        CancellationToken cancelToken = default)
-    { 
+        CancellationToken cancellationToken = default)
+    {
         var sql = $@"
         SELECT 
             CASE WHEN EXISTS (SELECT 1 
@@ -46,6 +51,10 @@ public class VolunteerReadRepositoryWithDapper(
                 AND {Volunteers.Id} <> @Id) 
                 THEN 'Email' ELSE NULL END AS EmailTaken";
 
+        _logger.LogInformation("Executing(CheckUniqueFields) SQL Query: {sql} with Parameters:" +
+            " {volunteerId}, {phoneRegionCode}, {phoneNumber}, {email}",
+            sql, volunteerId, phoneRegionCode, phoneNumber, email);
+
         var result = await _dbConnection.QuerySingleAsync<(string PhoneTaken, string EmailTaken)>(
             sql,
             new
@@ -54,7 +63,8 @@ public class VolunteerReadRepositoryWithDapper(
                 PhoneRegionCode = phoneRegionCode,
                 PhoneNumber = phoneNumber,
                 Email = email
-            });
+            },
+            commandTimeout: _options.QueryTimeout);
 
         List<ValidationError> validationErrors = [];
 
@@ -71,6 +81,9 @@ public class VolunteerReadRepositoryWithDapper(
 
             return UnitResult.Fail(Error.ValuesAreAlreadyExist(validationErrors));
         }
+        _logger.LogInformation("Volunteer {phone} {email} is/are unique!",
+            result.PhoneTaken ?? "", result.EmailTaken ?? "");
+
         return UnitResult.Ok();
     }
 
@@ -119,18 +132,22 @@ public class VolunteerReadRepositoryWithDapper(
             GROUP BY v.{Volunteers.Id}  -- Group by volunteer to aggregate pets into a JSONB array
             LIMIT 1";
 
-        _logger.LogInformation("Executing SQL Query: {sql} with Parameters: {volunteerId}",
+        _logger.LogInformation("Executing(GetByIdAsync for volunteerDTO) SQL Query: " +
+            "{sql} with Parameters: {volunteerId}",
             sql, volunteerId);
 
         var volunteer = await _dbConnection.QuerySingleOrDefaultAsync<VolunteerDto>(
             sql,
-            new { Id = volunteerId });
+            new { Id = volunteerId },
+            commandTimeout: _options.QueryTimeout);
 
         if (volunteer == null)
         {
             _logger.LogWarning("Volunteer with id: {Id} not found!", volunteerId);
             return Result.Fail(Error.NotFound($"Volunteer with id:{volunteerId}"));
         }
+        _logger.LogInformation("Get volunteer with id: {Id} successful!", volunteerId);
+
         return Result.Ok(volunteer);
     }
 
@@ -150,32 +167,48 @@ public class VolunteerReadRepositoryWithDapper(
             _ => "desc"
         };
 
+        var sql = $@"
+            SELECT v.Id, 
+            CONCAT(v.last_name, ' ', v.first_name) AS FullName, 
+            CONCAT(v.phone_region_code, '-', v.phone_number) AS Phone, 
+            v.rating
+            FROM {Volunteers.Table} v
+            WHERE v.{Volunteers.IsDeleted} = FALSE
+            ORDER BY {orderBy} {orderDirection}
+            LIMIT @Limit OFFSET @Offset";
+
         var offset = (query.pageNumber - 1) * query.pageSize;
         var limit = query.pageSize + 1;
 
-        var volunteersList = await _dbConnection.QueryAsync<VolunteerMainInfoDto>(
-            $@"
-                SELECT v.Id, 
-                CONCAT(v.last_name, ' ', v.first_name) AS FullName, 
-                CONCAT(v.phone_region_code, '-', v.phone_number) AS Phone, 
-                v.rating
-                FROM {Volunteers.Table} v
-                WHERE v.{Volunteers.IsDeleted} = FALSEs
-                ORDER BY {orderBy} {orderDirection}
-                LIMIT @Limit OFFSET @Offset",
-                new { Limit = limit, Offset = offset });
+        _logger.LogInformation("Executing(GetVolunteers) SQL Query: {sql} with Parameters: {limit}, {offset}",
+            sql, limit, offset);
 
-        var volunteersListAsList = volunteersList.ToList();
-        bool hasMoreRecords = volunteersListAsList.Count > query.pageSize;
+        var volunteers = await _dbConnection.QueryAsync<VolunteerMainInfoDto>(
+                sql,
+                new { Limit = limit, Offset = offset },
+                commandTimeout: _options.QueryTimeout);
+
+        var volunteersList = volunteers.ToList();
+
+        bool hasMoreRecords = volunteersList.Count > query.pageSize;
+
+        var volunteersCount = (query.pageNumber - 1) * query.pageSize + volunteersList.Count;
 
         if (hasMoreRecords)
-            volunteersListAsList.RemoveAt(volunteersListAsList.Count - 1);
+        {
+            volunteersList.RemoveAt(volunteersList.Count - 1);
 
-        var totalCount = hasMoreRecords
-            ? await _dbConnection.ExecuteScalarAsync<int>(
-                "SELECT COUNT(1) FROM Volunteers")
-            : (query.pageNumber - 1) * query.pageSize + volunteersListAsList.Count;
+            var getVolunteerCountSql = "SELECT COUNT(1) FROM Volunteers";
 
-        return new GetVolunteersResponse(totalCount, volunteersListAsList);
+            _logger.LogInformation("Executing(GetVolunteers) SQL Query:{sql}", getVolunteerCountSql);
+
+            volunteersCount = await _dbConnection.ExecuteScalarAsync<int>(
+                getVolunteerCountSql,
+                commandTimeout:_options.QueryTimeout);
+        }
+
+        _logger.LogInformation("GetVolunteers successful! Total count: {totalCount}", volunteersCount);
+
+        return new GetVolunteersResponse(volunteersCount, volunteersList);
     }
 }

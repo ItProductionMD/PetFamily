@@ -6,12 +6,11 @@ using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.Enums;
-using PetSpecies = PetFamily.Domain.PetManagment.Entities.Species;
+using PetSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
 using System;
 using System.Reflection.Metadata.Ecma335;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Application.IRepositories;
-using PetFamily.Application.Commands.PetTypeManagment;
 using PetFamily.Application.Abstractions;
 
 
@@ -20,11 +19,13 @@ namespace PetFamily.Application.Commands.PetManagment.AddPet;
 public class AddPetHandler(
     ILogger<AddPetHandler> logger,
     IVolunteerWriteRepository volunteerRepository,
-    ISpeciesRepository speciesRepository) : ICommandHandler<AddPetResponse, AddPetCommand>
+    ISpeciesReadRepository speciesReadRepository,
+    ISpeciesWriteRepository speciesRepository) : ICommandHandler<AddPetResponse, AddPetCommand>
 {
-    private readonly ISpeciesRepository _speciesRepository = speciesRepository;
+    private readonly ISpeciesWriteRepository _speciesRepository = speciesRepository;
     private readonly ILogger<AddPetHandler> _logger = logger;
     private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
+    private readonly ISpeciesReadRepository _speciesReadRepository = speciesReadRepository;
 
     public async Task<Result<AddPetResponse>> Handle(
         AddPetCommand command,
@@ -36,7 +37,11 @@ public class AddPetHandler(
             _logger.LogWarning("Validate add pet command errors:{Errors}", validate.ValidationMessagesToString());
             return validate;
         }
-        var checkPetType = await CheckPetTypeAsync(command.SpeciesId, command.BreedId, cancelToken);
+
+        var checkPetType = await _speciesReadRepository.CheckIfPetTypeExists(
+            command.SpeciesId,
+            command.BreedId,
+            cancelToken);
         if (checkPetType.IsFailure)
             return checkPetType;
 
@@ -58,23 +63,7 @@ public class AddPetHandler(
         return Result.Ok(new AddPetResponse(newPet.Id, newPet.SerialNumber.Value));
     }
 
-    private async Task<UnitResult> CheckPetTypeAsync(Guid speciesId, Guid breedId, CancellationToken cancelToken)
-    {
-        var species = await _speciesRepository.GetAsync(speciesId, cancelToken);
-        if (species == null)
-        {
-            _logger.LogError("Fail check pet type! Species with id:{Id} not found", speciesId);
-            return Result.Fail(Error.NotFound("Species"));
-        }
-        if (species.Breeds.Any(b => b.Id == breedId) == false)
-        {
-            _logger.LogError("Fail check pet type! Breed with id:{Id} not found", breedId);
-            return Result.Fail(Error.NotFound("Breed"));
-        }
-        return UnitResult.Ok();
-    }
-
-    private Pet CreatingPetProcess(AddPetCommand command, Volunteer volunteer)
+    private static Pet CreatingPetProcess(AddPetCommand command, Volunteer volunteer)
     {
         var address = Address.CreatePossibleEmpty(command.Region, command.City, command.Street, command.HomeNumber).Data!;
         var ownerPhone = Phone.CreatePossibbleEmpty(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;

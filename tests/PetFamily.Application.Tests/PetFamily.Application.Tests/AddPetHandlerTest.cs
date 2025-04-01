@@ -3,19 +3,18 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Application.Commands.PetTypeManagment;
 using PetFamily.Application.Commands.PetManagment.AddPet;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.IO;
-using DomainSpecies = PetFamily.Domain.PetManagment.Entities.Species;
+using DomainSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
 
 namespace PetFamily.Application.Tests;
 
@@ -23,21 +22,24 @@ public class AddPetHandlerTests
 {
     private readonly Mock<ILogger<AddPetHandler>> _loggerMock;
     private readonly Mock<IVolunteerWriteRepository> _volunteerRepositoryMock;
-    private readonly Mock<ISpeciesRepository> _speciesRepositoryMock;
+    private readonly Mock<ISpeciesWriteRepository> _speciesRepositoryMock;
     private readonly AddPetHandler _handler;
     private readonly CancellationToken _token;
     private readonly Mock<IVolunteerReadRepository> _volunteerReadRepositoryMock;
+    private readonly Mock<ISpeciesReadRepository> _speciesReadRepository;
 
     public AddPetHandlerTests()
     {
         _loggerMock = new Mock<ILogger<AddPetHandler>>();
         _volunteerRepositoryMock = new Mock<IVolunteerWriteRepository>();
-        _speciesRepositoryMock = new Mock<ISpeciesRepository>();
+        _speciesRepositoryMock = new Mock<ISpeciesWriteRepository>();
         _volunteerReadRepositoryMock = new Mock<IVolunteerReadRepository>();
+        _speciesReadRepository = new Mock<ISpeciesReadRepository>();
 
         _handler = new AddPetHandler(
             _loggerMock.Object,
             _volunteerRepositoryMock.Object,
+            _speciesReadRepository.Object,
             _speciesRepositoryMock.Object);
 
         _token = CancellationToken.None;
@@ -148,8 +150,8 @@ public class AddPetHandlerTests
             HomeNumber: "11a",
             []);
 
-        _speciesRepositoryMock.Setup(x => x.GetAsync(command.SpeciesId, _token))
-            .ReturnsAsync(nullSpecies);
+        _speciesRepositoryMock.Setup(x => x.GetByIdAsync(command.SpeciesId, _token))
+            .ReturnsAsync(Result.Ok(nullSpecies));
 
         // ACT
         var result = await _handler.Handle(command, _token);
@@ -193,8 +195,8 @@ public class AddPetHandlerTests
             HomeNumber: "11a",
             []);
 
-        _speciesRepositoryMock.Setup(x => x.GetAsync(command.SpeciesId, _token))
-            .ReturnsAsync(species);
+        _speciesRepositoryMock.Setup(x => x.GetByIdAsync(command.SpeciesId, _token))
+            .ReturnsAsync(Result.Ok(species));
 
         var result = await _handler.Handle(command, _token);
 
@@ -241,8 +243,8 @@ public class AddPetHandlerTests
             HomeNumber: "11a",
             []);
 
-        _speciesRepositoryMock.Setup(x => x.GetAsync(species.Id, _token))
-            .ReturnsAsync(species);
+        _speciesRepositoryMock.Setup(x => x.GetByIdAsync(species.Id, _token))
+            .ReturnsAsync(Result.Ok(species));
 
         _volunteerRepositoryMock
            .Setup(x => x.GetByIdAsync(command.VolunteerId, _token))

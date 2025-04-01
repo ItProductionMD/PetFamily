@@ -39,7 +39,7 @@ using PetFamily.Application.Commands.FilesManagment;
 namespace PetFamily.API.Controllers;
 
 [ApiController]
-[Route("volunteers")]
+[Route("api/volunteers")]
 public class VolunteerController(
     IOptions<FileValidatorOptions> validateFileOptions,
     ILogger<VolunteerController> logger) : Controller
