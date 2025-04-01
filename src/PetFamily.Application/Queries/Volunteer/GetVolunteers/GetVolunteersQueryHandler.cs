@@ -19,7 +19,7 @@ public class GetVolunteersQueryHandler(
         CancellationToken cancellToken)
     {
         //validate query
-        var volunteers = await _volunteerReadRepository.GetVolunteers(query, cancellToken);
-        return Result.Ok(volunteers);
+        var getVolunteersResponse = await _volunteerReadRepository.GetVolunteers(query, cancellToken);
+        return Result.Ok(getVolunteersResponse);
     }
 }

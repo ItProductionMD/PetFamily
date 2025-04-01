@@ -14,7 +14,6 @@ using PetFamily.Infrastructure.Services.MinioService;
 using System.Data;
 using Npgsql;
 using PetFamily.Application.IRepositories;
-using PetFamily.Application.Commands.PetTypeManagment;
 using PetFamily.Application.Dtos;
 using static PetFamily.Infrastructure.Dapper.Convertors;
 using PetFamily.Infrastructure.Dapper;
@@ -28,15 +27,16 @@ public static class Inject
         IConfiguration configuration)
     {
         var postgresConnection = configuration.GetConnectionString(ConnectionStringName.POSTGRESQL);
-        DapperConfigurations.ConfigDapper();
 
         services
             .AddScoped<IVolunteerReadRepository, VolunteerReadRepositoryWithDapper>()
-            .AddScoped<ISpeciesRepository, SpeciesRepository>()
-            .AddScoped<IUnitOfWork, UnitOfWork>()
             .AddScoped<IVolunteerWriteRepository, VolunteerWriteRepository>()
+            .AddScoped<ISpeciesWriteRepository, SpeciesWriteRepository>()
+            .AddScoped<ISpeciesReadRepository, SpeciesReadRepository>()
+            .AddScoped<IUnitOfWork, UnitOfWork>()
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddDbContext<ReadDbContext>(options => options.UseNpgsql(postgresConnection))
+            .ConfigDapper(configuration)
             .AddScoped<IDbConnection>(sp => new NpgsqlConnection(postgresConnection))
             .AddScoped<WriteDbContext>()
             .AddHostedService<DbCleanupService>()

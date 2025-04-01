@@ -5,7 +5,7 @@ using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.PetManagment.ValueObjects;
 
-namespace PetFamily.Domain.PetManagment.Entities;
+namespace PetFamily.Domain.PetTypeManagment.Entities;
 
 public class Breed : Entity<Guid>
 {
