@@ -5,8 +5,9 @@ using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.DomainError;
+using PetFamily.Domain.PetTypeManagment.Entities;
 
-namespace PetFamily.Domain.PetManagment.Entities
+namespace PetFamily.Domain.PetTypeManagment.Root
 {
     public class Species : Entity<Guid>
     {
@@ -46,7 +47,21 @@ namespace PetFamily.Domain.PetManagment.Entities
         public UnitResult DeleteBreedsById(List<Guid> breedIdsToDelete)
         {
             var removedItemsCount = _breeds.RemoveAll(b => breedIdsToDelete.Contains(b.Id));
+            if (removedItemsCount == 0)
+                return UnitResult.Fail(Error.NotFound(
+                    $"Breeds with Ids: {string.Join(',', breedIdsToDelete)} not found"));
+
             return UnitResult.Ok();
         }
+
+        public UnitResult DeleteBreedById(Guid breedId)
+        {
+            var removedItemsCount = _breeds.RemoveAll(b => b.Id == breedId);
+            if(removedItemsCount == 0)
+                return UnitResult.Fail(Error.NotFound($"Breed with Id: {breedId} not found"));
+
+            return UnitResult.Ok();
+        }
+
     }
 }

@@ -20,7 +20,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PetFamily.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/files")]
 [ApiController]
 public class TestFileServiceController : ControllerBase
 {

@@ -19,6 +19,7 @@ public record Phone:IValueObject
     }
 
     public static Phone CreateEmpty() => new Phone("","");
+
     public static Result<Phone> CreateNotEmpty(string? number, string? regionCode)
     {
         var validationResult = Validate(number, regionCode);
@@ -27,6 +28,7 @@ public record Phone:IValueObject
 
         return Result.Ok(new Phone(number!, regionCode!));
     }
+
     public static Result<Phone> CreatePossibbleEmpty(string? number, string? regionCode)
     {
         var validationResult = ValidateNonRequired(number, regionCode);
@@ -38,6 +40,7 @@ public record Phone:IValueObject
 
         return Result.Ok(new Phone(number!, regionCode!));
     }
+
     public static UnitResult Validate(string? number, string? regionCode) =>
 
         UnitResult.ValidateCollection(
@@ -55,6 +58,7 @@ public record Phone:IValueObject
                 valueName: "Phone regionCode",
                 maxLength: MAX_LENGTH_SHORT_TEXT,
                 pattern: PHONE_REGION_PATTERN));
+
     public static UnitResult ValidateNonRequired(string? number, string? regionCode)
     {
         if (IsPhoneEmpty(number, regionCode))
@@ -62,6 +66,7 @@ public record Phone:IValueObject
 
         return Validate(number, regionCode);
     }
+
     private static bool IsPhoneEmpty(string? regionCode, string? number)
     {
         return HasOnlyEmptyStrings(regionCode, number);

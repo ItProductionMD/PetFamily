@@ -34,7 +34,6 @@ public class DeleteVolunteerHandler(
         foreach (var pet in volunteer.Pets)
             imagesToDelete.AddRange(pet.Images.Select(x => new AppFileDto(x.Name,_fileFolders.Images)));   
         
-
         await _volunteerRepository.Delete(volunteer, cancelToken);
 
         if(imagesToDelete.Count > 0)

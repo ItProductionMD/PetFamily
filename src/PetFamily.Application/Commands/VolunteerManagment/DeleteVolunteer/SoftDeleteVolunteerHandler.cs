@@ -29,11 +29,13 @@ public class SoftDeleteVolunteerHandler(
         List<AppFileDto> imagesToDelete = [];
 
         foreach (var pet in volunteer.Pets)
-            imagesToDelete.AddRange(pet.Images.Select(x => new AppFileDto(x.Name, _fileFolders.Images)));
+            imagesToDelete.AddRange(pet.Images.Select(i => new AppFileDto(i.Name, _fileFolders.Images)));
         
-        volunteer.Delete();// set is delete true fore volunteer and pets
+        volunteer.SetAsDeleted();
 
-        await _volunteerRepository.Save(volunteer, cancelToken);
+        var result = await _volunteerRepository.Save(volunteer, cancelToken);
+        if (result.IsFailure)
+            return result;
 
         if (imagesToDelete.Count > 0)
             await _filesProcessingQueue.DeleteChannel.Writer.WriteAsync(imagesToDelete);

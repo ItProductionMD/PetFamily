@@ -168,8 +168,21 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         _pets.Add(pet);
         return pet;
     }
-    //--------------------------------------Remove Pet--------------------------------------------//
-    public void RemovePet(Pet pet)
+
+    //--------------------------------------Soft delete Pet---------------------------------------//
+    public void SoftDeletePet(Pet pet)
+    {
+        var maxSerialNumberValue = Pets.Max(pet => pet.SerialNumber.Value);
+
+        var maxSerialNumber = PetSerialNumber.Create(maxSerialNumberValue, this);
+
+        MovePetSerialNumber(pet, maxSerialNumber.Data!);
+
+        pet.SetAsDeleted();
+    }
+
+    //-------------------------------------Hard delete pet----------------------------------------//
+    public void HardDeletePet(Pet pet)
     {
         var maxSerialNumberValue = Pets.Max(pet => pet.SerialNumber.Value);
 
@@ -179,16 +192,17 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
         _pets.Remove(pet);
     }
-    //------------------------------Set is Deleted fal se(for soft deleting)-----------------------//
-    public void Delete()
+
+    //----------------------------------------Soft delete pet-------------------------------------//
+    public void SetAsDeleted()
     {
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
 
         foreach (var pet in _pets)
-            pet.Delete();
+            pet.SetAsDeleted();
     }
-    //------------------------------Set is Deleted true(for soft deleting)-----------------------//
+    //------------------------------Set is Deleted true(for soft deleting)------------------------//
     public void Restore()
     {
         _isDeleted = false;
@@ -218,11 +232,13 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
         return UnitResult.Ok();
     }
+
     //------------------------------------Update Requisites---------------------------------------//
     public void UpdateRequisites(IEnumerable<RequisitesInfo> requisites)
     {
         Requisites = requisites.ToList();
     }
+
     //------------------------------------Update Social Networks----------------------------------//
     public void UpdateSocialNetworks(IEnumerable<SocialNetworkInfo> socialNetworks)
     {
@@ -243,6 +259,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
             pet.DeleteImages(imagesToDelete);
         }
     }
+
     //------------------------------------ChangePetsOrder-----------------------------------------//
     public UnitResult ChangePetsOrder(List<Guid> petsIds)
     {

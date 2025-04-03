@@ -1,24 +1,25 @@
 ﻿using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
-using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Application.IRepositories;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.Results;
-using PetSpecies = PetFamily.Domain.PetManagment.Entities.Species;
+using PetSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
 
 
-namespace PetFamily.Application.Commands.PetTypeManagment;
+namespace PetFamily.Application.Commands.PetTypeManagment.AddPetType;
 
-public class AddSpeciesHandler(
-    ISpeciesRepository repository,
-    ILogger<AddSpeciesHandler> logger) : ICommandHandler<PetSpecies, AddPetTypeComand>
+public class AddPetTypeHandler(
+    ISpeciesWriteRepository repository,
+    ILogger<AddPetTypeHandler> logger) : ICommandHandler<PetSpecies, AddPetTypeComand>
 {
-    private ILogger<AddSpeciesHandler> _logger = logger;
-    private readonly ISpeciesRepository _repository = repository;
+    private ILogger<AddPetTypeHandler> _logger = logger;
+    private readonly ISpeciesWriteRepository _repository = repository;
     public async Task<Result<PetSpecies>> Handle(
         AddPetTypeComand command,
         CancellationToken token)
     {
-        var validationResult = AddSpeciesRequestValidator.Validate(command);
+        var validationResult = AddPetTypeCommandValidator.Validate(command);
         if (validationResult.IsFailure)
         {
             _logger.LogWarning("Validate pet type errors: {Errors}",
