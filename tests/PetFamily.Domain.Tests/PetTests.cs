@@ -99,7 +99,7 @@ public class PetTests
         var volunteer = TestDataFactory.CreateVolunteer(1);
         var pet =volunteer.Pets[0];
         // ACT
-        pet.SetAsDeleted();
+        pet.SoftDelete();
         // ASSERT
         Assert.True(pet.IsDeleted);
         Assert.NotNull(pet.DeletedDateTime);
@@ -111,7 +111,7 @@ public class PetTests
         // ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(1);
         var pet = volunteer.Pets[0];
-        pet.SetAsDeleted();
+        pet.SoftDelete();
         //ACT
         pet.Restore();
         // ASSERT

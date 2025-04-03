@@ -31,7 +31,7 @@ public class SoftDeleteVolunteerHandler(
         foreach (var pet in volunteer.Pets)
             imagesToDelete.AddRange(pet.Images.Select(i => new AppFileDto(i.Name, _fileFolders.Images)));
         
-        volunteer.SetAsDeleted();
+        volunteer.SoftDelete();
 
         var result = await _volunteerRepository.Save(volunteer, cancelToken);
         if (result.IsFailure)

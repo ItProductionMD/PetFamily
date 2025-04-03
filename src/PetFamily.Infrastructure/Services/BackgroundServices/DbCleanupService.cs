@@ -65,14 +65,24 @@ public class DbCleanupService : BackgroundService
 
             _logger.LogInformation("Starting cleanup task...");
 
-            int deletedCount = await dbContext.Volunteers.Where(v =>
+            int deletedVolunteersCount = await dbContext.Volunteers.Where(v =>
                 EF.Property<bool>(v, "_isDeleted") == true
                 && EF.Property<DateTime?>(v, "_deletedDateTime")!.Value
                 <= DateTime.UtcNow.AddDays(-_deleteAfterDays))
             .ExecuteDeleteAsync(cancellationToken);
 
-            _logger.LogInformation("Cleanup task completed, {deletedCount} entities deleted.",
-                deletedCount);
+            int deletedPetsCount = await dbContext.Volunteers
+                .SelectMany(v => v.Pets)
+                .Where(p =>
+                    EF.Property<bool>(p, "_isDeleted") == true &&
+                    EF.Property<DateTime?>(p, "_deletedDateTime")!.Value
+                    <= DateTime.UtcNow.AddDays(-_deleteAfterDays))
+                .ExecuteDeleteAsync(cancellationToken);
+
+
+            _logger.LogInformation("Cleanup task completed, {deletedVolunteersCount} volunteers deleted," +
+                " and {deletedPetsCount} pets deleted",
+                deletedVolunteersCount, deletedPetsCount);
         }
         catch (Exception ex)
         {

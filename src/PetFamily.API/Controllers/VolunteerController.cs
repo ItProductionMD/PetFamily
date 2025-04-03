@@ -40,6 +40,8 @@ using PetFamily.Application.Commands.PetManagment.UpdatePetStatus;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using PetFamily.Application.Commands.PetManagment.DeletePet;
 using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
+using PetFamily.Application.Commands.PetManagment.RestorePet;
+using PetFamily.Application.Commands.PetManagment.Shared;
 
 namespace PetFamily.API.Controllers;
 
@@ -227,7 +229,7 @@ public class VolunteerController(
     /// <param name="volunteerId"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
-    [HttpGet("{volunteerId}/restore")]
+    [HttpPost("{volunteerId}/restore")]
     public async Task<ActionResult<Envelope>> Restore(
         [FromServices] RestoreVolunteerHandler handler,
         [FromRoute] Guid volunteerId,
@@ -444,6 +446,23 @@ public class VolunteerController(
         CancellationToken cancelToken)
     {
         var command = new DeletePetCommand(volunteerId, petId);
+
+        var result = await handler.Handle(command, cancelToken);
+
+        return result.IsFailure
+            ? result.ToErrorActionResult()
+            : result.ToEnvelope();
+    }
+
+    //-------------------------------------Restore pet--------------------------------------------//
+    [HttpPost("{volunteerId:Guid}/pets/{petId:Guid}/restore")]
+    public async Task<ActionResult<Envelope>> RestorePet(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromServices] RestorePetHandler handler,
+        CancellationToken cancelToken)
+    {
+        var command = new PetCommand(volunteerId, petId);
 
         var result = await handler.Handle(command, cancelToken);
 

@@ -136,12 +136,16 @@ public class Pet : Entity<Guid>, ISoftDeletable
     {
         SerialNumber = serialNumber;
     }
+
     public PetSerialNumber GetSerialNumber() => SerialNumber;
-    public void SetAsDeleted()
+
+    public void SoftDelete()
     {
+        SerialNumber = PetSerialNumber.Empty();
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
     }
+
     public void Restore()
     {
         _isDeleted = false;
@@ -156,6 +160,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
             _images.Add(image);
         }
     }
+
     public List<string> DeleteImages(List<string> imageNames)
     {
         var imagesToDeleteSet = new HashSet<string>(imageNames); //delete reapeted images
@@ -173,6 +178,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
 
         return deletedImages;
     }
+
     public List<string> DeleteImages(List<Image> images)
     {
         if (images.Count == 0)
@@ -193,6 +199,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
 
         return deletedImages;
     }
+
     public void ChangePetStatus(HelpStatus helpStatus)
     {
         HelpStatus = helpStatus;
