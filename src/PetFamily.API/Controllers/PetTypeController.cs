@@ -12,7 +12,7 @@ using PetFamily.Application.Queries.PetType.GetBreeds;
 
 namespace PetFamily.API.Controllers;
 
-[Route("api/pet_types)")]
+[Route("api/species")]
 [ApiController]
 public class PetTypeController : ControllerBase
 {
@@ -90,12 +90,12 @@ public class PetTypeController : ControllerBase
     /// <param name="pageSize"></param>
     /// <param name="handler"></param>
     /// <returns></returns>
-    [HttpGet("page/{page:int}/order_by/{orderBy}/order_direction/{orderDirection}/page_size/{pageSize:int}")]
+    [HttpGet]
     public async Task<ActionResult<Envelope>> GetSpecies(
-        [FromRoute] int page,
-        [FromRoute] string? orderBy,
-        [FromRoute] string? orderDirection,
-        [FromRoute] int pageSize,
+        [FromQuery] int page,
+        [FromQuery] string? orderBy,
+        [FromQuery] string? orderDirection,
+        [FromQuery] int pageSize,
         [FromServices] GetListOfSpeciesHandler handler,
         CancellationToken cancelToken)
     {
@@ -108,13 +108,13 @@ public class PetTypeController : ControllerBase
             : Ok(response.ToEnvelope());
     }
 
-    [HttpGet("species_id/{speciesId}/page/{page:int}/order_by/{orderBy}/order_direction/{orderDirection}/page_size/{pageSize:int}")]
+    [HttpGet("{speciesId}")]
     public async Task<ActionResult<Envelope>> GetBreeds(
         [FromRoute] Guid speciesId,
-        [FromRoute] int page,
-        [FromRoute] string orderBy,
-        [FromRoute] string orderDirection,
-        [FromRoute] int pageSize,
+        [FromQuery] int page,
+        [FromQuery] string? orderBy,
+        [FromQuery] string? orderDirection,
+        [FromQuery] int pageSize,
         [FromServices] GetBreedsHandler handler,
         CancellationToken cancelToken)
     {

@@ -15,7 +15,7 @@ public class GetVolunteersQueryV2
     public string OrderBy { get; init; }
     public string OrderDirection { get; init; }
 
-    public GetVolunteersQueryV2(int pageSize, int page, string? orderBy, string orderDirection)
+    public GetVolunteersQueryV2(int pageSize, int page, string? orderBy, string? orderDirection)
     {
         PageSize = pageSize;
         Page = page;
@@ -25,6 +25,6 @@ public class GetVolunteersQueryV2
             "rating" => "rating",
             _ => "id"
         };
-        OrderDirection = orderDirection.ToLower() == "asc" ? "asc" : "desc";
+        OrderDirection = orderDirection?.ToLower() == "asc" ? "asc" : "desc";
     }
 }

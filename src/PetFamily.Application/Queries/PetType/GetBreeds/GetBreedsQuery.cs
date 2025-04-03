@@ -8,12 +8,12 @@ public class GetBreedsQuery : IQuery
     public string SortBy { get; set; }
     public string SortDirection { get; set; }
     public Guid SpeciesId { get; set; }
-    public GetBreedsQuery(int page, int pageSize, string sortBy, string sortDirection, Guid speciesId)
+    public GetBreedsQuery(int page, int pageSize, string? sortBy, string? sortDirection, Guid speciesId)
     {
         Page = page;
         PageSize = pageSize;
-        SortBy = sortBy.ToLower() == "name" ? "name" : "id";
-        SortDirection = sortDirection.ToLower() == "asc" ? "asc" : "desc";
+        SortBy = sortBy?.ToLower() == "name" ? "name" : "id";
+        SortDirection = sortDirection?.ToLower() == "asc" ? "asc" : "desc";
         SpeciesId = speciesId;
     }
 }

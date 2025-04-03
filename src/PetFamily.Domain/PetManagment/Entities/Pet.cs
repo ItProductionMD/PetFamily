@@ -34,7 +34,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public Address Address { get; private set; }
     public HelpStatus HelpStatus { get; private set; }
     public IReadOnlyList<Image> Images => _images;
-    private readonly List<Image> _images = [];
+    private List<Image> _images = [];
     private bool _isDeleted;
     public bool IsDeleted => _isDeleted;
     private DateTime? _deletedDateTime;
@@ -137,7 +137,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
         SerialNumber = serialNumber;
     }
     public PetSerialNumber GetSerialNumber() => SerialNumber;
-    public void Delete()
+    public void SetAsDeleted()
     {
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
@@ -196,6 +196,60 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public void ChangePetStatus(HelpStatus helpStatus)
     {
         HelpStatus = helpStatus;
+    }
+
+    public UnitResult Update(
+        string name,
+        DateOnly? dateOfBirth,
+        string? description,
+        bool isVaccinated,
+        bool isSterilized,
+        double? weight,
+        double? height,
+        string? color,
+        PetType petType,
+        Phone? ownerPhone,
+        IReadOnlyList<RequisitesInfo> requisites,
+        HelpStatus helpStatus,
+        string? healthInfo,
+        Address? address)
+    {
+        var validatePetDomain = Validate(name, description, color, healthInfo);
+        if (validatePetDomain.IsFailure)
+            return validatePetDomain;
+
+        Name = name;
+        DateOfBirth = dateOfBirth;
+        Description = description;
+        IsVaccinated = isVaccinated;
+        IsSterilized = isSterilized;
+        Weight = weight;
+        Height = height;
+        Color = color;
+        PetType = petType;
+        OwnerPhone = ownerPhone ?? Phone.CreateEmpty();
+        Requisites = requisites;
+        HelpStatus = helpStatus;
+        Address = address ?? Address.CreateEmpty();
+
+        return UnitResult.Ok();
+    }
+
+    public void UpdateHelpStatus(HelpStatus helpStatus)
+    {
+        HelpStatus = helpStatus;
+    }
+
+    public UnitResult ChangeMainPhoto(string imageName)
+    {
+        if (!_images.Any(i => i.Name == imageName))
+            return UnitResult.Fail(Error.NotFound($"Image with name: {imageName}"));
+
+        _images = _images
+            .OrderByDescending(i => i.Name == imageName)
+            .ToList();
+
+        return UnitResult.Ok();
     }
 }
 

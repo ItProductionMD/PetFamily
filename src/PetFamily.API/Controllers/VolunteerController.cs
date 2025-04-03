@@ -35,6 +35,11 @@ using PetFamily.Application.Commands.PetManagment.DeletePetImages;
 using PetFamily.Application.Commands.PetManagment.AddPetImages;
 using PetFamily.API.Common.AppiValidators;
 using PetFamily.Application.Commands.FilesManagment;
+using PetFamily.Application.Commands.PetManagment.UpdatePet;
+using PetFamily.Application.Commands.PetManagment.UpdatePetStatus;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using PetFamily.Application.Commands.PetManagment.DeletePet;
+using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
 
 namespace PetFamily.API.Controllers;
 
@@ -237,7 +242,7 @@ public class VolunteerController(
             : Ok(handlerResult.ToEnvelope());
     }
 
-    //-------------------------------------AddPet---------------------------------------------//
+    //-----------------------------------------AddPet---------------------------------------------//
     /// <summary>
     /// Adds a new pet for a volunteer.
     /// </summary>
@@ -255,10 +260,10 @@ public class VolunteerController(
     public async Task<ActionResult<Envelope>> Add(
         [FromServices] AddPetHandler handler,
         [FromRoute] Guid volunteerId,
-        [FromBody] AddPetRequest request,
+        [FromBody] PetRequest request,
         CancellationToken cancelToken)
     {
-        var command = request.ToCommand(volunteerId);
+        var command = request.ToAddPetCommand(volunteerId);
 
         var addPetResult = await handler.Handle(command, cancelToken);
 
@@ -267,6 +272,42 @@ public class VolunteerController(
             : Ok(addPetResult.ToEnvelope());
     }
 
+    //-----------------------------------------UpdatePet------------------------------------------//
+    [HttpPatch("{volunteerId:Guid}/pets/{petId:Guid}")]
+    public async Task<ActionResult<Envelope>> UpdatePet(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] PetRequest request,
+        [FromServices] UpdatePetHandler handler,
+        CancellationToken cancelToken)
+    {
+        var command = request.ToUpdatePetCommand(volunteerId, petId);
+
+        var addPetResult = await handler.Handle(command, cancelToken);
+
+        return addPetResult.IsFailure
+            ? addPetResult.ToErrorActionResult()
+            : Ok(addPetResult.ToEnvelope());
+    }
+
+    //------------------------------------UpdatePetStatus-----------------------------------------//
+    [HttpPatch("{volunteerId:Guid}/pets/{petId:Guid}/help_status")]
+    public async Task<ActionResult<Envelope>> UpdatePetStatus(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] int helpStatus,
+        [FromServices] UpdatePetStatusHandler handler,
+        CancellationToken cancelToken) 
+    {
+        var command = new UpdatePetStatusCommand(volunteerId,petId,helpStatus);
+
+        var updateStatusResult = await handler.Handle(command, cancelToken);
+
+        return updateStatusResult.IsFailure
+            ? updateStatusResult.ToErrorActionResult()
+            : Ok(updateStatusResult.ToEnvelope());
+
+    }
     //------------------------------------DeletePetImages-----------------------------------------//
     /// <summary>
     /// Delete images from Pet
@@ -332,6 +373,24 @@ public class VolunteerController(
             : uploadPetImages.ToEnvelope();
     }
 
+    //------------------------------------Change main pet image-----------------------------------//
+    [HttpPost("{volunteerId:Guid}/pets{petId:Guid}/images/main_image")]
+    public async Task<ActionResult<Envelope>> ChangeMainPetImage(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromQuery] string imageName,
+        [FromServices] ChangeMainPetImageHandler handler,
+        CancellationToken cancelToken) 
+    {
+        var command = new ChangeMainPetImageCommand(volunteerId, petId, imageName);
+
+        var result = await handler.Handle(command, cancelToken);
+
+        return result.IsFailure
+            ? result.ToErrorActionResult()
+            : result.ToEnvelope();
+    }
+
     //------------------------------------Change pets order---------------------------------------//
     /// <summary>
     /// Change pets order
@@ -359,7 +418,40 @@ public class VolunteerController(
             : result.ToEnvelope();
     }
 
-    //----------------------------Get Volunteers With Pagination------------------------------//
+    //---------------------------------Soft delete pet--------------------------------------------//
+    [HttpDelete("{volunteerId:Guid}/pets/{petId:Guid}/soft")]
+    public async Task<ActionResult<Envelope>> SoftDeletePet(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromServices] SoftDeletePetHandler handler,
+        CancellationToken cancelToken)
+    {
+        var command = new DeletePetCommand(volunteerId, petId);
+
+        var result = await handler.Handle(command, cancelToken);
+
+        return result.IsFailure
+            ? result.ToErrorActionResult()
+            : result.ToEnvelope();
+    }
+
+    //---------------------------------Hard delete pet--------------------------------------------//
+    [HttpDelete("{volunteerId:Guid}/pets/{petId:Guid}/hard")]
+    public async Task<ActionResult<Envelope>> HardDeletePet(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromServices] HardDeletePetHandler handler,
+        CancellationToken cancelToken)
+    {
+        var command = new DeletePetCommand(volunteerId, petId);
+
+        var result = await handler.Handle(command, cancelToken);
+
+        return result.IsFailure
+            ? result.ToErrorActionResult()
+            : result.ToEnvelope();
+    }
+    //--------------------------------Get Volunteers With Pagination------------------------------//
     /// <summary>
     /// 
     /// </summary>
@@ -367,12 +459,12 @@ public class VolunteerController(
     /// <param name="handler"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
-    [HttpGet("page/{page:int}/order_by/{orderBy}/order_direction/{orderDirection}/page_size/{pageSize:int}")]
+    [HttpGet]
     public async Task<ActionResult<Envelope>> GetVolunteers(
-        [FromRoute] int page,
-        [FromRoute] string? orderBy,
-        [FromRoute] string? orderDirection,
-        [FromRoute] int pageSize,
+        [FromQuery] int page,
+        [FromQuery] string? orderBy,
+        [FromQuery] string? orderDirection,
+        [FromQuery] int pageSize,
         [FromServices] GetVolunteersQueryHandler handler,
         CancellationToken cancelToken)
     {

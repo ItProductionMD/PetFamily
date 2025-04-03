@@ -186,7 +186,7 @@ public class VolunteerTests
         //ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(10);
         //ACT
-        volunteer.Delete();
+        volunteer.SetAsDeleted();
         //ASSERT
         Assert.True(volunteer.IsDeleted);
         Assert.All(volunteer.Pets, p => Assert.True(p.IsDeleted));
@@ -196,7 +196,7 @@ public class VolunteerTests
     {
         //ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(10);
-        volunteer.Delete();
+        volunteer.SetAsDeleted();
         //ACT
         volunteer.Restore();
         //ASSERT

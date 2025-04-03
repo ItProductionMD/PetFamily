@@ -1,4 +1,8 @@
-﻿using System;
+﻿using PetFamily.Domain.PetManagment.Enums;
+using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,25 +11,22 @@ using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 using static PetFamily.Application.Validations.ValidationExtensions;
-using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Application.SharedValidations;
-using PetFamily.Domain.Results;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetManagment.Enums;
-using PetFamily.Domain.PetManagment.Entities;
 
-namespace PetFamily.Application.Commands.PetManagment.AddPet;
+namespace PetFamily.Application.Commands.PetManagment.UpdatePet;
 
-public static class AddPetCommandValidator
+public static class UpdatePetCommandValidator
 {
-    public static UnitResult Validate(AddPetCommand command)
+    public static UnitResult Validate(UpdatePetCommand command)
     {
         return UnitResult.ValidateCollection(
 
-            ()=> ValidateIfGuidIsNotEpmty(command.VolunteerId,"Volunteer id"),
+            ()=> ValidateIfGuidIsNotEpmty(command.PetId,"Pet id"),
+
+            () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "Volunteer id"),
 
             () => ValidateRequiredField(
-                command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
+                command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 
             () => ValidateNonRequiredField(
                 command.Description, "Pet description", MAX_LENGTH_LONG_TEXT),
@@ -37,10 +38,10 @@ public static class AddPetCommandValidator
                 command.Height, "Pet height", 0, 500),
 
             () => ValidateNonRequiredField(
-                command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
+                command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 
             () => Phone.ValidateNonRequired(
-                command.OwnerPhoneNumber, command.OwnerPhoneRegion),
+                command.PhoneNumber, command.PhoneRegion),
 
             () => ValidateNonRequiredField(
                 command.HealthInfo, "Pet info about health", MAX_LENGTH_LONG_TEXT),
@@ -57,4 +58,5 @@ public static class AddPetCommandValidator
             () => PetType.Validate(
                 BreedID.SetValue(command.BreedId), SpeciesID.SetValue(command.SpeciesId)));
     }
+
 }

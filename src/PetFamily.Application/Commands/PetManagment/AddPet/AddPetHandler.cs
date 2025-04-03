@@ -63,33 +63,34 @@ public class AddPetHandler(
         return Result.Ok(new AddPetResponse(newPet.Id, newPet.SerialNumber.Value));
     }
 
-    private static Pet CreatingPetProcess(AddPetCommand command, Volunteer volunteer)
+    private static Pet CreatingPetProcess(AddPetCommand cmd, Volunteer volunteer)
     {
-        var address = Address.CreatePossibleEmpty(command.Region, command.City, command.Street, command.HomeNumber).Data!;
-        var ownerPhone = Phone.CreatePossibbleEmpty(command.OwnerPhoneNumber, command.OwnerPhoneRegion).Data!;
+        var address = Address.CreatePossibleEmpty(cmd.Region, cmd.City, cmd.Street, cmd.HomeNumber).Data!;
 
-        var helpStatus = (HelpStatus)command.HelpStatus;
+        var ownerPhone = Phone.CreatePossibbleEmpty(cmd.OwnerPhoneNumber, cmd.OwnerPhoneRegion).Data!;
 
-        var requisites = command.Requisites
+        var helpStatus = (HelpStatus)cmd.HelpStatus;
+
+        var requisites = cmd.Requisites
             .Select(d => RequisitesInfo.Create(d.Name, d.Description).Data!).ToList();
 
         var petType = PetType.Create(
-            BreedID.SetValue(command.BreedId), SpeciesID.SetValue(command.SpeciesId)).Data!;
+            BreedID.SetValue(cmd.BreedId), SpeciesID.SetValue(cmd.SpeciesId)).Data!;
 
         return volunteer.CreateAndAddPet(
-            command.PetName,
-            command.DateOfBirth,
-            command.Description,
-            command.IsVaccinated,
-            command.IsSterilized,
-            command.Weight,
-            command.Height,
-            command.Color,
+            cmd.PetName,
+            cmd.DateOfBirth,
+            cmd.Description,
+            cmd.IsVaccinated,
+            cmd.IsSterilized,
+            cmd.Weight,
+            cmd.Height,
+            cmd.Color,
             petType,
             ownerPhone,
             requisites,
             helpStatus,
-            command.HealthInfo,
+            cmd.HealthInfo,
             address);
     }
 }
