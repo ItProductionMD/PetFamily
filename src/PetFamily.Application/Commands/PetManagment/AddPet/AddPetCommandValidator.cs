@@ -12,6 +12,7 @@ using PetFamily.Application.SharedValidations;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.Enums;
+using PetFamily.Domain.PetManagment.Entities;
 
 namespace PetFamily.Application.Commands.PetManagment.AddPet;
 

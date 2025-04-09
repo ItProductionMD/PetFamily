@@ -1,9 +1,10 @@
 ﻿using PetFamily.Application.Commands.PetManagment.AddPet;
+using PetFamily.Application.Commands.PetManagment.UpdatePet;
 using PetFamily.Application.Dtos;
 
 namespace PetFamily.API.Dtos;
 
-public record AddPetRequest(
+public record PetRequest(
    string PetName,
    DateOnly? DateOfBirth,
    string Description,
@@ -24,7 +25,7 @@ public record AddPetRequest(
    string HomeNumber,
    IEnumerable<RequisitesDto> DonateDetails)
 {
-    public AddPetCommand ToCommand(Guid volunteerId) =>
+    public AddPetCommand ToAddPetCommand(Guid volunteerId) =>
         new AddPetCommand(
            volunteerId,
            PetName,
@@ -45,5 +46,29 @@ public record AddPetRequest(
            Region,
            Street,
            HomeNumber,
-           DonateDetails);   
+           DonateDetails);
+
+    public UpdatePetCommand ToUpdatePetCommand(Guid volunteerId,Guid petId) =>
+       new UpdatePetCommand(
+          volunteerId,
+          petId,
+          PetName,
+          DateOfBirth,
+          Description,
+          IsVaccinated,
+          IsSterilized,
+          Weight,
+          Height,
+          Color,
+          SpeciesId,
+          BreedId,
+          OwnerPhoneRegion,
+          OwnerPhoneNumber,
+          HealthInfo,
+          HelpStatus,
+          City,
+          Region,
+          Street,
+          HomeNumber,
+          DonateDetails);
 }   

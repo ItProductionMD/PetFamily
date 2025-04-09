@@ -14,11 +14,6 @@ public class VolunteerReadRepository(ReadDbContext context) : IVolunteerReadRepo
 {
     private readonly ReadDbContext _context = context;
 
-    public Task<UnitResult> GetVolunteerByPhoneOrEmail(string phoneRegionCode, string phone, string email, CancellationToken cancelToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
     public Task<Result<VolunteerDto>> GetByIdAsync(Guid volunteerId, CancellationToken cancellToken = default)
     {
         throw new NotImplementedException();
