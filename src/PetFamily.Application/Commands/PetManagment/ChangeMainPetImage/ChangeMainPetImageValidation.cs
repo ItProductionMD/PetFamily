@@ -7,7 +7,7 @@ namespace PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
 
 public static class ChangeMainPetImageValidation
 {
-    public static UnitResult Validate(ChangeMainPetImageCommand command)
+    public static UnitResult Validate(ChangePetMainImageCommand command)
     {
         return UnitResult.ValidateCollection(
 

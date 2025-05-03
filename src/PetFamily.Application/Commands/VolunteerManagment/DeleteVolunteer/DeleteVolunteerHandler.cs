@@ -14,14 +14,14 @@ public class DeleteVolunteerHandler(
     IVolunteerWriteRepository volunteerRepository,
     IFileRepository fileRepository,
     FilesProcessingQueue filesProcessingQueue,
-    IOptions<FileFolders> fileFoldersOptions) : ICommandHandler<Guid,VolunteerIdCommand>
+    IOptions<FileFolders> fileFoldersOptions) : ICommandHandler<Guid,HardDeleteVolunteerCommand>
 {
     private readonly IFileRepository _fileRepository = fileRepository;
     private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<DeleteVolunteerHandler> _logger = logger;
     FilesProcessingQueue _filesProcessingQueue = filesProcessingQueue;
     FileFolders _fileFolders = fileFoldersOptions.Value;
-    public async Task<Result<Guid>> Handle(VolunteerIdCommand command, CancellationToken cancelToken)
+    public async Task<Result<Guid>> Handle(HardDeleteVolunteerCommand command, CancellationToken cancelToken)
     {
         var getVolunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
         if (getVolunteer.IsFailure)

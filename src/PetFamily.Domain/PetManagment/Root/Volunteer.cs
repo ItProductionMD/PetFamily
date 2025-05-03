@@ -34,10 +34,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     public bool IsDeleted => _isDeleted;
     private bool _isDeleted;
     public DateTime? DeletedDateTime => _deletedDateTime;
-
     private DateTime? _deletedDateTime;
     private Volunteer(Guid id) : base(id) { } //Ef core needs this
-
     public int PetsForAdoptCount => Pets
         .Where(p => p.HelpStatus == HelpStatus.ForAdoption && p.IsDeleted == false)
         .Count();
@@ -51,8 +49,6 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     public int ExistingPetsCount => Pets
         .Where(p => p.IsDeleted == false)
         .Count();
-
-    public static List<string> UniquenessFieldsName { get => ["Email", "PhoneNumber"]; }
 
     private Volunteer(
         Guid id,
@@ -112,6 +108,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
             () => ValidateRequiredField(email, "Volunteer email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
             () => ValidateNonRequiredField(description, "Volunteer description", MAX_LENGTH_LONG_TEXT));
     }
+
+
     //-------------------------------------Move Pet position--------------------------------------//
     public void MovePetSerialNumber(Pet movedPet, PetSerialNumber newSerialNumber)
     {
@@ -137,9 +135,9 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
             pet.SetSerialNumber(updatedSerialNumber.Data!);
         }
-
         movedPet.SetSerialNumber(newSerialNumber);
     }
+
     //--------------------------------------Add Pet-----------------------------------------------//
     public Pet CreateAndAddPet(
         string name,
@@ -189,6 +187,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
         MovePetSerialNumber(pet, maxSerialNumber);
 
+        pet.SetSerialNumber(PetSerialNumber.Empty());
+
         pet.SoftDelete();
     }
 
@@ -204,7 +204,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         _pets.Remove(pet);
     }
 
-    //----------------------------------------Soft delete pet-------------------------------------//
+    //----------------------------------------Soft delete itself----------------------------------//
     public void SoftDelete()
     {
         _isDeleted = true;
@@ -215,24 +215,28 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     }
 
 
-    //-------------------------------------------Restore------------------------------------------//
+    //--------------------------------------Restore itself----------------------------------------//
     public void Restore()
     {
         _isDeleted = false;
         _deletedDateTime = null;
 
         foreach (var pet in _pets)
-            pet.Restore();
+        {
+            if (pet.SerialNumber != PetSerialNumber.Empty())
+                pet.Restore();
+        }
     }
+
     //-----------------------------------------Restore Pet----------------------------------------//
     public UnitResult RestorePet(Guid petId)
     {
-        var pet = _pets.FirstOrDefault(p => p.Id == petId);
+        var pet = _pets.FirstOrDefault(p => p.Id == petId && p.IsDeleted == true);
         if (pet == null)
             return UnitResult.Fail(Error.NotFound($"Pet with id:{petId}"));
 
         var newSerialNumberValue = ExistingPetsCount + 1;
-        
+
         pet.Restore();
 
         PetSerialNumber serial = PetSerialNumber.Create(newSerialNumberValue, this).Data!;
@@ -241,6 +245,24 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
         return UnitResult.Ok();
     }
+
+    //---------------------------------------Restore Deleted Pets---------------------------------//
+    public UnitResult RestoreDeletedPets()
+    {
+        var deletedPets = _pets.Where(p => p.IsDeleted).ToList();
+        if (deletedPets.Count == 0)
+            return UnitResult.Fail(Error.NotFound("No deleted pets found"));
+
+        foreach (var pet in deletedPets)
+        {
+            pet.Restore();
+            var newSerialNumberValue = ExistingPetsCount + 1;
+            PetSerialNumber serial = PetSerialNumber.Create(newSerialNumberValue, this).Data!;
+            pet.SetSerialNumber(serial);
+        }
+        return UnitResult.Ok();
+    }
+
     //------------------------------------Update Main Info----------------------------------------//
     public UnitResult UpdateMainInfo(
         FullName fullName,
@@ -328,8 +350,6 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     {
         Rating = PetsAdoptedCount;
     }
-    public static List<string> VolunteerUniqness() => Volunteer.UniquenessFieldsName;
-
     public static string[] GetUniqueFields()
     {
         return typeof(Volunteer).GetProperties()

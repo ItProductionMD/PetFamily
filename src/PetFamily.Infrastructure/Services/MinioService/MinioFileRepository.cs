@@ -361,23 +361,23 @@ public class MinioFileRepository(
        List<AppFileDto> filesToDelete,
        CancellationToken cancelToken)
     {
-        List<Error> errors = [];
+        var errorMessage = string.Empty;
         var restoreResult = await RestoreFileListAsync(filesToRestore, cancelToken);
         if (restoreResult.IsFailure)
         {
-            errors.AddRange(restoreResult.Error);
-            _logger.LogCritical("Fail restore some files! Errors:{Errors}",
+            errorMessage = restoreResult.Error.Message;
+            _logger.LogCritical("Fail restore some files! Error:{Message}",
                 restoreResult.Error.Message);
         }
         var deleteResult = await DeleteFileListAsync(filesToDelete, cancelToken);
         if (deleteResult.IsFailure)
         {
-            errors.AddRange(deleteResult.Error);
-            _logger.LogCritical("Fail delete some files!Errors:{Errors}",
+            errorMessage = errorMessage+", "+restoreResult.Error.Message;
+            _logger.LogCritical("Fail delete some files!Error:{Message}",
              deleteResult.Error.Message);
         }
-        return errors.Count > 0
-            ? UnitResult.Fail(errors)
+        return string.IsNullOrEmpty(errorMessage)
+            ? UnitResult.Fail(Error.InternalServerError(errorMessage))
             : UnitResult.Ok();
     }
 

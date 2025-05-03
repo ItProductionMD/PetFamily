@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.Shared.ValueObjects;
+using Polly;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Infrastructure.WriteDbConfigurations.Converters;
@@ -73,6 +75,9 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
             address.Property(a => a.Region)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
+
+            address.Property(a => a.Number)
+                .HasMaxLength (MAX_LENGTH_SHORT_TEXT);
         });
 
         builder.ComplexProperty(p => p.SerialNumber, v =>

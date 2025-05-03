@@ -38,8 +38,8 @@ public static class Validators
                 errors.Add(Error.FileValidation(file.Name, ValidationErrorCodes.FILE_TOO_LARGE));
         }
         if (errors.Count > 0)
-            return Result.Fail(errors);
-
+            return UnitResult.Fail(Error.FileValidation(errors));
+        
         return UnitResult.Ok();
     }
     public static UnitResult ValidateFile(
@@ -63,7 +63,7 @@ public static class Validators
             errors.Add(Error.FileValidation(file.Name, ValidationErrorCodes.FILE_TOO_LARGE));
 
         if (errors.Count > 0)
-            return Result.Fail(errors);
+            return UnitResult.Fail(Error.FileValidation(errors));
 
         return UnitResult.Ok();
     }
