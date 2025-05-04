@@ -22,6 +22,7 @@ public abstract class Result
     public static UnitResult Fail(List<Error> errors)
     {
         var result = new UnitResult();
+        //result.Error = Error.FileValidation();
         result.AddValidationErrors(errors!);
         return result;
     }

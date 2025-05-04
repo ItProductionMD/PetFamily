@@ -19,6 +19,9 @@ public record PetSerialNumber
 
         return Result.Ok(new PetSerialNumber(value));
     }
+
+    public static PetSerialNumber Empty() => new(0);
+
     public static UnitResult Validate(int value, Volunteer volunteer)
     {
         if (value > volunteer.Pets.Count + 1 || value < 0 || value == 0)

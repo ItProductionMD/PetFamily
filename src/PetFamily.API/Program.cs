@@ -18,6 +18,7 @@ Log.Logger = new LoggerConfiguration()
         ?? throw new ArgumentNullException("Seq configuration wasn't found!"))
     .CreateLogger();
 var logger = Log.Logger;
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100MB
@@ -31,7 +32,7 @@ builder.Services
     .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); 
 
 builder.Services.AddSerilog();
 
@@ -47,7 +48,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    await app.ApplyMigration();    
+    //await app.ApplyMigration();    
 }
 
 app.UseHttpsRedirection();
@@ -57,3 +58,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

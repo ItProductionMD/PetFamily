@@ -16,7 +16,7 @@ public class HardDeletePetHandler(
     IFileRepository fileRepository,
     FilesProcessingQueue filesProcessingQueue,
     IOptions<FileFolders> fileOptions,
-    ILogger<SoftDeletePetHandler> logger) : ICommandHandler<DeletePetCommand>
+    ILogger<SoftDeletePetHandler> logger) : ICommandHandler<HardDeletePetCommand>
 {
     private readonly IVolunteerWriteRepository _volunteerWriteRepository = volunteerWriteRepository;
     private readonly IFileRepository _fileRepository = fileRepository;
@@ -24,7 +24,7 @@ public class HardDeletePetHandler(
     private readonly FileFolders _fileFolders = fileOptions.Value;
     private readonly FilesProcessingQueue filesQueue = filesProcessingQueue;
 
-    public async Task<UnitResult> Handle(DeletePetCommand cmd, CancellationToken cancelToken)
+    public async Task<UnitResult> Handle(HardDeletePetCommand cmd, CancellationToken cancelToken)
     {
         var validation = Validate(cmd);
         if (validation.IsFailure)

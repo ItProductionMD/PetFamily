@@ -27,6 +27,8 @@ public static class Inject
         IConfiguration configuration)
     {
         var postgresConnection = configuration.GetConnectionString(ConnectionStringName.POSTGRESQL);
+        if (string.IsNullOrEmpty(postgresConnection))
+            throw new ApplicationException("PostgreSQL connection string wasn't found!");
 
         services
             .AddScoped<IVolunteerReadRepository, VolunteerReadRepositoryWithDapper>()
@@ -37,8 +39,8 @@ public static class Inject
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddDbContext<ReadDbContext>(options => options.UseNpgsql(postgresConnection))
             .ConfigDapper(configuration)
-            .AddScoped<IDbConnection>(sp => new NpgsqlConnection(postgresConnection))
-            .AddScoped<WriteDbContext>()
+            .AddScoped<IDbConnection>(_ => new NpgsqlConnection(postgresConnection))
+            .AddScoped<WriteDbContext>(_ => new WriteDbContext(postgresConnection))
             .AddHostedService<DbCleanupService>()
             .AddHostedService<MinioCleanupService>()
             .AddAWSClient(configuration)

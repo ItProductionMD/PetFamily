@@ -20,7 +20,7 @@ public class CreateVolunteerHandler(
     IVolunteerWriteRepository volunteerWriteRepository,
     IVolunteerReadRepository volunteerReadRepository,
     IValidator<CreateVolunteerCommand> validator,
-    ILogger<CreateVolunteerHandler> logger):ICommandHandler<Guid,CreateVolunteerCommand>
+    ILogger<CreateVolunteerHandler> logger) : ICommandHandler<Guid, CreateVolunteerCommand>
 {
     private readonly IVolunteerWriteRepository _volunteerWriteRepository = volunteerWriteRepository;
     private readonly IVolunteerReadRepository _volunteerReadRepository = volunteerReadRepository;
@@ -45,7 +45,7 @@ public class CreateVolunteerHandler(
             command.PhoneNumber,
             command.Email,
             cancelToken);
-        if(checkUniqueness.IsFailure)
+        if (checkUniqueness.IsFailure)
             return checkUniqueness;
 
         var volunteer = CreateVolunteerProccess(command);

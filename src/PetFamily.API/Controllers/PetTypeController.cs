@@ -4,9 +4,9 @@ using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Domain.DomainError;
 using PetFamily.API.Dtos;
-using PetFamily.Application.Commands.PetTypeManagment.AddPetType;
-using PetFamily.Application.Commands.PetTypeManagment.DeleteSpecies;
-using PetFamily.Application.Commands.PetTypeManagment.DeleteBreed;
+using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
+using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
+using PetFamily.Application.Commands.PetTypeManagement.DeleteBreed;
 using PetFamily.Application.Queries.PetType.GetListOfSpecies;
 using PetFamily.Application.Queries.PetType.GetBreeds;
 

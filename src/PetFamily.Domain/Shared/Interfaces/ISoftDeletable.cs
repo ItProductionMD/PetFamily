@@ -2,6 +2,6 @@
 
 public interface ISoftDeletable
 {
-    void SetAsDeleted();
+    void SoftDelete();
     void Restore();
 }

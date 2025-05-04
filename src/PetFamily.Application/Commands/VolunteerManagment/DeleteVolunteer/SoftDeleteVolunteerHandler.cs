@@ -5,6 +5,7 @@ using PetFamily.Application.IRepositories;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.Commands.SharedCommands;
+using PetFamily.Application.Abstractions;
 
 namespace PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
 
@@ -12,13 +13,14 @@ public class SoftDeleteVolunteerHandler(
     ILogger<SoftDeleteVolunteerHandler> logger,
     IVolunteerWriteRepository volunteerRepository,
     FilesProcessingQueue filesProcessingQueue,
-    IOptions<FileFolders> fileFoldersOptions)
+    IOptions<FileFolders> fileFoldersOptions) : ICommandHandler<Guid, SoftDeleteVolunteerCommand>
 {
     private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<SoftDeleteVolunteerHandler> _logger = logger;
     FilesProcessingQueue _filesProcessingQueue = filesProcessingQueue;
     FileFolders _fileFolders = fileFoldersOptions.Value;
-    public async Task<Result<Guid>> Handle(VolunteerIdCommand command, CancellationToken cancelToken)
+
+    public async Task<Result<Guid>> Handle(SoftDeleteVolunteerCommand command, CancellationToken cancelToken)
     {
         var getVolunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);
         if (getVolunteer.IsFailure)
@@ -31,7 +33,7 @@ public class SoftDeleteVolunteerHandler(
         foreach (var pet in volunteer.Pets)
             imagesToDelete.AddRange(pet.Images.Select(i => new AppFileDto(i.Name, _fileFolders.Images)));
         
-        volunteer.SetAsDeleted();
+        volunteer.SoftDelete();
 
         var result = await _volunteerRepository.Save(volunteer, cancelToken);
         if (result.IsFailure)

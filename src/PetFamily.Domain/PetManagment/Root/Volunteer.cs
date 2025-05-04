@@ -34,14 +34,21 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     public bool IsDeleted => _isDeleted;
     private bool _isDeleted;
     public DateTime? DeletedDateTime => _deletedDateTime;
-
     private DateTime? _deletedDateTime;
     private Volunteer(Guid id) : base(id) { } //Ef core needs this
+    public int PetsForAdoptCount => Pets
+        .Where(p => p.HelpStatus == HelpStatus.ForAdoption && p.IsDeleted == false)
+        .Count();
+    public int PetsForHelpCount => Pets
+        .Where(p => p.HelpStatus == HelpStatus.ForHelp && p.IsDeleted == false)
+        .Count();
+    public int PetsAdoptedCount => Pets
+        .Where(p => p.HelpStatus == HelpStatus.Helped && p.IsDeleted == false)
+        .Count();
 
-    public int PetsForAdoptCount => Pets.Where(p => p.HelpStatus == HelpStatus.ForAdoption).Count();
-    public int PetsForHelpCount => Pets.Where(p => p.HelpStatus == HelpStatus.ForHelp).Count();
-    public int PetsAdoptedCount => Pets.Where(p => p.HelpStatus == HelpStatus.Helped).Count();
-    public static List<string> UniquenessFieldsName { get => ["Email", "PhoneNumber"]; }
+    public int ExistingPetsCount => Pets
+        .Where(p => p.IsDeleted == false)
+        .Count();
 
     private Volunteer(
         Guid id,
@@ -75,7 +82,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         )
     {
         var validationResult = Validate(fullName, email, phoneNumber, expirienceYears, description);
-        if(validationResult.IsFailure) 
+        if (validationResult.IsFailure)
             return validationResult;
 
         return Result.Ok(new Volunteer(
@@ -101,6 +108,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
             () => ValidateRequiredField(email, "Volunteer email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
             () => ValidateNonRequiredField(description, "Volunteer description", MAX_LENGTH_LONG_TEXT));
     }
+
+
     //-------------------------------------Move Pet position--------------------------------------//
     public void MovePetSerialNumber(Pet movedPet, PetSerialNumber newSerialNumber)
     {
@@ -109,7 +118,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         if (oldPosition == newPosition)
             return;
 
-        var affectedPets = Pets.Where(p =>
+        var affectedPets = Pets.Where(p => p.IsDeleted == false &&
             oldPosition > newPosition
                 ? p.SerialNumber.Value >= newPosition && p.SerialNumber.Value < oldPosition
                 : p.SerialNumber.Value <= newPosition && p.SerialNumber.Value > oldPosition);
@@ -126,9 +135,9 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
             pet.SetSerialNumber(updatedSerialNumber.Data!);
         }
-
         movedPet.SetSerialNumber(newSerialNumber);
     }
+
     //--------------------------------------Add Pet-----------------------------------------------//
     public Pet CreateAndAddPet(
         string name,
@@ -146,7 +155,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         string? healthInfo,
         Address address)
     {
-        var serialNumberValue = Pets.Count + 1;
+        var serialNumberValue = ExistingPetsCount + 1;
         var serialNumber = PetSerialNumber.Create(serialNumberValue, this).Data!;
         var pet = Pet.Create(
             name,
@@ -172,13 +181,15 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     //--------------------------------------Soft delete Pet---------------------------------------//
     public void SoftDeletePet(Pet pet)
     {
-        var maxSerialNumberValue = Pets.Max(pet => pet.SerialNumber.Value);
+        var maxSerialNumberValue = ExistingPetsCount;
 
-        var maxSerialNumber = PetSerialNumber.Create(maxSerialNumberValue, this);
+        var maxSerialNumber = PetSerialNumber.Create(maxSerialNumberValue, this).Data!;
 
-        MovePetSerialNumber(pet, maxSerialNumber.Data!);
+        MovePetSerialNumber(pet, maxSerialNumber);
 
-        pet.SetAsDeleted();
+        pet.SetSerialNumber(PetSerialNumber.Empty());
+
+        pet.SoftDelete();
     }
 
     //-------------------------------------Hard delete pet----------------------------------------//
@@ -193,24 +204,65 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         _pets.Remove(pet);
     }
 
-    //----------------------------------------Soft delete pet-------------------------------------//
-    public void SetAsDeleted()
+    //----------------------------------------Soft delete itself----------------------------------//
+    public void SoftDelete()
     {
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
 
         foreach (var pet in _pets)
-            pet.SetAsDeleted();
+            pet.SoftDelete();
     }
-    //------------------------------Set is Deleted true(for soft deleting)------------------------//
+
+
+    //--------------------------------------Restore itself----------------------------------------//
     public void Restore()
     {
         _isDeleted = false;
         _deletedDateTime = null;
 
         foreach (var pet in _pets)
-            pet.Restore();
+        {
+            if (pet.SerialNumber != PetSerialNumber.Empty())
+                pet.Restore();
+        }
     }
+
+    //-----------------------------------------Restore Pet----------------------------------------//
+    public UnitResult RestorePet(Guid petId)
+    {
+        var pet = _pets.FirstOrDefault(p => p.Id == petId && p.IsDeleted == true);
+        if (pet == null)
+            return UnitResult.Fail(Error.NotFound($"Pet with id:{petId}"));
+
+        var newSerialNumberValue = ExistingPetsCount + 1;
+
+        pet.Restore();
+
+        PetSerialNumber serial = PetSerialNumber.Create(newSerialNumberValue, this).Data!;
+
+        pet.SetSerialNumber(serial);
+
+        return UnitResult.Ok();
+    }
+
+    //---------------------------------------Restore Deleted Pets---------------------------------//
+    public UnitResult RestoreDeletedPets()
+    {
+        var deletedPets = _pets.Where(p => p.IsDeleted).ToList();
+        if (deletedPets.Count == 0)
+            return UnitResult.Fail(Error.NotFound("No deleted pets found"));
+
+        foreach (var pet in deletedPets)
+        {
+            pet.Restore();
+            var newSerialNumberValue = ExistingPetsCount + 1;
+            PetSerialNumber serial = PetSerialNumber.Create(newSerialNumberValue, this).Data!;
+            pet.SetSerialNumber(serial);
+        }
+        return UnitResult.Ok();
+    }
+
     //------------------------------------Update Main Info----------------------------------------//
     public UnitResult UpdateMainInfo(
         FullName fullName,
@@ -266,13 +318,13 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         if (_pets.Count != petsIds.Count)
             return UnitResult.Fail(Error.ValueOutOfRange("Count of pets in PetsOrder"));
 
-        foreach(var id in petsIds)
+        foreach (var id in petsIds)
         {
             var pet = _pets.FirstOrDefault(p => p.Id == id);
             if (pet == null)
                 return UnitResult.Fail(Error.NotFound($"Pet with id {id}"));
 
-            var newSerialNumber = PetSerialNumber.Create(petsIds.IndexOf(id)+1,this).Data;
+            var newSerialNumber = PetSerialNumber.Create(petsIds.IndexOf(id) + 1, this).Data;
             if (newSerialNumber == null)
                 return UnitResult.Fail(Error.InvalidFormat("pet serial number"));
 
@@ -281,7 +333,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         return UnitResult.Ok();
     }
 
-    public UnitResult UpdatePetStatus(Guid petId,HelpStatus helpStatus)
+    public UnitResult UpdatePetStatus(Guid petId, HelpStatus helpStatus)
     {
         var pet = Pets.FirstOrDefault(p => p.Id == petId);
         if (pet == null)
@@ -298,13 +350,11 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     {
         Rating = PetsAdoptedCount;
     }
-    public static List<string> VolunteerUniqness() => Volunteer.UniquenessFieldsName;
-
     public static string[] GetUniqueFields()
     {
         return typeof(Volunteer).GetProperties()
-        .Where(prop => Attribute.IsDefined(prop, typeof(UniqueAttribute))) 
-        .Select(prop => prop.Name.ToLower()) 
+        .Where(prop => Attribute.IsDefined(prop, typeof(UniqueAttribute)))
+        .Select(prop => prop.Name.ToLower())
         .ToArray();
     }
 
@@ -316,11 +366,11 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         {
             if (Attribute.IsDefined(prop, typeof(UniqueAttribute)))
             {
-                UniqueProps uniqueProp = new () { Field = prop.Name };
-                if(typeof(IValueObject).IsAssignableFrom(prop.PropertyType))
+                UniqueProps uniqueProp = new() { Field = prop.Name };
+                if (typeof(IValueObject).IsAssignableFrom(prop.PropertyType))
                 {
                     var vProps = prop.PropertyType.GetProperties();
-                    foreach (var valueObjectProp in vProps  )
+                    foreach (var valueObjectProp in vProps)
                     {
                         uniqueProp.Values.Add(valueObjectProp.Name.ToLower());
                     }

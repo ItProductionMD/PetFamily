@@ -40,7 +40,7 @@ public class UpdatePetStatusHandler(
             return UnitResult.Fail(Error.NotFound("Pet"));
         }
 
-        pet.UpdateHelpStatus((HelpStatus)cmd.HelpStatus);
+        pet.ChangePetStatus((HelpStatus)cmd.HelpStatus);
 
         var result = await _writeRepository.Save(volunteer, cancelToken);
 

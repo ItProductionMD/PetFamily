@@ -11,21 +11,20 @@ namespace PetFamily.Infrastructure.Contexts;
 
 public class WriteDbContext : DbContext
 {
-    private readonly IConfiguration _configuration;
+    private readonly string _connectionString;
     public DbSet<Volunteer> Volunteers { get; set; }
     public DbSet<Species> AnimalTypes { get; set; }
 
-    public WriteDbContext(IConfiguration configuration)
+    public WriteDbContext(string connectionString)
     {
-         _configuration=configuration;
+        _connectionString = connectionString;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connectionString = _configuration.GetConnectionString(ConnectionStringName.POSTGRESQL);
 
         optionsBuilder
-            .UseNpgsql(connectionString) 
+            .UseNpgsql(_connectionString) 
             .UseSnakeCaseNamingConvention()
             .UseLoggerFactory(MyLoggerFactory.LoggerFactoryInstance)
             .EnableSensitiveDataLogging();

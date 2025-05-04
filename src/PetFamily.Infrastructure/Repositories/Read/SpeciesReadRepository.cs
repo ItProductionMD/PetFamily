@@ -86,8 +86,8 @@ public class SpeciesReadRepository(
             _logger.LogWarning("Pet type with speciesId:{speciesId} and breedId:{breedId} not exists!",
                 speciesId, breedId);
 
-            return UnitResult.Fail(Error.InternalServerError($"Pet type with speciesId:{speciesId}" +
-                $" and breedId:{breedId} doesn't exist!"));
+            return UnitResult.Fail(Error.NotFound($"Pet type with speciesId:{speciesId}" +
+                $" and breedId:{breedId}"));
         }
         _logger.LogInformation("Pet type with speciesId:{speciesId} and breedId:{breedId} exists!",
             speciesId, breedId);

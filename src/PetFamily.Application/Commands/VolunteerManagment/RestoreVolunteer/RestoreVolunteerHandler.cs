@@ -13,13 +13,13 @@ public class RestoreVolunteerHandler(
 ILogger<RestoreVolunteerHandler> logger,
 IVolunteerWriteRepository volunteerRepository,
 IFileRepository fileRepository,
-IOptions<FileFolders> fileFoldersOptions):ICommandHandler<VolunteerIdCommand>
+IOptions<FileFolders> fileFoldersOptions):ICommandHandler<RestoreVolunteerCommand>
 {
     private readonly FileFolders _fileFolders = fileFoldersOptions.Value;
     private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
     private readonly ILogger<RestoreVolunteerHandler> _logger = logger;
     private readonly IFileRepository _fileRepository = fileRepository;
-    public async Task<UnitResult> Handle(VolunteerIdCommand command, CancellationToken cancelToken)
+    public async Task<UnitResult> Handle(RestoreVolunteerCommand command, CancellationToken cancelToken)
     {
         //TODO INDRODUCE THE UNIT OF WORK FOR TRANSACTION
         var getVolunteer = await _volunteerRepository.GetByIdAsync(command.VolunteerId, cancelToken);

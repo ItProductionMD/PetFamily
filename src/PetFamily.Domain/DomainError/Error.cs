@@ -1,5 +1,6 @@
 ﻿using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.Validations;
+using System.ComponentModel;
 
 namespace PetFamily.Domain.DomainError;
 
@@ -71,7 +72,13 @@ public record Error
           ErrorType.Validation,
           validationErrors);
     //----------------------------------------File errors-----------------------------------------//
-    public static Error FileValidation(string fileName,string validationCode)=>
+    public static Error FileValidation(List<Error> errors) =>
+        new(ErrorCodes.VALIDATION_ERROR,
+          string.Empty,
+          ErrorType.Validation,
+          errors.SelectMany(e => e.ValidationErrors).ToList());
+
+    public static Error FileValidation(string fileName, string validationCode) =>
         new(ErrorCodes.VALIDATION_ERROR,
           string.Empty,
           ErrorType.Validation,
@@ -94,9 +101,9 @@ public record Error
         new(ErrorCodes.OPERATION_CANCELLED, message, ErrorType.Cancellation);
 
     public static Error ValueOutOfRange(string message) =>
-        new(ErrorCodes.VALIDATION_ERROR, 
+        new(ErrorCodes.VALIDATION_ERROR,
             message,
-            ErrorType.Validation, 
+            ErrorType.Validation,
             [new(ValidationErrorType.Field, "count", ValidationErrorCodes.VALUE_OUT_OF_RANGE)]);
 
 

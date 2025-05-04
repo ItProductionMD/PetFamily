@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Commands.VolunteerManagment.GetVolunteers;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Entities;
@@ -187,33 +186,5 @@ public class VolunteerWriteRepository(
         {
             await Save(volunteer, cancelToken);
         });
-    }
-
-    public async Task<VolunteersResponse> GetVolunteersAsync(
-        int PageNumber,
-        int maxItemsOnPage,
-        CancellationToken cancelToken)
-    {
-        var query = _context.Volunteers.AsNoTracking();
-
-        var countVolunteers = await query.CountAsync(cancelToken);
-
-        var volunteers = await query
-            .OrderBy(v => v.Id)
-            .Skip((PageNumber - 1) * maxItemsOnPage)
-            .Take(maxItemsOnPage)
-            .Select(v => new VolunteerDtoCommand(
-                v.Id,
-                v.FullName.FirstName,
-                v.FullName.LastName,
-                v.Email,
-                v.Description ?? "",
-                v.Phone.RegionCode,
-                v.Phone.Number,
-                v.ExperienceYears,
-                v.PetsForAdoptCount))
-            .ToListAsync(cancelToken);
-
-        return new(countVolunteers, volunteers);
     }
 }

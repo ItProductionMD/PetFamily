@@ -167,6 +167,20 @@ public class VolunteerReadRepositoryWithDapper(
             _ => "desc"
         };
 
+        var totalVolunteersCount = await _dbConnection.ExecuteScalarAsync<int>(
+            "SELECT COUNT(1) FROM Volunteers WHERE is_deleted = FALSE",
+            commandTimeout: _options.QueryTimeout);
+
+        var totalPages = (int)Math.Ceiling((double)totalVolunteersCount / query.pageSize);
+
+        var pageNumber = query.pageNumber;
+        if (pageNumber > totalPages || pageNumber <= 0)
+        {
+            _logger.LogWarning("Page number {pageNumber} exceeds total pages {totalPages}. " +
+                "Returning empty result.", pageNumber, totalPages);
+            return new GetVolunteersResponse(totalVolunteersCount, []);
+        }
+
         var sql = $@"
             SELECT v.Id, 
             CONCAT(v.last_name, ' ', v.first_name) AS FullName, 
@@ -178,7 +192,8 @@ public class VolunteerReadRepositoryWithDapper(
             LIMIT @Limit OFFSET @Offset";
 
         var offset = (query.pageNumber - 1) * query.pageSize;
-        var limit = query.pageSize + 1;
+
+        var limit = query.pageSize;
 
         _logger.LogInformation("Executing(GetVolunteers) SQL Query: {sql} with Parameters: {limit}, {offset}",
             sql, limit, offset);
@@ -190,25 +205,8 @@ public class VolunteerReadRepositoryWithDapper(
 
         var volunteersList = volunteers.ToList();
 
-        bool hasMoreRecords = volunteersList.Count > query.pageSize;
+        _logger.LogInformation("GetVolunteers successful! Total count: {totalCount}", totalVolunteersCount);
 
-        var volunteersCount = (query.pageNumber - 1) * query.pageSize + volunteersList.Count;
-
-        if (hasMoreRecords)
-        {
-            volunteersList.RemoveAt(volunteersList.Count - 1);
-
-            var getVolunteerCountSql = "SELECT COUNT(1) FROM Volunteers";
-
-            _logger.LogInformation("Executing(GetVolunteers) SQL Query:{sql}", getVolunteerCountSql);
-
-            volunteersCount = await _dbConnection.ExecuteScalarAsync<int>(
-                getVolunteerCountSql,
-                commandTimeout:_options.QueryTimeout);
-        }
-
-        _logger.LogInformation("GetVolunteers successful! Total count: {totalCount}", volunteersCount);
-
-        return new GetVolunteersResponse(volunteersCount, volunteersList);
+        return new GetVolunteersResponse(totalVolunteersCount, volunteersList);
     }
 }

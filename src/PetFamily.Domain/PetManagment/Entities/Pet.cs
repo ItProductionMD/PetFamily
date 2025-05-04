@@ -115,6 +115,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
                 address ?? Address.CreateEmpty(),
                 serialNumber));
     }
+
     public static UnitResult Validate(
         string name,
         string? description,
@@ -132,16 +133,18 @@ public class Pet : Entity<Guid>, ISoftDeletable
             () => ValidateNonRequiredField(color, "Pet color", MAX_LENGTH_SHORT_TEXT));
     }
 
-    public void SetSerialNumber(PetSerialNumber serialNumber)
-    {
-        SerialNumber = serialNumber;
-    }
     public PetSerialNumber GetSerialNumber() => SerialNumber;
-    public void SetAsDeleted()
+
+    public void SetSerialNumber(PetSerialNumber serialNumber) => SerialNumber = serialNumber;
+
+    public void ChangePetStatus(HelpStatus helpStatus) => HelpStatus = helpStatus;
+
+    public void SoftDelete()
     {
         _isDeleted = true;
         _deletedDateTime = DateTime.UtcNow;
     }
+
     public void Restore()
     {
         _isDeleted = false;
@@ -156,6 +159,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
             _images.Add(image);
         }
     }
+
     public List<string> DeleteImages(List<string> imageNames)
     {
         var imagesToDeleteSet = new HashSet<string>(imageNames); //delete reapeted images
@@ -173,6 +177,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
 
         return deletedImages;
     }
+
     public List<string> DeleteImages(List<Image> images)
     {
         if (images.Count == 0)
@@ -192,10 +197,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
         });
 
         return deletedImages;
-    }
-    public void ChangePetStatus(HelpStatus helpStatus)
-    {
-        HelpStatus = helpStatus;
     }
 
     public UnitResult Update(
@@ -233,11 +234,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
         Address = address ?? Address.CreateEmpty();
 
         return UnitResult.Ok();
-    }
-
-    public void UpdateHelpStatus(HelpStatus helpStatus)
-    {
-        HelpStatus = helpStatus;
     }
 
     public UnitResult ChangeMainPhoto(string imageName)

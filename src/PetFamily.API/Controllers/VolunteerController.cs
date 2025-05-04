@@ -23,7 +23,6 @@ using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
 using PetFamily.Application.Commands.PetManagment.UpdateSocialNetworks;
 using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
 using PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
-using PetFamily.Application.Commands.VolunteerManagment.GetVolunteers;
 using PetFamily.Application.Commands.VolunteerManagment.RestoreVolunteer;
 using PetFamily.Application.Commands.VolunteerManagment.UpdateRequisites;
 using PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
@@ -40,6 +39,8 @@ using PetFamily.Application.Commands.PetManagment.UpdatePetStatus;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using PetFamily.Application.Commands.PetManagment.DeletePet;
 using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
+using PetFamily.Application.Commands.PetManagment.RestorePet;
+using PetFamily.Application.Commands.PetManagment.Shared;
 
 namespace PetFamily.API.Controllers;
 
@@ -137,7 +138,7 @@ public class VolunteerController(
         [FromRoute] Guid volunteerId,
         CancellationToken cancelToken = default)
     {
-        var command = new VolunteerIdCommand(volunteerId);
+        var command = new SoftDeleteVolunteerCommand(volunteerId);
 
         var handlerResult = await handler.Handle(command, cancelToken);
 
@@ -160,7 +161,7 @@ public class VolunteerController(
        [FromRoute] Guid volunteerId,
        CancellationToken cancelToken = default)
     {
-        var command = new VolunteerIdCommand(volunteerId);
+        var command = new HardDeleteVolunteerCommand(volunteerId);
 
         var handlerResult = await handler.Handle(command, cancelToken);
 
@@ -227,13 +228,13 @@ public class VolunteerController(
     /// <param name="volunteerId"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
-    [HttpGet("{volunteerId}/restore")]
+    [HttpPost("{volunteerId}/restore")]
     public async Task<ActionResult<Envelope>> Restore(
         [FromServices] RestoreVolunteerHandler handler,
         [FromRoute] Guid volunteerId,
         CancellationToken cancelToken = default)
     {
-        var command = new VolunteerIdCommand(volunteerId);
+        var command = new RestoreVolunteerCommand(volunteerId);
 
         var handlerResult = await handler.Handle(command, cancelToken);
 
@@ -379,10 +380,10 @@ public class VolunteerController(
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
         [FromQuery] string imageName,
-        [FromServices] ChangeMainPetImageHandler handler,
+        [FromServices] ChangePetMainImageHandler handler,
         CancellationToken cancelToken) 
     {
-        var command = new ChangeMainPetImageCommand(volunteerId, petId, imageName);
+        var command = new ChangePetMainImageCommand(volunteerId, petId, imageName);
 
         var result = await handler.Handle(command, cancelToken);
 
@@ -426,7 +427,7 @@ public class VolunteerController(
         [FromServices] SoftDeletePetHandler handler,
         CancellationToken cancelToken)
     {
-        var command = new DeletePetCommand(volunteerId, petId);
+        var command = new SoftDeletePetCommand(volunteerId, petId);
 
         var result = await handler.Handle(command, cancelToken);
 
@@ -443,7 +444,24 @@ public class VolunteerController(
         [FromServices] HardDeletePetHandler handler,
         CancellationToken cancelToken)
     {
-        var command = new DeletePetCommand(volunteerId, petId);
+        var command = new HardDeletePetCommand(volunteerId, petId);
+
+        var result = await handler.Handle(command, cancelToken);
+
+        return result.IsFailure
+            ? result.ToErrorActionResult()
+            : result.ToEnvelope();
+    }
+
+    //-------------------------------------Restore pet--------------------------------------------//
+    [HttpPost("{volunteerId:Guid}/pets/{petId:Guid}/restore")]
+    public async Task<ActionResult<Envelope>> RestorePet(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromServices] RestorePetHandler handler,
+        CancellationToken cancelToken)
+    {
+        var command = new PetCommand(volunteerId, petId);
 
         var result = await handler.Handle(command, cancelToken);
 
@@ -483,7 +501,7 @@ public class VolunteerController(
     /// <param name="count"></param>
     /// <param name="handler"></param>
     /// <returns></returns>
-    [HttpPost("addfakevolunteers/{count:int}")]
+    [HttpPost("addfakevolunteers")]
     public async Task<ActionResult<Envelope>> AddFakeVolunteers(
         [FromQuery] int count,
         [FromServices] CreateVolunteerHandler handler)
