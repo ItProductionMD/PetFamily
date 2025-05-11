@@ -1,4 +1,5 @@
 ﻿using PetFamily.Application.Dtos;
+using PetFamily.Application.Queries.Pet.GetPets;
 using PetFamily.Application.Queries.Volunteer.GetVolunteers;
 using PetFamily.Domain.Results;
 
@@ -19,5 +20,11 @@ public interface IVolunteerReadRepository
         string phoneRegionCode,
         string phoneNuber,
         string email,
+        CancellationToken cancelToken = default);
+
+    Task<Result<GetPetsResponse>> GetPets(
+        PetsFilter? filter,
+        int pageNumber,
+        int pageSize,
         CancellationToken cancelToken = default);
 }

@@ -54,6 +54,7 @@ public class ChangePetsOrderTest(TestWebApplicationFactory factory)
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
+
         SeedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["breedOne", "breedTwo"]).Species;
         await Seeder.Seed(SeedSpecies, _dbContext);

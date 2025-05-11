@@ -1,10 +1,6 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
 using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Infrastructure.Contexts;
 
 namespace PetFamily.IntegrationTests.PetTypeFeatures;
 

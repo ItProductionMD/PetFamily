@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.IRepositories;
+using static Azure.Core.HttpHeader;
 
 namespace PetFamily.Infrastructure.Services.BackgroundServices;
 
@@ -54,18 +55,28 @@ public class MinioCleanupService(
         var result = await fileService.SoftDeleteFileListAsync(fileList, stoppingToken);
         if (result.IsFailure)
         {
+            _logger.LogCritical("MinioBackgroundCleanup service error!Errors:{error}", result.Error.Message);
+
             if (result.Data != null && result.Data.Count != 0)
             {
                 var undeletedFiles = fileList
                     .Select(f => f.Name)
                     .Except(result.Data).ToList();
 
-                string names = string.Join(";", result.Data);
+                string names = string.Join(";", undeletedFiles);
 
                 _logger.LogCritical("UndeletedFiles:{fileNames}", names);
             }
-            _logger.LogCritical("MinioBackgroundCleanup service error!Errors:{error}"
-                , result.Error.Message);
+            else
+            {
+                var undeletedFiles = fileList
+                    .Select(f => f.Name)
+                    .ToList();
+
+                string names = string.Join(";", undeletedFiles);
+
+                _logger.LogCritical("UndeletedFiles:{fileNames}", names);
+            }
         }
         else
         {

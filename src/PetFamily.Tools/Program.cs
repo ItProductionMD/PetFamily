@@ -1,66 +1,58 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using PetFamily.Infrastructure.Contexts;
 using PetFamily.Infrastructure.Dapper;
+using PetFamily.Tools;
 using System.Reflection;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         if (args.Length == 0)
         {
             Console.WriteLine("Using: dotnet run -- [command]");
-            Console.WriteLine("list of commands: scaffold");
+            Console.WriteLine("list of commands: " +
+                "\n\tscaffold," +
+                "\n\tseed --volunteers=<volunteersCount>" +
+                "--pets=<petsOnVolunteersCount>," +
+                "\n\tclear --<tableName>");
+           
             return;
         }
-
         switch (args[0].ToLower())
         {
             case "scaffold":
-                RunScaffold();
+                Scaffolder.RunScaffold();
                 break;
+
+            case "seed":
+                Console.WriteLine($"######SeedVolunteers()");
+                int volunteersCount = 10; // default
+                int petsCount = 2;   // default
+
+                foreach (var arg in args.Skip(1))
+                {
+                    if (arg.StartsWith("--volunteers=") && int.TryParse(arg.Split('=')[1], out var c))
+                        volunteersCount = c;
+
+                    if (arg.StartsWith("--pets=") && int.TryParse(arg.Split('=')[1], out var p))
+                        petsCount = p;
+                }
+                await Seeder.RunSeed(volunteersCount, petsCount);
+                break;
+
+            case "clear":
+                var tableName = args[1].Remove(0, 2);
+                await Seeder.RunClear(tableName);
+                break;
+
             default:
                 Console.WriteLine($"unknown command: {args[0]}");
                 break;
         }
-    }
-    static string GetConnectionString()
-    {
-        string pathToDll = Path.Combine(
-           Directory.GetParent(Directory.GetCurrentDirectory())!.FullName,  
-           "PetFamily.API",  
-           "bin", "Debug", "net9.0", "PetFamily.API.dll"  
-       );
-
-        if (!File.Exists(pathToDll))
-            throw new FileNotFoundException($"Assemby fail not found: {pathToDll}");
-
-        var mainAssembly = Assembly.LoadFile(pathToDll);
-
-        var config = new ConfigurationBuilder()
-            .AddUserSecrets(mainAssembly)
-            .Build();
-
-        return config.GetConnectionString("PostgreForPetFamily") 
-            ?? throw new Exception("Connection string not found.");
-    }
-    /// <summary>
-    /// Generate classes from DBTable with column names to use Dapper easy
-    /// </summary>
-    /// <exception cref="FileNotFoundException"></exception>
-    private static void RunScaffold()
-    {
-        string pathToInfrastructure = Path.Combine(
-          Directory.GetParent(Directory.GetCurrentDirectory())!.FullName,
-          "PetFamily.Infrastructure"
-        );
-
-        if (!Path.Exists(pathToInfrastructure))
-            throw new FileNotFoundException($"Assemby fail not found: {pathToInfrastructure}");
-        string connectionString = GetConnectionString();
-        Console.WriteLine($"Connection String: {connectionString}");
-
-        var scaffolder = new ScaffoldFromDb(connectionString);
-        scaffolder.Run(pathToInfrastructure);
     }
 }
 

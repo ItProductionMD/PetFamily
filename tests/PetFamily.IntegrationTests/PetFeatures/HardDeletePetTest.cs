@@ -1,13 +1,10 @@
-﻿using Amazon.Runtime.SharedInterfaces;
-using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Commands.PetManagment.DeletePet;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
-using System.Runtime.CompilerServices;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 

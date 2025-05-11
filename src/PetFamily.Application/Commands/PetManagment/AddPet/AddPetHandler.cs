@@ -51,7 +51,7 @@ public class AddPetHandler(
 
         var volunteer = getVolunteer.Data!;
 
-        var newPet = CreatingPetProcess(command, volunteer);
+        var newPet = CreatePetProcess(command, volunteer);
 
         var result = await _volunteerRepository.Save(volunteer, cancelToken);
         if (result.IsFailure)
@@ -63,7 +63,7 @@ public class AddPetHandler(
         return Result.Ok(new AddPetResponse(newPet.Id, newPet.SerialNumber.Value));
     }
 
-    private static Pet CreatingPetProcess(AddPetCommand cmd, Volunteer volunteer)
+    private static Pet CreatePetProcess(AddPetCommand cmd, Volunteer volunteer)
     {
         var address = Address.CreatePossibleEmpty(cmd.Region, cmd.City, cmd.Street, cmd.HomeNumber).Data!;
 

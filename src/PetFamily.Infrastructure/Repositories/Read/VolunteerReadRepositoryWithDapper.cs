@@ -18,6 +18,9 @@ using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.PetManagment.Root;
 using Microsoft.Extensions.Options;
 using PetFamily.Infrastructure.Dapper;
+using PetFamily.Application.Queries.Pet.GetPets;
+using System.Text;
+using PetFamily.Infrastructure.Extensions;
 
 namespace PetFamily.Infrastructure.Repositories.Read;
 
@@ -208,5 +211,61 @@ public class VolunteerReadRepositoryWithDapper(
         _logger.LogInformation("GetVolunteers successful! Total count: {totalCount}", totalVolunteersCount);
 
         return new GetVolunteersResponse(totalVolunteersCount, volunteersList);
+    }
+
+    public async Task<Result<GetPetsResponse>> GetPets(
+       PetsFilter? filter,
+       int pageNumber,
+       int pageSize,
+       CancellationToken cancelToken = default)
+    {
+        var parameters = new DynamicParameters();
+
+        var countBuilder = new StringBuilder($@"
+            SELECT COUNT(*)
+            FROM {Pets.Table} p ");
+
+        var sqlBuilder = new StringBuilder($@"
+            SELECT 
+            p.{Pets.Id} AS Id,
+            p.{Pets.Name} AS PetName,
+            p.{Pets.Color} AS Color,
+            p.{Pets.Images}->0->>'Name' AS MainPhoto,
+            p.{Pets.HelpStatus} AS StatusForHelp,
+            DATE_PART('year', AGE(p.{Pets.DateOfBirth})) * 12 +
+            DATE_PART('month', AGE(p.{Pets.DateOfBirth})) AS AgeInMonths,
+            CONCAT(p.{Pets.AddressRegion}, ',',p.{Pets.AddressCity}, ',',p.{Pets.AddressStreet}) AS Address,
+            v.{Volunteers.Id} AS VolunteerId,
+            s.{Species.Name} AS SpeciesName,
+            b.{Breeds.Name} AS BreedName,
+            CONCAT(v.{Volunteers.LastName}, ' ', v.{Volunteers.FirstName}) AS VolunteerFullName  
+            FROM {Pets.Table} p
+            LEFT JOIN {Volunteers.Table} v ON v.{Volunteers.Id} = p.{Pets.VolunteerId}
+            LEFT JOIN {Species.Table} s ON s.{Species.Id} = p.{Pets.PetTypeSpeciesId}
+            LEFT JOIN {Breeds.Table} b ON b.{Breeds.Id} = p.{Pets.PetTypeBreedId}
+            WHERE p.{Pets.IsDeleted} = FALSE");
+
+        if (filter != null)
+        {
+            countBuilder.AppendJoinsForGetPets(filter);
+            countBuilder.AppendFiltersForGetPets(parameters, filter);
+
+            sqlBuilder.AppendFiltersForGetPets(parameters, filter);
+            sqlBuilder.AppendOrderByForGetPets(filter.GetOrderBies());
+        }
+        sqlBuilder.AppendPagination(pageNumber, pageSize, parameters);
+
+        string sqlQuery = sqlBuilder.ToString();
+        string countQuery = countBuilder.ToString();
+
+        _logger.LogInformation("Executing(GetPets) SQL Query: {sql} with Parameters:", sqlQuery);
+        _logger.LogInformation("Executing(GetPets) COUNT Query: {count} with Parameters:", countQuery);
+        _logger.LogInformation("Parameters: {@Parameters}", parameters.ToDictionary());
+
+        var pets = await _dbConnection.QueryAsync<PetWithVolunteerDto>(sqlQuery, parameters);
+
+        var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
+
+        return Result.Ok<GetPetsResponse>(new(totalCount, pets));
     }
 }

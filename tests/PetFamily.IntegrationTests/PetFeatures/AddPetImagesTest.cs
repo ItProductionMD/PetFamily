@@ -1,23 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.Commands.PetManagment.AddPetImages;
-using PetFamily.Application.IRepositories;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Infrastructure.Contexts;
-using PetFamily.Infrastructure.Repositories.Read;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
@@ -134,24 +128,15 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
 
     private void SetupIFileService(List<FileUploadResponse>? response)
     {
-        var error = Error
-           .InternalServerError($"ProcessFile: {ERROR_FILE_NAME} unexpected error!");
-        if (response == null)
-        {
-            _factory.FileServiceMock.Reset();
+        var fileServiceResult = response == null 
+            ? Result<List<FileUploadResponse>>.Fail(Error.InternalServerError("Error handle file!")) 
+            : Result<List<FileUploadResponse>>.Ok(response);
 
-            _factory.FileServiceMock
-                .Setup(x => x.UploadFileListAsync(It.IsAny<List<AppFileDto>>(), CancellationToken.None))
-                .ReturnsAsync(Result<List<FileUploadResponse>>.Fail(error));
-        }
-        else
-        {
-            _factory.FileServiceMock.Reset();
+        _factory.FileServiceMock.Reset();
 
-            _factory.FileServiceMock
-                .Setup(x => x.UploadFileListAsync(It.IsAny<List<AppFileDto>>(), CancellationToken.None))
-                .ReturnsAsync(Result<List<FileUploadResponse>>.Ok(response));
-        }
+        _factory.FileServiceMock
+            .Setup(x => x.UploadFileListAsync(It.IsAny<List<AppFileDto>>(), CancellationToken.None))
+            .ReturnsAsync(fileServiceResult);
     }
 
     public  override async Task InitializeAsync()

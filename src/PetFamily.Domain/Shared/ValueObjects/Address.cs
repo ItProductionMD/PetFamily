@@ -29,50 +29,55 @@ public record Address
     public static Address CreateEmpty() => new Address("","","","");
     public static Result<Address> CreatePossibleEmpty(string? region, string? city, string? street, string? number)
     {
-        if (IsAdressEmpty(region, city, street, number))
+        if (IsAddressEmpty(region, city, street, number))
             return Result.Ok(CreateEmpty());
  
-        var validationResult = ValidateNonRequired(region, city, street, number);
+        var validationResult = ValidateRequired(region, city, street, number);
 
         if (validationResult.IsFailure)
             return validationResult;
 
         return Result.Ok(new Address(region!, city!, street!, number!));
     }
-
-    public static UnitResult ValidateNonRequired(string? region, string? city, string? street, string? number)
+    
+    public static UnitResult ValidateRequired(string? region, string? city, string? street, string? number)
     {
-        if (IsAdressEmpty(region, city, street, number))
-            return UnitResult.Ok();
-
         return UnitResult.ValidateCollection(
 
             () => ValidateRequiredField(
                 valueToValidate: region,
-                valueName: "Adress region",
+                valueName: "Address region",
                 maxLength: MAX_LENGTH_SHORT_TEXT,
-                pattern: NAME_PATTERN),
+                pattern: STREET_PATTERN),
 
             () => ValidateRequiredField(
                 valueToValidate: city,
-                valueName: "Adress city",
+                valueName: "Address city",
                 maxLength: MAX_LENGTH_SHORT_TEXT,
-                pattern: NAME_PATTERN),
+                pattern: STREET_PATTERN),
 
             () => ValidateRequiredField(
                 valueToValidate: street,
-                valueName: "Adress street",
+                valueName: "Address street",
                 maxLength: MAX_LENGTH_SHORT_TEXT,
                 pattern: STREET_PATTERN),
 
             () => ValidateRequiredField(
                 valueToValidate: number,
-                valueName: "Adress number",
+                valueName: "Address number",
                 maxLength: MAX_LENGTH_SHORT_TEXT,
                 pattern: ADRESS_NUMBER_PATTERN));
     }
 
-    private static bool IsAdressEmpty(string? region, string? city, string? street, string? number)
+    public static UnitResult ValidateNonRequired(string? region, string? city, string? street, string? number)
+    {
+        if (IsAddressEmpty(region, city, street, number))
+            return UnitResult.Ok();
+
+        return ValidateRequired(region, city, street, number);
+    }
+
+    private static bool IsAddressEmpty(string? region, string? city, string? street, string? number)
     {
         return HasOnlyEmptyStrings(region, city, street, number);
     }

@@ -1,14 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Query.ExpressionTranslators.Internal;
 using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
 using PetFamily.Application.Commands.PetTypeManagement.DeleteBreed;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetTypeManagment.Entities;
-using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Infrastructure.Contexts;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
-using System.Linq;
 
 namespace PetFamily.IntegrationTests.PetTypeFeatures;
 

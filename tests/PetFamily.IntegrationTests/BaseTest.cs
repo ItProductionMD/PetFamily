@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Moq;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Infrastructure.Contexts;
-using PetFamily.Infrastructure.Contexts.ReadDbContext;
+using System.Runtime.CompilerServices;
 
 namespace PetFamily.IntegrationTests;
 
@@ -43,4 +44,5 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
 
     protected IQueryHandler<T> GetQueryHandler<T>() where T : IQuery =>
         _services.GetRequiredService<IQueryHandler<T>>();
+
 }
