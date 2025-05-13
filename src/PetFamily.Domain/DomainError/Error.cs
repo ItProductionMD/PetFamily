@@ -104,7 +104,7 @@ public record Error
         new(ErrorCodes.VALIDATION_ERROR,
             message,
             ErrorType.Validation,
-            [new(ValidationErrorType.Field, "count", ValidationErrorCodes.VALUE_OUT_OF_RANGE)]);
+            [new(ValidationErrorType.Field, message, ValidationErrorCodes.VALUE_OUT_OF_RANGE)]);
 
 
     public static Error FilesCountIsNull() =>

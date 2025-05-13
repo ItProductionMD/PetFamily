@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using PetFamily.Application.Queries.ForFilters;
 using PetFamily.Application.Queries.Pet.GetPets;
 using PetFamily.Infrastructure.Dapper.GeneratedTables;
 using System.Text;

@@ -4,8 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using Npgsql;
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
 using PetFamily.Infrastructure.Contexts;
+using PetFamily.Infrastructure.Dapper;
 using Respawn;
 using System.Data;
 using Testcontainers.PostgreSql;
@@ -34,7 +36,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (writeDbContext != null)
                 services.Remove(writeDbContext);
 
-            var iDbConnection = services.SingleOrDefault(s => s.ServiceType == typeof(IDbConnection));
+            var iDbConnection = services.SingleOrDefault(s => s.ServiceType == typeof(IDbConnectionFactory));
             if (iDbConnection != null)
                 services.Remove(iDbConnection);
 
@@ -45,8 +47,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             services.AddScoped<WriteDbContext>(_ =>
                 new WriteDbContext(_dbContainer.GetConnectionString()));
 
-            services.AddScoped<IDbConnection>(_ =>
-                new NpgsqlConnection(_dbContainer.GetConnectionString()));
+            services.AddScoped<IDbConnectionFactory>(_ =>
+                new NpgSqlConnectionFactory(_dbContainer.GetConnectionString()));
 
             services.AddScoped<IFileRepository>(_ => FileServiceMock.Object);
         });

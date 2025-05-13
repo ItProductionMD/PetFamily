@@ -2,6 +2,7 @@
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Application.Queries.Pet.GetPets;
+using PetFamily.Application.Queries.Pet.GetPetsFilter;
 
 namespace PetFamily.API.Controllers;
 
@@ -23,17 +24,32 @@ public class PetController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<Envelope>> GetPets(
         [FromServices] GetPetsQueryHandler handler,
+        [FromServices] GetPetsFilterHandler filterHandler,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] PetsFilter? filter = null,
+        [FromQuery] bool hasDataForFilter = false,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetPetsQuery(pageNumber, pageSize, filter);
+        var getPetsQuery = new GetPetsQuery(pageNumber, pageSize, filter);      
+        var getPetsFilterQuery = new GetPetsFilterQuery(hasDataForFilter);
 
-        var response = await handler.Handle(query, cancellationToken);
+        var petsTask = handler.Handle(getPetsQuery, cancellationToken);
+        var filterTask = filterHandler.Handle(getPetsFilterQuery, cancellationToken);
 
-        return response.IsFailure
-            ? response.ToErrorActionResult()
-            : response.ToEnvelope();
+        await Task.WhenAll(petsTask, filterTask);
+
+        var getPetsResponse = petsTask.Result;
+        var getFilterResponse = filterTask.Result;
+
+        if (getPetsResponse.IsFailure)
+            return getPetsResponse.ToErrorActionResult();
+
+        if (getFilterResponse.IsFailure)
+            return getFilterResponse.ToErrorActionResult();
+
+        getPetsResponse.Data!.SpeciesDtos = getFilterResponse.Data!.SpeciesDtos;
+
+        return getPetsResponse.ToEnvelope();
     }
 }

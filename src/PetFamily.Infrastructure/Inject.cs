@@ -10,13 +10,13 @@ using PetFamily.Infrastructure.Repositories.Read;
 using PetFamily.Infrastructure.Repositories.Write;
 using PetFamily.Infrastructure.Services.BackgroundServices;
 using PetFamily.Infrastructure.Services.MinioService;
-//using Dapper;
 using System.Data;
 using Npgsql;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.Dtos;
 using static PetFamily.Infrastructure.Dapper.Convertors;
 using PetFamily.Infrastructure.Dapper;
+using PetFamily.Application.Abstractions;
 
 namespace PetFamily.Infrastructure;
 
@@ -39,7 +39,7 @@ public static class Inject
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddDbContext<ReadDbContext>(options => options.UseNpgsql(postgresConnection))
             .ConfigDapper(configuration)
-            .AddScoped<IDbConnection>(_ => new NpgsqlConnection(postgresConnection))
+            .AddTransient<IDbConnectionFactory>(_ =>new NpgSqlConnectionFactory(postgresConnection))
             .AddScoped<WriteDbContext>(_ => new WriteDbContext(postgresConnection))
             .AddHostedService<DbCleanupService>()
             .AddHostedService<MinioCleanupService>()

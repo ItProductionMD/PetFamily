@@ -11,18 +11,14 @@ public class GetPetsQueryHandler(
 
     public async Task<Result<GetPetsResponse>> Handle(GetPetsQuery query, CancellationToken token)
     {
-        // Validate query
-        if (query.PageNumber <= 0)
-            throw new ArgumentException("Page number must be greater than 0");
-        if (query.PageSize <= 0)
-            throw new ArgumentException("Page size must be greater than 0");
+        var validationResult = GetPetsQueryValidator.Validate(query);
+        if(validationResult.IsFailure)
+            return validationResult;
 
-        var result = await _volunteerReadRepository.GetPets(
+        return await _volunteerReadRepository.GetPets(
             query.PetsFilter,
             query.PageNumber,
             query.PageSize,
             token);
-
-        return result;
     }
 }

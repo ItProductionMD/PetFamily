@@ -1,6 +1,6 @@
 ﻿using PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
 
-namespace PetFamily.API.Dtos;
+namespace PetFamily.API.Requests;
 
 public record UpdateVolunteerRequest
 (

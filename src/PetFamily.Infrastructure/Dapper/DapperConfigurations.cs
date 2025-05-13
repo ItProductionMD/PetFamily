@@ -1,6 +1,4 @@
-﻿
-
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Dtos;
@@ -19,6 +17,7 @@ public static class DapperConfigurations
         SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<SocialNetworksDto>>());
         SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<RequisitesDto>>());
         SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<PetMainInfoDto>>());
+        SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<BreedDto>>());
 
         services.Configure<DapperOptions>(configuration.GetSection("DapperOptions"));
         return services;

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Domain.DomainError;
-using PetFamily.API.Dtos;
+using PetFamily.API.Requests;
 using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
 using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
 using PetFamily.Application.Commands.PetTypeManagement.DeleteBreed;
