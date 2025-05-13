@@ -35,8 +35,12 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.Property(p => p.DateOfBirth)
             .HasConversion(
-                v => v.HasValue ? v.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null, // Convert DateOnly to DateTime
-                v => v.HasValue ? DateOnly.FromDateTime(v.Value) : (DateOnly?)null         // Convert DateTime to DateOnly
+                v => v.HasValue  // Convert DateOnly to DateTime for Db
+                    ? v.Value.ToDateTime(TimeOnly.MinValue) 
+                    : (DateTime?)null,          
+                v => v.HasValue  // Convert DateTime to DateOnly from Db
+                    ? DateOnly.FromDateTime(v.Value) 
+                    : (DateOnly?)null         
             )
             .HasColumnType("date") // Map to the PostgreSQL DATE type
             .IsRequired(false);    // Adjust nullability as needed

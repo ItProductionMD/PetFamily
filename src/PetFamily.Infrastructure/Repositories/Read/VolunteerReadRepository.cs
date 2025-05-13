@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Dtos;
 using PetFamily.Application.IRepositories;
+using PetFamily.Application.Queries.Pet.GetPets;
 using PetFamily.Application.Queries.Volunteer.GetVolunteers;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
@@ -63,6 +64,11 @@ public class VolunteerReadRepository(ReadDbContext context) : IVolunteerReadRepo
         string phoneNuber, 
         string email,
         CancellationToken cancelToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<GetPetsResponse>> GetPets(PetsFilter filter, int pageNumber, int pageSize, CancellationToken cancelToken = default)
     {
         throw new NotImplementedException();
     }

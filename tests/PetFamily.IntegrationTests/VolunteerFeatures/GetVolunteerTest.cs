@@ -1,11 +1,6 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Dtos;
 using PetFamily.Application.Queries.Volunteer.GetVolunteer;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Infrastructure.Contexts;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 

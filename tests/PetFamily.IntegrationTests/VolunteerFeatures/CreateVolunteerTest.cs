@@ -1,18 +1,7 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
-using PetFamily.Application.Queries.Volunteer.GetVolunteers;
-using PetFamily.Infrastructure.Contexts;
-using System;
-using PetFamily.Application.Abstractions;
-using System.ComponentModel.DataAnnotations;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.Seeds;
-using PetFamily.Domain.PetManagment.Root;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 

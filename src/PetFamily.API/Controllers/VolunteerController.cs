@@ -41,6 +41,8 @@ using PetFamily.Application.Commands.PetManagment.DeletePet;
 using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
 using PetFamily.Application.Commands.PetManagment.RestorePet;
 using PetFamily.Application.Commands.PetManagment.Shared;
+using PetFamily.Application.Queries.Pet.GetPets;
+using static Bogus.DataSets.Name;
 
 namespace PetFamily.API.Controllers;
 
@@ -546,5 +548,7 @@ public class VolunteerController(
         var response = UnitResult.Ok().ToEnvelope();
         return Ok(response);
     }
+
+   
 }
 

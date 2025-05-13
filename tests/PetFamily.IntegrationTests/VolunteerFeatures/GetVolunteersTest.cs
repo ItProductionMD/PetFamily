@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.Queries.Volunteer.GetVolunteers;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Infrastructure.Contexts;
+﻿using PetFamily.Application.Queries.Volunteer.GetVolunteers;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 

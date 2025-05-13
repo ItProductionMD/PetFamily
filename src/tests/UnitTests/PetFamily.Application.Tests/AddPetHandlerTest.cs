@@ -58,7 +58,7 @@ public class AddPetHandlerTests
     [InlineData("phoneNumber", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "", 50, 0, "Trento", "jrfoe", "ehbhb", "21a")]//phoneNumber doesnt mutch pettern
     [InlineData("healthInfoLength", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 5000, 0, "Trento", "jrfoe", "ehbhb", "21a")]//Health info size is too big
     [InlineData("helpStatusNumber", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 50, 100, "Trento", "jrfoe", "ehbhb", "21a")]//Help status doesnt exist
-    [InlineData("cityPattern", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 50, 0, "Trento331", "jrfoe", "ehbhb", "21a")]//City doesnt mutch its pattern
+    [InlineData("cityPattern", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 50, 0, "Trento%!331", "jrfoe", "ehbhb", "21a")]//City doesnt mutch its pattern
     public async Task Handle_ShouldReturnValidationError_WhenCommand_IsInvalid(
         string invalidField,
         bool volunteerId,

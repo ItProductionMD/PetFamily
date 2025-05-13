@@ -13,8 +13,8 @@ using PetFamily.Infrastructure.Contexts;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20250424202536_Initial")]
-    partial class Initial
+    [Migration("20250505150307_AddAddressNumberToPet")]
+    partial class AddAddressNumberToPet
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,6 +113,12 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasMaxLength(50)
                                 .HasColumnType("character varying(50)")
                                 .HasColumnName("address_city");
+
+                            b1.Property<string>("Number")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
+                                .HasColumnName("address_number");
 
                             b1.Property<string>("Region")
                                 .IsRequired()

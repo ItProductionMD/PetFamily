@@ -19,8 +19,8 @@ public static class ValidationPatterns
     // Does not include region code; use PHONE_REGION_PATTERN for that.
     public const string PHONE_NUMBER_PATTERN = @"^\d{7,15}$";
 
-    public const string STREET_PATTERN = @"^(?=.*[A-Za-z0-9])";
+    public const string STREET_PATTERN = @"^(?=.*[A-Za-z])[-A-Za-z0-9 ]+$";
 
-    //Allows for numbers and letters that present home adress(e.g. 55/2 ,18b ,11)
+    //Allows for numbers and letters that present home address(e.g. 55/2 ,18b ,11)
     public const string ADRESS_NUMBER_PATTERN = @"^\d+[a-zA-Z]?(/[a-zA-Z0-9]+)?$";
 }

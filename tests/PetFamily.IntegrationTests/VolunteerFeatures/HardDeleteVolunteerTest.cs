@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 

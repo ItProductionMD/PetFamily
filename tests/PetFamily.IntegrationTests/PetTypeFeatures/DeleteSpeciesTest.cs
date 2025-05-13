@@ -1,9 +1,4 @@
 ﻿using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Infrastructure.Contexts;
-using System.Diagnostics.Contracts;
-using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.Seeds;

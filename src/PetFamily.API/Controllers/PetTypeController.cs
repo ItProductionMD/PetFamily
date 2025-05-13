@@ -92,12 +92,12 @@ public class PetTypeController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<Envelope>> GetSpecies(
-        [FromQuery] int page,
-        [FromQuery] string? orderBy,
-        [FromQuery] string? orderDirection,
-        [FromQuery] int pageSize,
         [FromServices] GetListOfSpeciesHandler handler,
-        CancellationToken cancelToken)
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? orderBy = null,
+        [FromQuery] string? orderDirection = null,
+        CancellationToken cancelToken = default)
     {
         var query = new GetListOfSpeciesQuery(page, pageSize, orderBy, orderDirection);
 
@@ -110,13 +110,13 @@ public class PetTypeController : ControllerBase
 
     [HttpGet("{speciesId}")]
     public async Task<ActionResult<Envelope>> GetBreeds(
-        [FromRoute] Guid speciesId,
-        [FromQuery] int page,
-        [FromQuery] string? orderBy,
-        [FromQuery] string? orderDirection,
-        [FromQuery] int pageSize,
         [FromServices] GetBreedsHandler handler,
-        CancellationToken cancelToken)
+        [FromRoute] Guid speciesId,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? orderBy = null,
+        [FromQuery] string? orderDirection = null,
+        CancellationToken cancelToken = default)
     {
         var query = new GetBreedsQuery(page, pageSize, orderBy, orderDirection, speciesId);
 

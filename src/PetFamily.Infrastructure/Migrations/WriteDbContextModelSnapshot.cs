@@ -111,6 +111,12 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasColumnType("character varying(50)")
                                 .HasColumnName("address_city");
 
+                            b1.Property<string>("Number")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
+                                .HasColumnName("address_number");
+
                             b1.Property<string>("Region")
                                 .IsRequired()
                                 .HasMaxLength(50)
