@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.Extensions.Options;
 using PetFamily.API.Common.AppiValidators;
 using PetFamily.API.Common.Utilities;
-using PetFamily.API.Dtos;
+using PetFamily.API.Requests;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Application.Commands.FilesManagment;

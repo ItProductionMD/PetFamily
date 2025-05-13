@@ -1,6 +1,6 @@
 ﻿using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
 
-namespace PetFamily.API.Dtos;
+namespace PetFamily.API.Requests;
 
 public record ChangePetsOrderRequest(List<Guid> PetsOrder)
 {

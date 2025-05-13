@@ -2,7 +2,7 @@
 using PetFamily.Application.Commands.PetManagment.UpdatePet;
 using PetFamily.Application.Dtos;
 
-namespace PetFamily.API.Dtos;
+namespace PetFamily.API.Requests;
 
 public record PetRequest(
    string PetName,

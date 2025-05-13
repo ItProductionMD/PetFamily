@@ -3,6 +3,7 @@ using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Application.Queries.PetType.GetListOfSpecies;
 using PetFamily.Application.Queries.PetType.GetBreeds;
+using PetFamily.Application.Dtos;
 
 namespace PetFamily.Application.IRepositories;
 
@@ -26,5 +27,6 @@ public interface ISpeciesReadRepository
     Task<UnitResult> CheckForDeleteAsync(Guid speciesId, CancellationToken cancelToken = default);
 
     Task<UnitResult> CheckForDeleteBreedAsync(Guid breedId, CancellationToken cancelToken = default);
+    Task<Result<List<SpeciesDto>>> GetSpeciesDtos(CancellationToken cancellationToken = default);
 
 }

@@ -21,18 +21,19 @@ using PetFamily.Infrastructure.Dapper;
 using PetFamily.Application.Queries.Pet.GetPets;
 using System.Text;
 using PetFamily.Infrastructure.Extensions;
+using PetFamily.Application.Abstractions;
+using Microsoft.AspNetCore.Connections;
 
 namespace PetFamily.Infrastructure.Repositories.Read;
 
 public class VolunteerReadRepositoryWithDapper(
-    IDbConnection dbConnection,
+    IDbConnectionFactory dbConnectionFactory,
     IOptions<DapperOptions> options,
     ILogger<VolunteerReadRepositoryWithDapper> logger) : IVolunteerReadRepository
 {
-    private readonly IDbConnection _dbConnection = dbConnection;
+    private readonly IDbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
     private readonly DapperOptions _options = options.Value;
     private readonly ILogger<VolunteerReadRepositoryWithDapper> _logger = logger;
-
 
     public async Task<UnitResult> CheckUniqueFields(
         Guid volunteerId,
@@ -41,6 +42,8 @@ public class VolunteerReadRepositoryWithDapper(
         string email,
         CancellationToken cancellationToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var sql = $@"
         SELECT 
             CASE WHEN EXISTS (SELECT 1 
@@ -58,7 +61,7 @@ public class VolunteerReadRepositoryWithDapper(
             " {volunteerId}, {phoneRegionCode}, {phoneNumber}, {email}",
             sql, volunteerId, phoneRegionCode, phoneNumber, email);
 
-        var result = await _dbConnection.QuerySingleAsync<(string PhoneTaken, string EmailTaken)>(
+        var result = await dbConnection.QuerySingleAsync<(string PhoneTaken, string EmailTaken)>(
             sql,
             new
             {
@@ -103,6 +106,8 @@ public class VolunteerReadRepositoryWithDapper(
         Guid volunteerId,
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var sql = $@"
             -- Constructing a single table where volunteer data is combined with their pets.
             -- The PetDtos column is stored as JSONB, containing an array of pet objects.
@@ -139,7 +144,7 @@ public class VolunteerReadRepositoryWithDapper(
             "{sql} with Parameters: {volunteerId}",
             sql, volunteerId);
 
-        var volunteer = await _dbConnection.QuerySingleOrDefaultAsync<VolunteerDto>(
+        var volunteer = await dbConnection.QuerySingleOrDefaultAsync<VolunteerDto>(
             sql,
             new { Id = volunteerId },
             commandTimeout: _options.QueryTimeout);
@@ -158,6 +163,8 @@ public class VolunteerReadRepositoryWithDapper(
      GetVolunteersQuery query,
      CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var orderBy = query.orderBy switch
         {
             "full_name" => "v.last_name, v.first_name",
@@ -170,7 +177,7 @@ public class VolunteerReadRepositoryWithDapper(
             _ => "desc"
         };
 
-        var totalVolunteersCount = await _dbConnection.ExecuteScalarAsync<int>(
+        var totalVolunteersCount = await dbConnection.ExecuteScalarAsync<int>(
             "SELECT COUNT(1) FROM Volunteers WHERE is_deleted = FALSE",
             commandTimeout: _options.QueryTimeout);
 
@@ -201,7 +208,7 @@ public class VolunteerReadRepositoryWithDapper(
         _logger.LogInformation("Executing(GetVolunteers) SQL Query: {sql} with Parameters: {limit}, {offset}",
             sql, limit, offset);
 
-        var volunteers = await _dbConnection.QueryAsync<VolunteerMainInfoDto>(
+        var volunteers = await dbConnection.QueryAsync<VolunteerMainInfoDto>(
                 sql,
                 new { Limit = limit, Offset = offset },
                 commandTimeout: _options.QueryTimeout);
@@ -219,6 +226,8 @@ public class VolunteerReadRepositoryWithDapper(
        int pageSize,
        CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var parameters = new DynamicParameters();
 
         var countBuilder = new StringBuilder($@"
@@ -262,9 +271,11 @@ public class VolunteerReadRepositoryWithDapper(
         _logger.LogInformation("Executing(GetPets) COUNT Query: {count} with Parameters:", countQuery);
         _logger.LogInformation("Parameters: {@Parameters}", parameters.ToDictionary());
 
-        var pets = await _dbConnection.QueryAsync<PetWithVolunteerDto>(sqlQuery, parameters);
+        using var connection = _dbConnectionFactory.CreateConnection();
 
-        var totalCount = await _dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
+        var pets = await connection.QueryAsync<PetWithVolunteerDto>(sqlQuery, parameters);
+
+        var totalCount = await dbConnection.ExecuteScalarAsync<int>(countQuery, parameters);
 
         return Result.Ok<GetPetsResponse>(new(totalCount, pets));
     }

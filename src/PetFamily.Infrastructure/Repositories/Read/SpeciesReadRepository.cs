@@ -17,15 +17,17 @@ using PetFamily.Infrastructure.Dapper;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using PetFamily.Application.Queries.PetType.GetListOfSpecies;
 using PetFamily.Application.Queries.PetType.GetBreeds;
+using PetFamily.Application.Abstractions;
+using PetFamily.Application.Dtos;
 
 namespace PetFamily.Infrastructure.Repositories.Read;
 
 public class SpeciesReadRepository(
-    IDbConnection dbConnection,
+    IDbConnectionFactory dbConnectionFactory,
     IOptions<DapperOptions> options,
     ILogger<SpeciesReadRepository> logger) : ISpeciesReadRepository
 {
-    private readonly IDbConnection _dbConnection = dbConnection;
+    private readonly IDbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
     private readonly DapperOptions _options = options.Value;
     private readonly ILogger<SpeciesReadRepository> _logger = logger;
 
@@ -33,6 +35,7 @@ public class SpeciesReadRepository(
         Guid speciesId, 
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
         var sql = $@"
             SELECT 1 
             FROM {Pets.Table} 
@@ -43,7 +46,7 @@ public class SpeciesReadRepository(
             " one pet with species Id:{speciesId}. SQL: {sql}",
             speciesId, sql);
 
-        var hasPet = await _dbConnection.QueryFirstOrDefaultAsync<int?>(
+        var hasPet = await dbConnection.QueryFirstOrDefaultAsync<int?>(
             sql,
             new { SpeciesId = speciesId },
             commandTimeout: _options.QueryTimeout);
@@ -66,6 +69,8 @@ public class SpeciesReadRepository(
         Guid breedId,
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var sql = $@"
             SELECT 1 
             FROM {Breeds.Table} 
@@ -76,7 +81,7 @@ public class SpeciesReadRepository(
         _logger.LogInformation("EXECUTE(CheckIfPetTypeExists) for speciesId:{speciesId} and breedId:{breedId}. SQL: {sql}",
             speciesId, breedId, sql);
 
-        var hasPetType = await _dbConnection.QueryFirstOrDefaultAsync<int?>(
+        var hasPetType = await dbConnection.QueryFirstOrDefaultAsync<int?>(
             sql,
             new { SpeciesId = speciesId, BreedId = breedId },
             commandTimeout: _options.QueryTimeout);
@@ -99,6 +104,8 @@ public class SpeciesReadRepository(
         Guid breedId,
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var sql = $@"
             SELECT 1 
             FROM {Pets.Table} 
@@ -108,7 +115,7 @@ public class SpeciesReadRepository(
         _logger.LogInformation("EXECUTE(CheckForDeleteBreedAsync),check if exists at least" +
             " one pet with breedId:{Id}. SQL: {sql}", breedId, sql);
 
-        var hasPet = await _dbConnection.QueryFirstOrDefaultAsync<int?>(
+        var hasPet = await dbConnection.QueryFirstOrDefaultAsync<int?>(
             sql,
             new { BreedId = breedId },
             commandTimeout: _options.QueryTimeout);
@@ -131,6 +138,8 @@ public class SpeciesReadRepository(
         Guid breedId, 
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var sql = $@"
                 SELECT b.{Breeds.Id} AS Id,
                        b.{Breeds.Name} AS Name,
@@ -142,7 +151,7 @@ public class SpeciesReadRepository(
         _logger.LogInformation("EXECUTING DAPPER 'GetBreedById' with breedId:{Id} SQL:{sql}",
             breedId, sql);
 
-        var breed = await _dbConnection.QuerySingleOrDefaultAsync<Breed>(
+        var breed = await dbConnection.QuerySingleOrDefaultAsync<Breed>(
             sql,
             new { BreedId = breedId },
             commandTimeout: _options.QueryTimeout);
@@ -161,6 +170,8 @@ public class SpeciesReadRepository(
         GetBreedsQuery query,
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var sql = $@"
             SELECT b.{Breeds.Id} AS Id,
                    b.{Breeds.Name} As Name,
@@ -176,7 +187,7 @@ public class SpeciesReadRepository(
         _logger.LogInformation("EXECUTING(GetBreedsAsync) for speciesId:{Id} with SQL:{sql}",
             query.SpeciesId, sql);
 
-        var breeds = await _dbConnection.QueryAsync<Breed>(
+        var breeds = await dbConnection.QueryAsync<Breed>(
             sql,
             new { SpeciesId = query.SpeciesId , Limit = limit, Offset = offset },
             commandTimeout: _options.QueryTimeout);
@@ -194,7 +205,7 @@ public class SpeciesReadRepository(
             _logger.LogInformation("Executing(GetBreedsAsync) by species with id:{Id} SQL Query:{sql}", 
                 query.SpeciesId, getSpeciesCountSql);
 
-            breedsCount = await _dbConnection.ExecuteScalarAsync<int>(
+            breedsCount = await dbConnection.ExecuteScalarAsync<int>(
                 getSpeciesCountSql,
                 commandTimeout: _options.QueryTimeout);
         }
@@ -207,6 +218,8 @@ public class SpeciesReadRepository(
         Guid speciesId, 
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var sql = $@"
             SELECT s.{SpeciesTable.Id} AS Id
                    s.{SpeciesTable.Name} AS Name
@@ -230,7 +243,7 @@ public class SpeciesReadRepository(
         _logger.LogInformation("EXECUTING DAPPER GetSpeciesByIdAsync speciesId:{Id} with SQL:{sql} with sp ",
             speciesId, sql);
 
-        var species = await _dbConnection.QuerySingleAsync<Species>(sql, new { SpeciesId = speciesId });
+        var species = await dbConnection.QuerySingleAsync<Species>(sql, new { SpeciesId = speciesId });
         if (species == null)
         {
             _logger.LogWarning("Species with id:{Id} not found!", speciesId);
@@ -245,6 +258,8 @@ public class SpeciesReadRepository(
         GetListOfSpeciesQuery query,
         CancellationToken cancelToken = default)
     {
+        using var dbConnection = _dbConnectionFactory.CreateConnection();
+
         var orderBy = query.SortBy;
         var sql = $@"
             SELECT s.{SpeciesTable.Id} AS Id,
@@ -258,7 +273,7 @@ public class SpeciesReadRepository(
 
         _logger.LogInformation("EXECUTING(GetSpeciesesAsync) with SQL:{sql} ", sql);
 
-        var species = await _dbConnection.QueryAsync<Species>(
+        var species = await dbConnection.QueryAsync<Species>(
             sql,
             new { Limit = limit, Offset = offset },
             commandTimeout: _options.QueryTimeout);
@@ -276,12 +291,47 @@ public class SpeciesReadRepository(
 
             _logger.LogInformation("Executing(GetListOfSpecies) SQL Query:{sql}", getSpeciesCountSql);
 
-            speciesCount = await _dbConnection.ExecuteScalarAsync<int>(
+            speciesCount = await dbConnection.ExecuteScalarAsync<int>(
                 getSpeciesCountSql,
                 commandTimeout: _options.QueryTimeout);
         }
         _logger.LogInformation("Get all species ok! Species count:{count}", species.Count());
 
         return new(speciesCount, speciesList);
+    }
+
+    public async Task<Result<List<SpeciesDto>>> GetSpeciesDtos(CancellationToken cancellationToken = default)
+    {
+        var sql = $@"
+            SELECT s.{SpeciesTable.Id} AS Id,
+                   s.{SpeciesTable.Name} AS Name,
+                   COALESCE(
+                       JSON_AGG(
+                           JSONB_BUILD_OBJECT(
+                               'Id', b.{Breeds.Id}, 
+                               'Name', b.{Breeds.Name})
+                           ORDER BY b.name
+                        ) FILTER (WHERE b.{Breeds.Id} IS NOT NULL),
+                        '[]'
+                    ) AS BreedDtos
+            FROM {SpeciesTable.Table} s
+            LEFT JOIN {Breeds.Table} b ON s.{SpeciesTable.Id} = b.{Breeds.SpeciesId}
+            GROUP BY s.{SpeciesTable.Id}, s.{SpeciesTable.Name} 
+            ORDER BY s.{SpeciesTable.Name}";
+
+        _logger.LogInformation("EXECUTING DAPPER GetSpeciesDtos with SQL:{sql}", sql);
+
+        using var connection = _dbConnectionFactory.CreateConnection();
+
+        var speciesDtos = await connection.QueryAsync<SpeciesDto>(sql,_options.QueryTimeout);
+
+        if (speciesDtos == null)
+        {
+            _logger.LogWarning("No species found!");
+            return UnitResult.Fail(Error.NotFound($"No species found!"));
+        }
+        _logger.LogInformation("Get all species ok!");
+
+        return Result.Ok(speciesDtos.ToList());
     }
 }

@@ -59,7 +59,7 @@ public static class ValidationExtensions
         where T : IComparable<T>
     {
         if (number.CompareTo(minValue) < 0 || number.CompareTo(maxValue) > 0)
-            return UnitResult.Fail(InvalidFormat(valueName));
+            return UnitResult.Fail(ValueOutOfRange(valueName));
 
         return UnitResult.Ok();
     }
