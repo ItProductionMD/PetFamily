@@ -47,7 +47,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             services.AddScoped<WriteDbContext>(_ =>
                 new WriteDbContext(_dbContainer.GetConnectionString()));
 
-            services.AddScoped<IDbConnectionFactory>(_ =>
+            services.AddSingleton<IDbConnectionFactory>(_ =>
                 new NpgSqlConnectionFactory(_dbContainer.GetConnectionString()));
 
             services.AddScoped<IFileRepository>(_ => FileServiceMock.Object);

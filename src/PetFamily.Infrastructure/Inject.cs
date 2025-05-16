@@ -39,7 +39,7 @@ public static class Inject
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddDbContext<ReadDbContext>(options => options.UseNpgsql(postgresConnection))
             .ConfigDapper(configuration)
-            .AddTransient<IDbConnectionFactory>(_ =>new NpgSqlConnectionFactory(postgresConnection))
+            .AddSingleton<IDbConnectionFactory>(_ =>new NpgSqlConnectionFactory(postgresConnection))
             .AddScoped<WriteDbContext>(_ => new WriteDbContext(postgresConnection))
             .AddHostedService<DbCleanupService>()
             .AddHostedService<MinioCleanupService>()

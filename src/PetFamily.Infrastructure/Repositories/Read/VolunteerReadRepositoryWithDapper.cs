@@ -1,28 +1,18 @@
-﻿using System.Data;
-using Microsoft.Extensions.Configuration;
-using System.Data.Common;
-using PetFamily.Application.Dtos;
-using Dapper;
-using PetFamily.Application.IRepositories;
-using PetFamily.Application.Queries.Volunteer.GetVolunteers;
-using PetFamily.Infrastructure.Dapper.GeneratedTables;
-using System.Text.RegularExpressions;
-using Amazon.Runtime.Internal.Util;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using PetFamily.Domain.Results;
-using PetFamily.Domain.DomainError;
-using System.Collections.Generic;
-using Bogus.DataSets;
-using PetFamily.Domain.Shared.Validations;
-using PetFamily.Domain.PetManagment.Root;
 using Microsoft.Extensions.Options;
-using PetFamily.Infrastructure.Dapper;
-using PetFamily.Application.Queries.Pet.GetPets;
-using System.Text;
-using PetFamily.Infrastructure.Extensions;
 using PetFamily.Application.Abstractions;
-using Microsoft.AspNetCore.Connections;
+using PetFamily.Application.Dtos;
+using PetFamily.Application.IRepositories;
+using PetFamily.Application.Queries.Pet.GetPets;
+using PetFamily.Application.Queries.Volunteer.GetVolunteers;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.Validations;
+using PetFamily.Infrastructure.Dapper;
+using PetFamily.Infrastructure.Dapper.GeneratedTables;
+using PetFamily.Infrastructure.Extensions;
+using System.Text;
 
 namespace PetFamily.Infrastructure.Repositories.Read;
 
@@ -226,7 +216,7 @@ public class VolunteerReadRepositoryWithDapper(
        int pageSize,
        CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+        await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
         var parameters = new DynamicParameters();
 
