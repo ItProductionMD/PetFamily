@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PetFamily.Domain\PetFamily.Domain.csproj" />
+    <ProjectReference Include="..\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
   </ItemGroup>
 
 </Project>

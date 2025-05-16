@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;

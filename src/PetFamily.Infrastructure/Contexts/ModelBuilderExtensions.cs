@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Domain.Shared;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.SharedKernel.Domain;
 using System.Reflection;
 
 namespace PetFamily.Infrastructure.Contexts;

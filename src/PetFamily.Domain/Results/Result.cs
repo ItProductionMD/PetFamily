@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.DomainError;
+﻿using PetFamily.SharedKernel.Domain.DomainError;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using System.Text;

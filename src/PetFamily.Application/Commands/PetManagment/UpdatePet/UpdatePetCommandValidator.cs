@@ -1,17 +1,10 @@
-﻿using PetFamily.Domain.PetManagment.Enums;
+﻿using static PetFamily.SharedKernel.Domain.Validations.ValidationPatterns;
+using PetFamily.Domain.PetManagment.Enums;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using static PetFamily.Application.Validations.ValidationExtensions;
-using PetFamily.Application.SharedValidations;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationConstants;
 
 namespace PetFamily.Application.Commands.PetManagment.UpdatePet;
 

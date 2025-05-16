@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Domain.Shared.Validations;
+﻿namespace PetFamily.SharedKernel.Domain.Validations;
 public static class ValidationConstants
 {
     public const int MAX_LENGTH_SHORT_TEXT = 50;

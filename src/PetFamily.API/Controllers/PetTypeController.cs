@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.API.Requests;
 using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
 using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;

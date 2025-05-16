@@ -1,5 +1,5 @@
 ﻿using PetFamily.API.Responce;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using System.Diagnostics;
 
 namespace PetFamily.API.Middlewares;

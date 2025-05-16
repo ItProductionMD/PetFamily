@@ -1,10 +1,10 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Identity;
+﻿using static PetFamily.SharedKernel.Domain.Validations.ValidationErrorCodes;
+using FluentValidation;
 using PetFamily.Application.Validations;
 using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.Shared.ValueObjects;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+using PetFamily.SharedKernel.Domain.Validations;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationConstants;
 
 
 namespace PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
@@ -33,7 +33,7 @@ public class CreateVolunteerCommandValidator : AbstractValidator<CreateVolunteer
             .GreaterThanOrEqualTo(0)
             .LessThanOrEqualTo(100)
             .WithMessage($"Value is bigger than 100 or less than 0")
-            .WithErrorCode(ValidationErrorCodes.VALUE_OUT_OF_RANGE);
+            .WithErrorCode(SharedKernel.Domain.Validations.ValidationErrorCodes.VALUE_OUT_OF_RANGE);
 
         RuleForEach(c => c.SocialNetworksList)
             .MustBeValueObject(s => SocialNetworkInfo.Validate(s.Name, s.Url));

@@ -1,8 +1,6 @@
-﻿using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.Validations;
-using System.ComponentModel;
+﻿using PetFamily.SharedKernel.Domain.Validations;
 
-namespace PetFamily.Domain.DomainError;
+namespace PetFamily.SharedKernel.Domain.DomainError;
 
 public record Error
 {
@@ -40,31 +38,31 @@ public record Error
         new(ErrorCodes.VALIDATION_ERROR,
             string.Empty,
             ErrorType.Validation,
-            [new(ValidationErrorType.Field, valueName, ValidationErrorCodes.VALUE_IS_EMPTY)]);
+            [new(ValidationErrorType.Field, valueName, SharedKernel.Domain.Validations.ValidationErrorCodes.VALUE_IS_EMPTY)]);
 
     public static Error InvalidFormat(string valueName) =>
         new(ErrorCodes.VALIDATION_ERROR,
             string.Empty,
             ErrorType.Validation,
-            [new(ValidationErrorType.Field, valueName, ValidationErrorCodes.VALUE_INVALID_FORMAT)]);
+            [new(ValidationErrorType.Field, valueName, SharedKernel.Domain.Validations.ValidationErrorCodes.VALUE_INVALID_FORMAT)]);
 
     public static Error InvalidLength(string valueName) =>
         new(ErrorCodes.VALIDATION_ERROR,
             string.Empty,
             ErrorType.Validation,
-            [new(ValidationErrorType.Field, valueName, ValidationErrorCodes.VALUE_INVALID_LENGTH)]);
+            [new(ValidationErrorType.Field, valueName, SharedKernel.Domain.Validations.ValidationErrorCodes.VALUE_INVALID_LENGTH)]);
 
     public static Error GuidIsEmpty(string valueName) =>
         new(ErrorCodes.VALIDATION_ERROR,
             string.Empty,
             ErrorType.Validation,
-            [new(ValidationErrorType.Field, valueName, ValidationErrorCodes.VALUE_IS_EMPTY)]);
+            [new(ValidationErrorType.Field, valueName, SharedKernel.Domain.Validations.ValidationErrorCodes.VALUE_IS_EMPTY)]);
 
     public static Error ValueIsAlreadyExist(string valueName) =>
       new(ErrorCodes.VALIDATION_ERROR,
           "value already exist",
           ErrorType.Validation,
-          [new(ValidationErrorType.Field, valueName, ValidationErrorCodes.VALUE_ALREADY_EXISTS)]);
+          [new(ValidationErrorType.Field, valueName, SharedKernel.Domain.Validations.ValidationErrorCodes.VALUE_ALREADY_EXISTS)]);
 
     public static Error ValuesAreAlreadyExist(List<ValidationError> validationErrors) =>
       new(ErrorCodes.VALIDATION_ERROR,
@@ -104,13 +102,13 @@ public record Error
         new(ErrorCodes.VALIDATION_ERROR,
             message,
             ErrorType.Validation,
-            [new(ValidationErrorType.Field, message, ValidationErrorCodes.VALUE_OUT_OF_RANGE)]);
+            [new(ValidationErrorType.Field, message, SharedKernel.Domain.Validations.ValidationErrorCodes.VALUE_OUT_OF_RANGE)]);
 
 
     public static Error FilesCountIsNull() =>
        new(ErrorCodes.VALIDATION_ERROR,
            "File list to handle is empty!",
            ErrorType.Validation,
-           [new(ValidationErrorType.File, "count", ValidationErrorCodes.FILES_COUNT_IS_NULL)]);
+           [new(ValidationErrorType.File, "count", SharedKernel.Domain.Validations.ValidationErrorCodes.FILES_COUNT_IS_NULL)]);
 }
 

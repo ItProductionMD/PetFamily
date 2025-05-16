@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Domain.Shared.Validations;
+﻿namespace PetFamily.SharedKernel.Domain.Validations;
 
 public record ValidationError(
     ValidationErrorType ValidationObjectType,

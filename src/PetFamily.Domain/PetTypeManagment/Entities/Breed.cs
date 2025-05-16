@@ -1,9 +1,9 @@
-﻿using PetFamily.Domain.Shared;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.Results;
+﻿using static PetFamily.SharedKernel.Domain.Validations.ValidationPatterns;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.Results;
+using PetFamily.SharedKernel.Domain;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationConstants;
 
 namespace PetFamily.Domain.PetTypeManagment.Entities;
 

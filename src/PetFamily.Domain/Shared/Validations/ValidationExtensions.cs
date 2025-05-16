@@ -1,9 +1,8 @@
-﻿using System.Numerics;
-using System.Text.RegularExpressions;
+﻿usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
+using PetFamily.SharedKernel.Domain.Validations;
+using System.Text.RegularExpressions;
 using static PetFamily.Domain.DomainError.Error;
-using PetFamily.Domain.DomainError;
-using System.Globalization;
 
 namespace PetFamily.Domain.Shared.Validations;
 

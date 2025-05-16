@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.Commands.PetManagment.DeletePetImages;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetTypeManagment.Root;

@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Domain.Shared;
+﻿namespace PetFamily.SharedKernel.Domain;
 
 public class UniqueProps
 {

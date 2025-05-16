@@ -4,7 +4,7 @@ using PetFamily.Application.Abstractions;
 using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.Commands.PetManagment.AddPetImages;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.PetTypeManagment.Root;

@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.DomainError;
+﻿usingPetFamily.SharedKernel.Domain.DomainError;
 
 namespace PetFamily.API.Responce
 {

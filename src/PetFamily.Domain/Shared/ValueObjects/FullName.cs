@@ -1,7 +1,7 @@
-﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+﻿using static PetFamily.SharedKernel.Domain.Validations.ValidationPatterns;
 using PetFamily.Domain.Results;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationConstants;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 

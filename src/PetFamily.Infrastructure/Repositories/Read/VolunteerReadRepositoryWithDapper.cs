@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using PetFamily.SharedKernel.Domain.Validations;
+using System.Data;
 using Microsoft.Extensions.Configuration;
 using System.Data.Common;
 using PetFamily.Application.Dtos;
@@ -11,7 +12,7 @@ using Amazon.Runtime.Internal.Util;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using System.Collections.Generic;
 using Bogus.DataSets;
 using PetFamily.Domain.Shared.Validations;
@@ -163,7 +164,7 @@ public class VolunteerReadRepositoryWithDapper(
      GetVolunteersQuery query,
      CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+       await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
         var orderBy = query.orderBy switch
         {

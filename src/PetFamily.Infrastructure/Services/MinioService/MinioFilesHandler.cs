@@ -4,7 +4,7 @@ using System.Text;
 using Amazon.Runtime.Internal.Util;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using Polly;
 using Polly.Retry;

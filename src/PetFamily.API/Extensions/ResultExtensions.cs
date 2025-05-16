@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Responce;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
+using PetFamily.SharedKernel.Domain.DomainError;
 
 namespace PetFamily.API.Extensions
 {

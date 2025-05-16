@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.PetTypeManagment.Root;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.WriteDbConfigurations;
 public class SpeciesConfiguration : IEntityTypeConfiguration<Species>

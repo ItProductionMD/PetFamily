@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.DomainError;
+﻿usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
 

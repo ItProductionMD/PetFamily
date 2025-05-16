@@ -1,5 +1,7 @@
-﻿using PetFamily.Application.Commands.FilesManagment.Commands;
-using PetFamily.Domain.DomainError;
+﻿using static PetFamily.SharedKernel.Domain.Validations.ValidationErrorCodes;
+using PetFamily.SharedKernel.Domain.Validations;
+using PetFamily.Application.Commands.FilesManagment.Commands;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.Validations;
 
@@ -15,21 +17,21 @@ public static class FileValidator
             validationErrors.Add(
                 Error.FileValidation(
                     fileDto.OriginalName,
-                    ValidationErrorCodes.FILE_IS_EMPTY)
+                    SharedKernel.Domain.Validations.ValidationErrorCodes.FILE_IS_EMPTY)
                 .ValidationErrors.FirstOrDefault()!);
 
         if (fileDto.Size > options.MaxSize)
             validationErrors.Add(
                 Error.FileValidation(
                     fileDto.OriginalName,
-                    ValidationErrorCodes.FILE_TOO_LARGE)
+                    SharedKernel.Domain.Validations.ValidationErrorCodes.FILE_TOO_LARGE)
                 .ValidationErrors.FirstOrDefault()!);
 
         if (!options.AllowedExtensions.Contains(fileDto.Extension))
             validationErrors.Add(
                  Error.FileValidation(
                      fileDto.OriginalName,
-                     ValidationErrorCodes.FILE_INVALID_EXTENSION)
+                     SharedKernel.Domain.Validations.ValidationErrorCodes.FILE_INVALID_EXTENSION)
                  .ValidationErrors.FirstOrDefault()!);
 
 
@@ -37,7 +39,7 @@ public static class FileValidator
             validationErrors.Add(
                  Error.FileValidation(
                      fileDto.OriginalName,
-                     ValidationErrorCodes.FILE_INVALID_EXTENSION)
+                     SharedKernel.Domain.Validations.ValidationErrorCodes.FILE_INVALID_EXTENSION)
                  .ValidationErrors.FirstOrDefault()!);
 
         if (validationErrors.Count > 0)

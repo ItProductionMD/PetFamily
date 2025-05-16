@@ -13,13 +13,19 @@ class Program
     {
         if (args.Length == 0)
         {
+            Console.WriteLine("########################## All commands #######################################");
             Console.WriteLine("Using: dotnet run -- [command]");
             Console.WriteLine("list of commands: " +
-                "\n\tscaffold," +
-                "\n\tseed --volunteers=<volunteersCount>" +
-                "--pets=<petsOnVolunteersCount>," +
-                "\n\tclear --<tableName>");
-           
+                "\n\tscaffold //add classes with names and columns of Tables  for using Dapper easy" +
+                "\n\tseed --volunteers=<volunteersCount> " +
+                " --pets=<petsOnVolunteersCount> //seed the volunteers and pets data to db" +
+                "\n\tclear --<tableName> //clear all data from a specific table" +
+                "\n\tadd_using --class=<ClassName> --namespace=<NamespaceToAdd> //add indicated using to the classes with indicated type of Class or Interface " +
+                "\n\tremove_using --remove=<static%namespace> //remove indicated usings static from all classes" +
+                "\n\tremove_using --remove=<namespace> //remove indicated usings from all classes" +
+                "\n\treplace_usings --old=<oldName> new=<newName>");
+
+            Console.WriteLine("################################################################################");
             return;
         }
         switch (args[0].ToLower())
@@ -47,6 +53,19 @@ class Program
             case "clear":
                 var tableName = args[1].Remove(0, 2);
                 await Seeder.RunClear(tableName);
+                break;
+
+            case "add_using":
+                await UsingsAndNameSpacesRedactor.RunAddUsings(args);
+                break;
+
+            case "remove_using":  
+                await UsingsAndNameSpacesRedactor.RunRemoveUsings(args);
+                break;
+
+            case "replace_usings":
+
+                await UsingsAndNameSpacesRedactor.RunReplaceUsings(args);
                 break;
 
             default:

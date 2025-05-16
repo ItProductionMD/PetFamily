@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using PetFamily.Application.Commands.PetManagment.AddPet;
 using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetTypeManagment.Entities;

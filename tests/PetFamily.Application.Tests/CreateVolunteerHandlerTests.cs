@@ -10,7 +10,7 @@ using Moq;
 using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.Validations;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;

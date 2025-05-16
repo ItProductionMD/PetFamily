@@ -14,7 +14,7 @@ using Minio.DataModel.Notification;
 using Minio.Exceptions;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using Polly;
 using Polly.Retry;

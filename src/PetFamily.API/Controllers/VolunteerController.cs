@@ -4,7 +4,7 @@ using PetFamily.API.Requests;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Application.SharedValidations;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using static PetFamily.API.Extensions.ResultExtensions;
 using static PetFamily.API.Common.AppiValidators.Validators;

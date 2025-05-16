@@ -1,17 +1,16 @@
-﻿using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Shared.Validations;
-using PetFamily.Domain.Results;
+﻿using PetFamily.Domain.PetManagment.Enums;
 using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetManagment.Enums;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using System.Collections.Generic;
+using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
+using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.SharedKernel.Domain;
+using PetFamily.SharedKernel.Domain.DomainError;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationConstants;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationPatterns;
+using static PetFamily.SharedKernel.Domain.DomainError.Error;
+
 using Image = PetFamily.Domain.Shared.ValueObjects.Image;
-using PetFamily.Domain.DomainError;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
@@ -239,7 +238,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public UnitResult ChangeMainPhoto(string imageName)
     {
         if (!_images.Any(i => i.Name == imageName))
-            return UnitResult.Fail(Error.NotFound($"Image with name: {imageName}"));
+            return UnitResult.Fail(NotFound($"Image with name: {imageName}"));
 
         _images = _images
             .OrderByDescending(i => i.Name == imageName)

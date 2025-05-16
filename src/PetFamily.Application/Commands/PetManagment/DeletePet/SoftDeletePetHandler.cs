@@ -2,7 +2,7 @@
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Application.Commands.FilesManagment;
 using Microsoft.Extensions.Options;
 using PetFamily.Application.Commands.FilesManagment.Dtos;

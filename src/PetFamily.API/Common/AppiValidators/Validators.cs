@@ -1,7 +1,8 @@
-﻿using PetFamily.API.Extensions;
+﻿using static PetFamily.SharedKernel.Domain.Validations.ValidationErrorCodes;
+using PetFamily.API.Extensions;
 using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.SharedValidations;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.Validations;
 

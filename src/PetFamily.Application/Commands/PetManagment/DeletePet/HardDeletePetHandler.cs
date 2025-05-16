@@ -4,7 +4,7 @@ using PetFamily.Application.Abstractions;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using static PetFamily.Application.Commands.PetManagment.DeletePet.DeletePetValidation;
 

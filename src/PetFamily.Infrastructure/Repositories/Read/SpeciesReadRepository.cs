@@ -2,7 +2,7 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using PetFamily.Infrastructure.Dapper.GeneratedTables;
 using SpeciesTable = PetFamily.Infrastructure.Dapper.GeneratedTables.Species;

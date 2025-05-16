@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace PetFamily.Domain.Shared.ValueObjects;
+﻿namespace PetFamily.Domain.Shared.ValueObjects;
 
 public interface IValueObject
 {

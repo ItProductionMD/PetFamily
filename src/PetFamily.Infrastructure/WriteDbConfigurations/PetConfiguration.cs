@@ -1,14 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.Shared.ValueObjects;
-using Polly;
-using System.Net.NetworkInformation;
-using System.Text.Json;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Infrastructure.WriteDbConfigurations.Converters;
+using static PetFamily.SharedKernel.Domain.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.WriteDbConfigurations;
 

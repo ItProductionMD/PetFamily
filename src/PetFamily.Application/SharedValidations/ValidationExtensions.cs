@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+﻿using PetFamily.SharedKernel.Domain.Validations;
+using FluentValidation;
 using FluentValidation.Results;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.Shared.ValueObjects;

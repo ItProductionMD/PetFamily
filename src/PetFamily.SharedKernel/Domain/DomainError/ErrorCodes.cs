@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Domain.DomainError;
+﻿namespace PetFamily.SharedKernel.Domain.DomainError;
 
 public static class ErrorCodes
 {

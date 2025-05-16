@@ -8,7 +8,7 @@ using PetFamily.Domain.Results;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Shared.Validations;
 using PetFamily.Application.Abstractions;
 

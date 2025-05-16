@@ -1,4 +1,5 @@
-﻿using PetFamily.Domain.DomainError;
+﻿using PetFamily.SharedKernel.Domain.Validations;
+usingPetFamily.SharedKernel.Domain.DomainError;
 using PetFamily.Domain.Shared.Validations;
 using System.Runtime.CompilerServices;
 
