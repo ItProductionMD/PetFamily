@@ -13,7 +13,8 @@ class Program
                 "\n\tseed --volunteers=<volunteersCount>" +
                 "--pets=<petsOnVolunteersCount>," +
                 "\n\tclear --<tableName>," +
-                "\n\tusing --<operation> --old_using=<oldUsing> --new_using=<newUsing>");
+                "\n\tusing --<operation> --usings:<old_using>%<new_using>" +
+                "\n\tusing --<operation> --usings:<static:old_using>|<static:new_using>");
 
             return;
         }
