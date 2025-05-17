@@ -1,9 +1,7 @@
-﻿using System.Numerics;
-using System.Text.RegularExpressions;
+﻿using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
+using System.Text.RegularExpressions;
 using static PetFamily.Domain.DomainError.Error;
-using PetFamily.Domain.DomainError;
-using System.Globalization;
 
 namespace PetFamily.Domain.Shared.Validations;
 
@@ -42,7 +40,7 @@ public static class ValidationExtensions
 
     public static UnitResult ValidateRequiredObject<T>(T? objToValidate, string valueName) =>
         objToValidate != null
-            ? UnitResult.Ok() 
+            ? UnitResult.Ok()
             : UnitResult.Fail(Error.StringIsNullOrEmpty(valueName));
 
     public static bool HasOnlyEmptyStrings(params string?[] strings) =>
@@ -87,8 +85,8 @@ public static class ValidationExtensions
             if (unitResult.IsFailure)
                 validationErrors.AddRange(unitResult.Error.ValidationErrors);
         }
-        return validationErrors.Count > 0 
-            ? UnitResult.Fail(Error.ValidationError(validationErrors)) 
+        return validationErrors.Count > 0
+            ? UnitResult.Fail(Error.ValidationError(validationErrors))
             : UnitResult.Ok();
     }
 }

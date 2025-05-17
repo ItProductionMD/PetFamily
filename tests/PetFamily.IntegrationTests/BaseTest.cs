@@ -1,13 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+﻿using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Abstractions;
-using PetFamily.Application.IRepositories;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Infrastructure.Contexts;
-using System.Runtime.CompilerServices;
 
 namespace PetFamily.IntegrationTests;
 
@@ -18,7 +11,7 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
     protected IServiceScope? _scope { get; set; }
     protected IServiceProvider _services => _scope!.ServiceProvider;
     protected WriteDbContext _dbContext = null!;
-    
+
     public virtual Task InitializeAsync()
     {
         _scope = _factory.Services.CreateScope();

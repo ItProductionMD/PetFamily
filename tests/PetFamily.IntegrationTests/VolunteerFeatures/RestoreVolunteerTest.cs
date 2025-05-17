@@ -1,8 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Commands.SharedCommands;
 using PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
 using PetFamily.IntegrationTests.Seeds;
@@ -10,7 +6,7 @@ using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
-public class RestoreVolunteerTest(TestWebApplicationFactory factory) 
+public class RestoreVolunteerTest(TestWebApplicationFactory factory)
     : CommandHandlerTest<RestoreVolunteerCommand>(factory)
 {
     [Fact]
@@ -24,7 +20,7 @@ public class RestoreVolunteerTest(TestWebApplicationFactory factory)
         await Seeder.Seed(seedSpecies, _dbContext);
 
         var seedVolunteer = new VolunteerTestBuilder()
-            .WithPets(10,seedSpecies).Volunteer;
+            .WithPets(10, seedSpecies).Volunteer;
         await Seeder.Seed(seedVolunteer, _dbContext);
 
         await softDeleteHandler.Handle(new(seedVolunteer.Id), CancellationToken.None);

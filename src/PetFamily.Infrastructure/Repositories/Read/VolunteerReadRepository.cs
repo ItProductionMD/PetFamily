@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Dtos;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.Queries.Pet.GetPets;
 using PetFamily.Application.Queries.Volunteer.GetVolunteers;
-using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
-using PetFamily.Infrastructure.Contexts;
 using PetFamily.Infrastructure.Contexts.ReadDbContext;
 
 namespace PetFamily.Infrastructure.Repositories.Read;
@@ -59,9 +56,9 @@ public class VolunteerReadRepository(ReadDbContext context) : IVolunteerReadRepo
     }
 
     public Task<UnitResult> CheckUniqueFields(
-        Guid volunteerId, 
+        Guid volunteerId,
         string phoneRegionCode,
-        string phoneNuber, 
+        string phoneNuber,
         string email,
         CancellationToken cancelToken = default)
     {

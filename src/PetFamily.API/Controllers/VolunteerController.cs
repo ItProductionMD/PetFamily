@@ -1,48 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using PetFamily.API.Requests;
-using PetFamily.API.Extensions;
-using PetFamily.API.Responce;
-using PetFamily.Application.SharedValidations;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.Results;
-using static PetFamily.API.Extensions.ResultExtensions;
-using static PetFamily.API.Common.AppiValidators.Validators;
-using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.API.Common.AppiValidators;
 using PetFamily.API.Common.Utilities;
-using PetFamily.Domain.PetManagment.Root;
-using System.Text;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using Bogus.DataSets;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Infrastructure.Contexts.ReadDbContext.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Amazon.S3.Model.Internal.MarshallTransformations;
+using PetFamily.API.Extensions;
+using PetFamily.API.Requests;
+using PetFamily.API.Responce;
 using PetFamily.Application.Commands.PetManagment.AddPet;
+using PetFamily.Application.Commands.PetManagment.AddPetImages;
+using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
 using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
+using PetFamily.Application.Commands.PetManagment.DeletePet;
+using PetFamily.Application.Commands.PetManagment.DeletePetImages;
+using PetFamily.Application.Commands.PetManagment.RestorePet;
+using PetFamily.Application.Commands.PetManagment.Shared;
+using PetFamily.Application.Commands.PetManagment.UpdatePet;
+using PetFamily.Application.Commands.PetManagment.UpdatePetStatus;
 using PetFamily.Application.Commands.PetManagment.UpdateSocialNetworks;
+using PetFamily.Application.Commands.SharedCommands;
 using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
 using PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
 using PetFamily.Application.Commands.VolunteerManagment.RestoreVolunteer;
 using PetFamily.Application.Commands.VolunteerManagment.UpdateRequisites;
 using PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
 using PetFamily.Application.Dtos;
-using PetFamily.Application.Queries.Volunteer.GetVolunteers;
 using PetFamily.Application.Queries.Volunteer.GetVolunteer;
-using PetFamily.Application.Commands.SharedCommands;
-using PetFamily.Application.Commands.PetManagment.DeletePetImages;
-using PetFamily.Application.Commands.PetManagment.AddPetImages;
-using PetFamily.API.Common.AppiValidators;
-using PetFamily.Application.Commands.FilesManagment;
-using PetFamily.Application.Commands.PetManagment.UpdatePet;
-using PetFamily.Application.Commands.PetManagment.UpdatePetStatus;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using PetFamily.Application.Commands.PetManagment.DeletePet;
-using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
-using PetFamily.Application.Commands.PetManagment.RestorePet;
-using PetFamily.Application.Commands.PetManagment.Shared;
-using PetFamily.Application.Queries.Pet.GetPets;
-using static Bogus.DataSets.Name;
+using PetFamily.Application.Queries.Volunteer.GetVolunteers;
+using PetFamily.Application.SharedValidations;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
+using System.Text;
+using static PetFamily.API.Extensions.ResultExtensions;
 
 namespace PetFamily.API.Controllers;
 
@@ -300,9 +287,9 @@ public class VolunteerController(
         [FromRoute] Guid petId,
         [FromBody] int helpStatus,
         [FromServices] UpdatePetStatusHandler handler,
-        CancellationToken cancelToken) 
+        CancellationToken cancelToken)
     {
-        var command = new UpdatePetStatusCommand(volunteerId,petId,helpStatus);
+        var command = new UpdatePetStatusCommand(volunteerId, petId, helpStatus);
 
         var updateStatusResult = await handler.Handle(command, cancelToken);
 
@@ -383,7 +370,7 @@ public class VolunteerController(
         [FromRoute] Guid petId,
         [FromQuery] string imageName,
         [FromServices] ChangePetMainImageHandler handler,
-        CancellationToken cancelToken) 
+        CancellationToken cancelToken)
     {
         var command = new ChangePetMainImageCommand(volunteerId, petId, imageName);
 
@@ -549,6 +536,6 @@ public class VolunteerController(
         return Ok(response);
     }
 
-   
+
 }
 

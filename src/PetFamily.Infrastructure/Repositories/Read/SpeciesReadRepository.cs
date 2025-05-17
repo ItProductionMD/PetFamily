@@ -1,24 +1,18 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.Results;
-using PetFamily.Infrastructure.Dapper.GeneratedTables;
-using SpeciesTable = PetFamily.Infrastructure.Dapper.GeneratedTables.Species;
-using Species = PetFamily.Domain.PetTypeManagment.Root.Species;
-using Breed = PetFamily.Domain.PetTypeManagment.Entities.Breed;
-using System.Data;
-using System.Security.Cryptography;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Infrastructure.Contexts.ReadDbContext.Models;
 using Microsoft.Extensions.Options;
-using PetFamily.Infrastructure.Dapper;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using PetFamily.Application.Queries.PetType.GetListOfSpecies;
-using PetFamily.Application.Queries.PetType.GetBreeds;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Dtos;
+using PetFamily.Application.IRepositories;
+using PetFamily.Application.Queries.PetType.GetBreeds;
+using PetFamily.Application.Queries.PetType.GetListOfSpecies;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
+using PetFamily.Infrastructure.Dapper;
+using PetFamily.Infrastructure.Dapper.GeneratedTables;
+using Breed = PetFamily.Domain.PetTypeManagment.Entities.Breed;
+using Species = PetFamily.Domain.PetTypeManagment.Root.Species;
+using SpeciesTable = PetFamily.Infrastructure.Dapper.GeneratedTables.Species;
 
 namespace PetFamily.Infrastructure.Repositories.Read;
 
@@ -32,7 +26,7 @@ public class SpeciesReadRepository(
     private readonly ILogger<SpeciesReadRepository> _logger = logger;
 
     public async Task<UnitResult> CheckForDeleteAsync(
-        Guid speciesId, 
+        Guid speciesId,
         CancellationToken cancelToken = default)
     {
         using var dbConnection = _dbConnectionFactory.CreateConnection();
@@ -135,7 +129,7 @@ public class SpeciesReadRepository(
     }
 
     public async Task<Result<Breed>> GetBreedByIdAsync(
-        Guid breedId, 
+        Guid breedId,
         CancellationToken cancelToken = default)
     {
         using var dbConnection = _dbConnectionFactory.CreateConnection();
@@ -189,7 +183,7 @@ public class SpeciesReadRepository(
 
         var breeds = await dbConnection.QueryAsync<Breed>(
             sql,
-            new { SpeciesId = query.SpeciesId , Limit = limit, Offset = offset },
+            new { SpeciesId = query.SpeciesId, Limit = limit, Offset = offset },
             commandTimeout: _options.QueryTimeout);
 
         var breedsList = breeds.ToList();
@@ -202,7 +196,7 @@ public class SpeciesReadRepository(
 
             var getSpeciesCountSql = $@"SELECT COUNT(1) FROM {Breeds.Table}";
 
-            _logger.LogInformation("Executing(GetBreedsAsync) by species with id:{Id} SQL Query:{sql}", 
+            _logger.LogInformation("Executing(GetBreedsAsync) by species with id:{Id} SQL Query:{sql}",
                 query.SpeciesId, getSpeciesCountSql);
 
             breedsCount = await dbConnection.ExecuteScalarAsync<int>(
@@ -215,7 +209,7 @@ public class SpeciesReadRepository(
     }
 
     public async Task<Result<Species>> GetByIdAsync(
-        Guid speciesId, 
+        Guid speciesId,
         CancellationToken cancelToken = default)
     {
         using var dbConnection = _dbConnectionFactory.CreateConnection();
@@ -323,7 +317,7 @@ public class SpeciesReadRepository(
 
         using var connection = _dbConnectionFactory.CreateConnection();
 
-        var speciesDtos = await connection.QueryAsync<SpeciesDto>(sql,_options.QueryTimeout);
+        var speciesDtos = await connection.QueryAsync<SpeciesDto>(sql, _options.QueryTimeout);
 
         if (speciesDtos == null)
         {

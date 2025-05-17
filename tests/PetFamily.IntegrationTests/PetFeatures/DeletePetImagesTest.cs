@@ -1,13 +1,10 @@
-﻿using Docker.DotNet.Models;
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Moq;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.Commands.PetManagment.DeletePetImages;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
@@ -31,7 +28,7 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
         await Seeder.Seed(seedSpecies, _dbContext);
 
         _seedVolunteer = new VolunteerTestBuilder()
-            .WithPets(1,seedSpecies)
+            .WithPets(1, seedSpecies)
             .GetVolunteer();
 
         _seedVolunteer.Pets[0].AddImages([IMAGE_NAME]);
@@ -55,7 +52,7 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
 
         var updatedVolunteer = await _dbContext.Volunteers
             .AsNoTracking()
-            .Include(v=>v.Pets)
+            .Include(v => v.Pets)
             .SingleOrDefaultAsync();
         Assert.NotNull(updatedVolunteer);
 

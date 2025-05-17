@@ -1,5 +1,4 @@
-﻿using PetFamily.API.Extensions;
-using PetFamily.Application.Commands.FilesManagment.Commands;
+﻿using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.SharedValidations;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
@@ -39,7 +38,7 @@ public static class Validators
         }
         if (errors.Count > 0)
             return UnitResult.Fail(Error.FileValidation(errors));
-        
+
         return UnitResult.Ok();
     }
     public static UnitResult ValidateFile(
@@ -51,7 +50,7 @@ public static class Validators
                 file?.FileName ?? "empty", ValidationErrorCodes.FILE_IS_EMPTY));
 
         List<Error> errors = [];
- 
+
         var fileExtension = UploadFileCommand.GetFullExtension(file.FileName);
         if (fileValidatorOptions.AllowedExtensions.Contains(fileExtension) == false)
             errors.Add(Error.FileValidation(file.FileName, ValidationErrorCodes.FILE_INVALID_EXTENSION));

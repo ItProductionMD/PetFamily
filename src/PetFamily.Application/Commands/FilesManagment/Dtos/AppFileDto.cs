@@ -9,12 +9,12 @@ public class AppFileDto
     public string MimeType { get; set; } = string.Empty;
     public long Size { get; set; }
     public string Folder { get; set; } = string.Empty;
-    public AppFileDto(string name,string path)
+    public AppFileDto(string name, string path)
     {
         Name = name;
         Folder = path;
     }
-	public AppFileDto(string name,string path,Stream stream, string extension, string mimeType,long size)
+    public AppFileDto(string name, string path, Stream stream, string extension, string mimeType, long size)
     {
         Name = name;
         Folder = path;

@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
 using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
 using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
@@ -40,12 +36,12 @@ public class ChangePetsOrderTest(TestWebApplicationFactory factory)
 
         var updatedVolunteer = await _dbContext.Volunteers
             .AsNoTracking()
-            .Include(v=>v.Pets)
+            .Include(v => v.Pets)
             .SingleOrDefaultAsync();
         Assert.NotNull(updatedVolunteer);
 
         var updatedPetIdsOrder = updatedVolunteer.Pets
-            .OrderBy(p=>p.SerialNumber.Value)
+            .OrderBy(p => p.SerialNumber.Value)
             .Select(p => p.Id)
             .ToList();
 

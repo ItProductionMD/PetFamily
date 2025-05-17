@@ -1,22 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Infrastructure.Contexts;
 using Polly;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using Microsoft.Data.SqlClient;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using PetFamily.Domain.Shared.Validations;
-using Npgsql;
-using PetFamily.Application.Commands.SharedCommands;
 
 namespace PetFamily.Infrastructure.Repositories.Write;
 

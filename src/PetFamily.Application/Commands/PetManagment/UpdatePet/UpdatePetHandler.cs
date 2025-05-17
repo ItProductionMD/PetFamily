@@ -8,8 +8,6 @@ using PetFamily.Domain.PetManagment.Enums;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
-using Polly;
-using System.ComponentModel.DataAnnotations;
 using static PetFamily.Application.Commands.PetManagment.UpdatePet.UpdatePetCommandValidator;
 
 namespace PetFamily.Application.Commands.PetManagment.UpdatePet;
@@ -22,11 +20,11 @@ public class UpdatePetHandler(
     private readonly IVolunteerWriteRepository _writeRepository = volunteerWriteRepository;
     private readonly ILogger<UpdatePetHandler> _logger = logger;
     private readonly ISpeciesReadRepository _speciesReadRepository = speciesReadRepository;
-    
+
     public async Task<UnitResult> Handle(UpdatePetCommand cmd, CancellationToken cancelToken)
     {
         var validateCommand = Validate(cmd);
-        if(validateCommand.IsFailure)
+        if (validateCommand.IsFailure)
         {
             _logger.LogWarning("Update pet with id:{Id} validation errors:{Errors}",
                 cmd.PetId, validateCommand.ValidationMessagesToString());
@@ -48,7 +46,7 @@ public class UpdatePetHandler(
 
         var checkPetType = await _speciesReadRepository.CheckIfPetTypeExists(
             cmd.SpeciesId,
-            cmd.BreedId, 
+            cmd.BreedId,
             cancelToken);
         if (checkPetType.IsFailure)
             return checkPetType;
@@ -61,9 +59,9 @@ public class UpdatePetHandler(
 
         _logger.LogInformation("Update pet with id:{id} soccessful!", pet.Id);
 
-        return UnitResult.Ok();    
+        return UnitResult.Ok();
     }
-    private void UpdatePetProccess(Pet pet,UpdatePetCommand cmd)
+    private void UpdatePetProccess(Pet pet, UpdatePetCommand cmd)
     {
         var petType = PetType.Create(
             BreedID.SetValue(cmd.BreedId),

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Infrastructure.Contexts.ReadDbContext.Models;
 
 namespace PetFamily.Infrastructure.Contexts.ReadDbContext;

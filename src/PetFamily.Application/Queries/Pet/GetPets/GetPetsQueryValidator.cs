@@ -1,10 +1,8 @@
-﻿using PetFamily.Domain.Results;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+﻿using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using static PetFamily.Application.Validations.ValidationExtensions;
-using PetFamily.Domain.PetManagment.Enums;
-using PetFamily.Domain.DomainError;
 
 namespace PetFamily.Application.Queries.Pet.GetPets;
 

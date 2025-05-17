@@ -12,7 +12,7 @@ public interface IVolunteerReadRepository
         CancellationToken cancelToken = default);
 
     Task<Result<VolunteerDto>> GetByIdAsync(
-        Guid volunteerId ,
+        Guid volunteerId,
         CancellationToken cancelToken = default);
 
     Task<UnitResult> CheckUniqueFields(

@@ -5,15 +5,15 @@ namespace PetFamily.Application.IRepositories;
 
 public interface IFileRepository
 {
-    public Task<Result<Uri>> GetFileUrlAsync(AppFileDto file,CancellationToken cancelToken);
+    public Task<Result<Uri>> GetFileUrlAsync(AppFileDto file, CancellationToken cancelToken);
 
-    public Task UploadFileAsync(AppFileDto file,CancellationToken cancelToken);
+    public Task UploadFileAsync(AppFileDto file, CancellationToken cancelToken);
 
     public Task<Result<List<FileUploadResponse>>> UploadFileListAsync(
         List<AppFileDto> file,
         CancellationToken cancelToken);
 
-    public Task DeleteFileAsync(AppFileDto file,CancellationToken cancelToken);
+    public Task DeleteFileAsync(AppFileDto file, CancellationToken cancelToken);
 
     public Task<Result<List<FileDeleteResponse>>> DeleteFileListAsync(
        List<AppFileDto> file,

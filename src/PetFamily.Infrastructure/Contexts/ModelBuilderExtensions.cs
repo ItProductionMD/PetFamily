@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Shared;
 using System.Reflection;
 
@@ -11,7 +10,7 @@ public static class ModelBuilderExtensions
     {
         foreach (var property in typeof(T).GetProperties())
         {
-            if(property.GetCustomAttribute<UniqueAttribute>() == null)
+            if (property.GetCustomAttribute<UniqueAttribute>() == null)
                 continue;
 
             if (property.PropertyType == typeof(string) || property.PropertyType.IsValueType)
@@ -20,7 +19,7 @@ public static class ModelBuilderExtensions
                 builder.HasIndex(property.Name).IsUnique();
                 Console.WriteLine("OK!");
             }
-            
+
             if (IsComplexProperty(property.PropertyType))
             {
                 builder.OwnsOne(property.PropertyType, property.Name, ownedBuilder =>

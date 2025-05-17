@@ -17,7 +17,7 @@ public class DeleteBreedHandler(
 
     public async Task<UnitResult> Handle(DeleteBreedCommand command, CancellationToken cancelToken)
     {
-        if(command.BreedId == Guid.Empty)
+        if (command.BreedId == Guid.Empty)
         {
             _logger.LogWarning("BreedId cannot be empty");
             return UnitResult.Fail(Error.GuidIsEmpty("BreedId"));
@@ -26,18 +26,18 @@ public class DeleteBreedHandler(
         if (isPermitedToDelete.IsFailure)
             return isPermitedToDelete;
 
-        var getSpecies = await _writeRepository.GetByBreedIdAsync(command.BreedId,cancelToken);
-        if(getSpecies.IsFailure)
+        var getSpecies = await _writeRepository.GetByBreedIdAsync(command.BreedId, cancelToken);
+        if (getSpecies.IsFailure)
             return UnitResult.Fail(getSpecies.Error);
 
         var species = getSpecies.Data!;
 
         var deleteResult = species.DeleteBreedById(command.BreedId);
         if (deleteResult.IsFailure)
-            return UnitResult.Fail(deleteResult.Error); 
+            return UnitResult.Fail(deleteResult.Error);
 
         await _writeRepository.SaveAsync(species, cancelToken);
 
-        return UnitResult.Ok(); 
+        return UnitResult.Ok();
     }
 }

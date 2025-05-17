@@ -2,4 +2,4 @@
 
 namespace PetFamily.Application.Queries.Pet.GetPetsFilter;
 
-public record GetPetsFilterQuery(bool HasFilter) :IQuery;
+public record GetPetsFilterQuery(bool HasFilter) : IQuery;

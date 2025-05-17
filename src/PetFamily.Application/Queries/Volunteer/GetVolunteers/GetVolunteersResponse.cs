@@ -2,5 +2,5 @@
 
 namespace PetFamily.Application.Queries.Volunteer.GetVolunteers;
 
-public record GetVolunteersResponse(int VolunteersCount,List<VolunteerMainInfoDto> Volunteers);
+public record GetVolunteersResponse(int VolunteersCount, List<VolunteerMainInfoDto> Volunteers);
 

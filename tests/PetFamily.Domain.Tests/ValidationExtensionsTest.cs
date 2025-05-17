@@ -31,7 +31,7 @@ public class ValidationExtensionsTests
     [Theory]
     [InlineData("TooLongValue", "Name", 5)]
     public void ValidateRequiredField_ShouldFail_WhenValueExceedsMaxLength(
-        string value, 
+        string value,
         string valueName,
         int maxLength)
     {
@@ -43,7 +43,7 @@ public class ValidationExtensionsTests
     [InlineData("Valid123", "Name", 10, "^[A-Za-z0-9]+$")] // Matches pattern
     [InlineData("Invalid@#", "Name", 10, "^[A-Za-z0-9]+$")] // Invalid pattern
     public void ValidateRequiredField_ShouldFail_WhenPatternDoesNotMatch(
-        string value, 
+        string value,
         string valueName,
         int maxLength,
         string pattern)
@@ -59,8 +59,8 @@ public class ValidationExtensionsTests
     [InlineData(11, "Age", 1, 10)] // Above range
     public void ValidateIntegerNumber_ShouldPassOrFail_BasedOnRange(
         int number,
-        string valueName, 
-        int minValue, 
+        string valueName,
+        int minValue,
         int maxValue)
     {
         var result = ValidationExtensions.ValidateIntegerNumber(number, valueName, minValue, maxValue);
@@ -123,8 +123,8 @@ public class ValidationExtensionsTests
     {
         var items = new List<string> { "Valid1", "", "Valid2" };
         var result = ValidationExtensions.ValidateItems(
-            items, item => string.IsNullOrWhiteSpace(item) 
-                ? UnitResult.Fail(Error.InvalidFormat("TestField")) 
+            items, item => string.IsNullOrWhiteSpace(item)
+                ? UnitResult.Fail(Error.InvalidFormat("TestField"))
                 : UnitResult.Ok());
         Assert.False(result.IsSuccess);
     }

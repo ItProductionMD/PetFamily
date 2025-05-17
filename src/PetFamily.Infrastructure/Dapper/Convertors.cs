@@ -10,8 +10,8 @@ public static class Convertors
     {
         public override void SetValue(IDbDataParameter parameter, T value)
         {
-            parameter.Value = value == null 
-                ? (object)DBNull.Value 
+            parameter.Value = value == null
+                ? (object)DBNull.Value
                 : JsonConvert.SerializeObject(value);
 
             parameter.DbType = DbType.String;
@@ -19,8 +19,8 @@ public static class Convertors
 
         public override T Parse(object value)
         {
-            return value == null || value is DBNull 
-                ? default! 
+            return value == null || value is DBNull
+                ? default!
                 : JsonConvert.DeserializeObject<T>(value.ToString()!)!;
         }
     }

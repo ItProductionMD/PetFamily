@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using static PetFamily.Application.Validations.ValidationExtensions;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Application.SharedValidations;
-using PetFamily.Domain.Results;
+﻿using PetFamily.Domain.PetManagment.Enums;
 using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetManagment.Enums;
-using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.ValueObjects;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
 namespace PetFamily.Application.Commands.PetManagment.AddPet;
 
@@ -22,10 +14,10 @@ public static class AddPetCommandValidator
     {
         return UnitResult.ValidateCollection(
 
-            ()=> ValidateIfGuidIsNotEpmty(command.VolunteerId,"Volunteer id"),
+            () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "Volunteer id"),
 
             () => ValidateRequiredField(
-                command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
+                command.PetName, "Pet name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 
             () => ValidateNonRequiredField(
                 command.Description, "Pet description", MAX_LENGTH_LONG_TEXT),
@@ -37,7 +29,7 @@ public static class AddPetCommandValidator
                 command.Height, "Pet height", 0, 500),
 
             () => ValidateNonRequiredField(
-                command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT,NAME_PATTERN),
+                command.Color, "Pet color", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 
             () => Phone.ValidateNonRequired(
                 command.OwnerPhoneNumber, command.OwnerPhoneRegion),

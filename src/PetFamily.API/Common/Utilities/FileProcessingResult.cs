@@ -1,10 +1,9 @@
 ﻿using PetFamily.Application.Abstractions;
-using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 
 namespace PetFamily.API.Common.Utilities
 {
-    public class FileProcessingResult<T,TResponse>where T : ICommand
+    public class FileProcessingResult<T, TResponse> where T : ICommand
     {
         public List<AppFileDto> AppFileDtos { get; }
         public List<T> Commands { get; }

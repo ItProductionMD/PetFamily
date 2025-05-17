@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Dapper;
+using Npgsql;
 using System.Text;
 using System.Text.RegularExpressions;
-using Dapper;
-using Npgsql;
-using PetFamily.Domain.Results;
 
 namespace PetFamily.Infrastructure.Dapper;
 public class ScaffoldFromDb
@@ -31,8 +26,8 @@ public class ScaffoldFromDb
         var columns = connection.Query<(string TableName, string ColumnName)>(query);
         var tables = columns.GroupBy(c => c.TableName);
 
-        string outputPath = Path.Combine(infrastructurePath,"Dapper","GeneratedTables");
-        if(Directory.Exists(outputPath) == false!)
+        string outputPath = Path.Combine(infrastructurePath, "Dapper", "GeneratedTables");
+        if (Directory.Exists(outputPath) == false!)
         {
             Console.WriteLine($"Directory :{outputPath} not exist!Make shure you set command from write directory! ");
             return;
@@ -111,7 +106,7 @@ public class ScaffoldFromDb
         {
             if (!string.IsNullOrEmpty(item) && char.IsLetter(item[0]))
             {
-                var word  = item.ToLower();
+                var word = item.ToLower();
                 var pascaleCaseWord = char.ToUpper(word[0]) + word.Substring(1);
                 result = result + pascaleCaseWord;
             }

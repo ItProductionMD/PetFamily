@@ -48,7 +48,7 @@ public record PetRequest(
            HomeNumber,
            DonateDetails);
 
-    public UpdatePetCommand ToUpdatePetCommand(Guid volunteerId,Guid petId) =>
+    public UpdatePetCommand ToUpdatePetCommand(Guid volunteerId, Guid petId) =>
        new UpdatePetCommand(
           volunteerId,
           petId,
@@ -71,4 +71,4 @@ public record PetRequest(
           Street,
           HomeNumber,
           DonateDetails);
-}   
+}

@@ -1,6 +1,6 @@
 ﻿using PetFamily.Application.Abstractions;
-using PetFamily.Domain.Results;
 using PetFamily.Application.IRepositories;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Queries.Pet.GetPets;
 
@@ -12,7 +12,7 @@ public class GetPetsQueryHandler(
     public async Task<Result<GetPetsResponse>> Handle(GetPetsQuery query, CancellationToken token)
     {
         var validationResult = GetPetsQueryValidator.Validate(query);
-        if(validationResult.IsFailure)
+        if (validationResult.IsFailure)
             return validationResult;
 
         return await _volunteerReadRepository.GetPets(

@@ -1,8 +1,8 @@
-﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.Results;
+﻿using PetFamily.Domain.Results;
 using System.Text.Json.Serialization;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 

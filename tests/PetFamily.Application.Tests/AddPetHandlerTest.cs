@@ -1,7 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using PetFamily.Application.Commands.PetManagment.AddPet;
 using PetFamily.Application.IRepositories;
@@ -10,10 +7,6 @@ using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.ValueObjects;
-using System.ComponentModel.Design;
-using System.Drawing;
-using System.IO;
 using DomainSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
 
 namespace PetFamily.Application.Tests;

@@ -1,17 +1,14 @@
-﻿using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Shared.Validations;
-using PetFamily.Domain.Results;
-using PetFamily.Domain.PetManagment.ValueObjects;
+﻿using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Enums;
+using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.Interfaces;
+using PetFamily.Domain.Shared.ValueObjects;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using System.Collections.Generic;
-using PetFamily.Domain.Shared.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 using Image = PetFamily.Domain.Shared.ValueObjects.Image;
-using PetFamily.Domain.DomainError;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 

@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
 using PetFamily.Application.Commands.PetTypeManagement.DeleteBreed;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.PetTypeFeatures;
 
-public class DeleteBreedTest(TestWebApplicationFactory factory) 
+public class DeleteBreedTest(TestWebApplicationFactory factory)
     : CommandHandlerTest<DeleteBreedCommand>(factory)
 {
     [Fact]
@@ -20,7 +19,7 @@ public class DeleteBreedTest(TestWebApplicationFactory factory)
 
         var seededBreed = seedSpecies.Breeds[0];
 
-        var command = new DeleteBreedCommand(seedSpecies.Id,seededBreed.Id);
+        var command = new DeleteBreedCommand(seedSpecies.Id, seededBreed.Id);
         //ACT
         var result = await _sut.Handle(command, CancellationToken.None);
         //ASSERT

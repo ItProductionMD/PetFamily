@@ -6,7 +6,7 @@ using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
-public class UpdateRequisitesTest(TestWebApplicationFactory factory) 
+public class UpdateRequisitesTest(TestWebApplicationFactory factory)
     : CommandHandlerTest<UpdateRequisitesCommand>(factory)
 {
     [Fact]

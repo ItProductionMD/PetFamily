@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Extensions;
-using PetFamily.API.Responce;
-using PetFamily.Domain.DomainError;
 using PetFamily.API.Requests;
+using PetFamily.API.Responce;
 using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
-using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
 using PetFamily.Application.Commands.PetTypeManagement.DeleteBreed;
-using PetFamily.Application.Queries.PetType.GetListOfSpecies;
+using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
 using PetFamily.Application.Queries.PetType.GetBreeds;
+using PetFamily.Application.Queries.PetType.GetListOfSpecies;
 
 namespace PetFamily.API.Controllers;
 

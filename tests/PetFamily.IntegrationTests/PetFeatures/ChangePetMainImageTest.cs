@@ -1,20 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moq;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.Commands.FilesManagment.Dtos;
-using PetFamily.Application.Commands.PetManagment.AddPetImages;
 using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
 using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Domain.Results;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
-public class ChangePetMainImageTest(TestWebApplicationFactory factory) 
+public class ChangePetMainImageTest(TestWebApplicationFactory factory)
     : CommandHandlerTest<ChangePetMainImageCommand>(factory)
 {
     public Volunteer SeedVolunteer { get; set; } = null!;
@@ -39,7 +32,7 @@ public class ChangePetMainImageTest(TestWebApplicationFactory factory)
 
         var updatedVolunteer = await _dbContext.Volunteers
             .AsNoTracking()
-            .Include(v=>v.Pets)
+            .Include(v => v.Pets)
             .SingleOrDefaultAsync();
 
         Assert.NotNull(updatedVolunteer);
@@ -66,7 +59,7 @@ public class ChangePetMainImageTest(TestWebApplicationFactory factory)
 
         var updatedVolunteer = await _dbContext.Volunteers
             .AsNoTracking()
-            .Include(v=>v.Pets)
+            .Include(v => v.Pets)
             .SingleOrDefaultAsync();
         Assert.NotNull(updatedVolunteer);
 

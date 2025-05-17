@@ -1,11 +1,11 @@
-﻿using PetFamily.Domain.Shared;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.Results;
+﻿using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetTypeManagment.Entities;
+using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
 namespace PetFamily.Domain.PetTypeManagment.Root
 {
@@ -57,7 +57,7 @@ namespace PetFamily.Domain.PetTypeManagment.Root
         public UnitResult DeleteBreedById(Guid breedId)
         {
             var removedItemsCount = _breeds.RemoveAll(b => b.Id == breedId);
-            if(removedItemsCount == 0)
+            if (removedItemsCount == 0)
                 return UnitResult.Fail(Error.NotFound($"Breed with Id: {breedId} not found"));
 
             return UnitResult.Ok();

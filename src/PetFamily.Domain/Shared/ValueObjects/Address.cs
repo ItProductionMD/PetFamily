@@ -1,7 +1,7 @@
-﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+﻿using PetFamily.Domain.Results;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -18,7 +18,7 @@ public record Address
     public string Number { get; }
 
     private Address() { }//EF core need this
-   
+
     private Address(string region, string city, string street, string number)
     {
         Region = region;
@@ -26,12 +26,12 @@ public record Address
         Street = street;
         Number = number;
     }
-    public static Address CreateEmpty() => new Address("","","","");
+    public static Address CreateEmpty() => new Address("", "", "", "");
     public static Result<Address> CreatePossibleEmpty(string? region, string? city, string? street, string? number)
     {
         if (IsAddressEmpty(region, city, street, number))
             return Result.Ok(CreateEmpty());
- 
+
         var validationResult = ValidateRequired(region, city, street, number);
 
         if (validationResult.IsFailure)
@@ -39,7 +39,7 @@ public record Address
 
         return Result.Ok(new Address(region!, city!, street!, number!));
     }
-    
+
     public static UnitResult ValidateRequired(string? region, string? city, string? street, string? number)
     {
         return UnitResult.ValidateCollection(

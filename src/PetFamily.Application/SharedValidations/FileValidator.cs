@@ -48,21 +48,21 @@ public static class FileValidator
 
     public static UnitResult ValidateFilesCount(int filesCount, FileValidatorOptions options)
     {
-        if (filesCount == 0)        
+        if (filesCount == 0)
             return UnitResult.Fail(Error.FilesCountIsNull());
-        
+
         if (filesCount > options.MaxFilesCount)
             return UnitResult.Fail(Error.ValueOutOfRange("Count of files is out of range"));
- 
+
         return UnitResult.Ok();
     }
 
     public static UnitResult ValidateList(
         List<UploadFileCommand> fileDtos,
-        FileValidatorOptions fileValidatorOptions )
+        FileValidatorOptions fileValidatorOptions)
     {
         var validateCounts = ValidateFilesCount(fileDtos.Count, fileValidatorOptions);
-        if(validateCounts.IsFailure)
+        if (validateCounts.IsFailure)
             return validateCounts;
 
         List<ValidationError> validationErrors = [];

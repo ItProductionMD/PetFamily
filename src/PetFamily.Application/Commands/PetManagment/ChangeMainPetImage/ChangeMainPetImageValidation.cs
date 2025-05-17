@@ -1,5 +1,4 @@
-﻿using PetFamily.Application.Commands.PetManagment.DeletePet;
-using PetFamily.Domain.Results;
+﻿using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
 using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 

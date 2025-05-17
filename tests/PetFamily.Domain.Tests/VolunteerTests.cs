@@ -1,14 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using PetFamily.Domain.PetManagment.Enums;
+using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared.ValueObjects;
-using static System.Net.Mime.MediaTypeNames;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
-using System.Net;
-using System.Xml.Linq;
-using PetFamily.Domain.PetManagment.Root;
 
 namespace TestPetFamilyDomain;
 

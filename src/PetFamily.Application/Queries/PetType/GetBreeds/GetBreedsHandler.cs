@@ -17,7 +17,7 @@ public class GetBreedsHandler(
         GetBreedsQuery query,
         CancellationToken cancelToken)
     {
-        if(query.SpeciesId == Guid.Empty)
+        if (query.SpeciesId == Guid.Empty)
         {
             _logger.LogWarning("SpeciesId cannot be empty");
             return Result.Fail(Error.GuidIsEmpty("SpeciesId"));

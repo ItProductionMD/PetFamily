@@ -1,6 +1,4 @@
 ﻿using PetFamily.Domain.DomainError;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace PetFamily.Domain.Results;
@@ -17,7 +15,7 @@ public abstract class Result
 
     public static Result<T> Ok<T>() => new() { IsSuccess = true };
 
-    public static UnitResult Fail(Error error) => new() { IsSuccess = false, Error =  error  };
+    public static UnitResult Fail(Error error) => new() { IsSuccess = false, Error = error };
 
     public static UnitResult Fail(List<Error> errors)
     {
@@ -53,8 +51,8 @@ public abstract class Result
               .Append(validationError.ErrorCode)
               .Append("; ");
         }
-        return sb.Length > 0 
-            ? sb.ToString().TrimEnd(' ', ';') 
+        return sb.Length > 0
+            ? sb.ToString().TrimEnd(' ', ';')
             : string.Empty;
     }
     public void AddValidationErrors(List<Error> errors)
@@ -78,7 +76,7 @@ public class Result<T> : Result
         Data = data;
         return this;
     }
-    public static Result<T> Fail(Error error) => new() { IsSuccess = false, Error= error };
+    public static Result<T> Fail(Error error) => new() { IsSuccess = false, Error = error };
 
     public static Result<T> FailureWithData(T Object, Error error)
     {

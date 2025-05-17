@@ -1,9 +1,4 @@
 ﻿using PetFamily.Domain.Shared.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetFamily.Tools;
 
@@ -26,8 +21,8 @@ public static class RandomAddressGenerator
         { "Arizona", new() { "Phoenix", "Tucson", "Scottsdale" } }
     };
 
-    private static readonly List<string> StreetNames = 
-    [    
+    private static readonly List<string> StreetNames =
+    [
         "Broadway", "Elm St", "Main St", "Maple Ave", "Chestnut St",
         "5th Ave", "Sunset Blvd", "Wilson Ave", "Taylor St", "Madison Ave"
     ];

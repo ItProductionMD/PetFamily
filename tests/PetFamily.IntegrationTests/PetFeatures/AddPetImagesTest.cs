@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using PetFamily.Application.Abstractions;
 using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.Commands.PetManagment.AddPetImages;
@@ -19,15 +18,15 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
     : CommandHandlerTest<List<FileUploadResponse>, AddPetImagesCommand>(factory)
 {
     public Volunteer SeedVolunteer { get; set; } = null!;
-    public Species SeedSpecies { get;set; } = null!;
-    public Breed Breed {  get; set; } = null!;  
+    public Species SeedSpecies { get; set; } = null!;
+    public Breed Breed { get; set; } = null!;
     public const string OK_FILE_NAME = "ok_file.png";
     public const string ERROR_FILE_NAME = "error_file.png";
 
     [Fact]
     public async Task Should_add_one_pet_image_correctly()
     {
-        var command = CreateCommandWithFileNames([OK_FILE_NAME],SeedVolunteer);
+        var command = CreateCommandWithFileNames([OK_FILE_NAME], SeedVolunteer);
 
         var fileServiceOkResponse = CreateResponse(command);
 
@@ -49,7 +48,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
     [Fact]
     public async Task Should_add_one_pet_image_with_error()
     {
-        var command = CreateCommandWithFileNames([ERROR_FILE_NAME],SeedVolunteer);
+        var command = CreateCommandWithFileNames([ERROR_FILE_NAME], SeedVolunteer);
 
         List<FileUploadResponse>? fileServiceErrorResponse = null;
 
@@ -71,7 +70,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
     [Fact]
     public async Task Should_add_one_pet_image_correctly_and_one_with_error()
     {
-        var command = CreateCommandWithFileNames([OK_FILE_NAME,ERROR_FILE_NAME], SeedVolunteer);
+        var command = CreateCommandWithFileNames([OK_FILE_NAME, ERROR_FILE_NAME], SeedVolunteer);
 
         var response = CreateResponse(command);
 
@@ -94,11 +93,11 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
         Assert.Equal(expectedStoredName, addedPet.Images[0].Name);
     }
 
-   
-    private AddPetImagesCommand CreateCommandWithFileNames(List<string> fileNames,Volunteer volunteer)
+
+    private AddPetImagesCommand CreateCommandWithFileNames(List<string> fileNames, Volunteer volunteer)
     {
         var uploadFileCommands = new List<UploadFileCommand>();
-        foreach (var name in fileNames) 
+        foreach (var name in fileNames)
         {
             uploadFileCommands.Add(new(
             name,
@@ -128,8 +127,8 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
 
     private void SetupIFileService(List<FileUploadResponse>? response)
     {
-        var fileServiceResult = response == null 
-            ? Result<List<FileUploadResponse>>.Fail(Error.InternalServerError("Error handle file!")) 
+        var fileServiceResult = response == null
+            ? Result<List<FileUploadResponse>>.Fail(Error.InternalServerError("Error handle file!"))
             : Result<List<FileUploadResponse>>.Ok(response);
 
         _factory.FileServiceMock.Reset();
@@ -139,16 +138,16 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
             .ReturnsAsync(fileServiceResult);
     }
 
-    public  override async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
 
         SeedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["breedOne"]).Species;
-        await Seeder.Seed(SeedSpecies, _dbContext);  
+        await Seeder.Seed(SeedSpecies, _dbContext);
 
         SeedVolunteer = new VolunteerTestBuilder()
-            .WithPets(1,SeedSpecies).Volunteer;
+            .WithPets(1, SeedSpecies).Volunteer;
         await Seeder.Seed(SeedVolunteer, _dbContext);
     }
 }

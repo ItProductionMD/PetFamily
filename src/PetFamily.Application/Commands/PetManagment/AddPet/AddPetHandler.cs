@@ -1,17 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetManagment.Enums;
-using PetSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
-using System;
-using System.Reflection.Metadata.Ecma335;
-using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Application.IRepositories;
 using PetFamily.Application.Abstractions;
+using PetFamily.Application.IRepositories;
+using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.PetManagment.Enums;
+using PetFamily.Domain.PetManagment.Root;
+using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.ValueObjects;
 
 
 namespace PetFamily.Application.Commands.PetManagment.AddPet;

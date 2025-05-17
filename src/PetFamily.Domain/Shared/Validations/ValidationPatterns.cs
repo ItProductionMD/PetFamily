@@ -13,7 +13,7 @@ public static class ValidationPatterns
 
     // Allows international phone region codes (e.g., "+1", "+44", "380").
     // A leading "+" is optional, followed by 1–3 digits.
-    public  const string PHONE_REGION_PATTERN = @"^\+?[1-9]\d{0,2}$";
+    public const string PHONE_REGION_PATTERN = @"^\+?[1-9]\d{0,2}$";
 
     // Allows phone numbers consisting of 7 to 15 digits without spaces or dashes (e.g., "1234567890").
     // Does not include region code; use PHONE_REGION_PATTERN for that.

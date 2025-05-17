@@ -2,5 +2,5 @@
 
 namespace PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
 
-public record ChangePetMainImageCommand(Guid VolunteerId,Guid PetId,string imageName):ICommand;
+public record ChangePetMainImageCommand(Guid VolunteerId, Guid PetId, string imageName) : ICommand;
 

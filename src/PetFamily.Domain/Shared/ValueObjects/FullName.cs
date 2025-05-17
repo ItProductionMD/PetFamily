@@ -1,7 +1,7 @@
-﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+﻿using PetFamily.Domain.Results;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using PetFamily.Domain.Results;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
@@ -33,5 +33,5 @@ public record FullName
 
             () => ValidateRequiredField(firstName, "FirstName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN));
 
-    public override string ToString()=> string.Join(' ',LastName,FirstName);  
+    public override string ToString() => string.Join(' ', LastName, FirstName);
 }

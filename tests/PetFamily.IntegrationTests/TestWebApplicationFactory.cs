@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Moq;
 using Npgsql;
 using PetFamily.Application.Abstractions;
@@ -9,9 +8,7 @@ using PetFamily.Application.IRepositories;
 using PetFamily.Infrastructure.Contexts;
 using PetFamily.Infrastructure.Dapper;
 using Respawn;
-using System.Data;
 using Testcontainers.PostgreSql;
-using Address = PetFamily.Domain.Shared.ValueObjects.Address;
 
 namespace PetFamily.IntegrationTests;
 
@@ -25,7 +22,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             .WithPassword("postgres")
             .Build();
 
-    private Respawner _respawner =null!;
+    private Respawner _respawner = null!;
     private NpgsqlConnection _dbConnection = null!;
     public Mock<IFileRepository> FileServiceMock = new Mock<IFileRepository>();
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -47,13 +44,13 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             services.AddScoped<WriteDbContext>(_ =>
                 new WriteDbContext(_dbContainer.GetConnectionString()));
 
-            services.AddScoped<IDbConnectionFactory>(_ =>
+            services.AddSingleton<IDbConnectionFactory>(_ =>
                 new NpgSqlConnectionFactory(_dbContainer.GetConnectionString()));
 
             services.AddScoped<IFileRepository>(_ => FileServiceMock.Object);
         });
     }
-   
+
     public async Task InitializeRespawner()
     {
         await _dbConnection.OpenAsync();

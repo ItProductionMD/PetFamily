@@ -1,9 +1,9 @@
-﻿using PetFamily.Domain.Results;
-using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Domain.PetTypeManagment.Entities;
-using PetFamily.Application.Queries.PetType.GetListOfSpecies;
+﻿using PetFamily.Application.Dtos;
 using PetFamily.Application.Queries.PetType.GetBreeds;
-using PetFamily.Application.Dtos;
+using PetFamily.Application.Queries.PetType.GetListOfSpecies;
+using PetFamily.Domain.PetTypeManagment.Entities;
+using PetFamily.Domain.PetTypeManagment.Root;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.IRepositories;
 

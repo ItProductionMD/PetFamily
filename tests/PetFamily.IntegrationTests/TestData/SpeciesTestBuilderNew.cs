@@ -1,11 +1,6 @@
 ﻿using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.PetTypeManagment.Root;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetFamily.IntegrationTests.TestData;
 
@@ -22,7 +17,7 @@ public class SpeciesTestBuilderNew
 
     private SpeciesTestBuilderNew()
     {
-        
+
     }
     public static List<Species> Build()
     {

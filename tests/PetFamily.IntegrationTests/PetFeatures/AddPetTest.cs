@@ -1,17 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Commands.PetManagment.AddPet;
 using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetTypeManagment.Entities;
-using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Infrastructure.Contexts;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
-public class AddPetTest(TestWebApplicationFactory factory) 
+public class AddPetTest(TestWebApplicationFactory factory)
     : CommandHandlerTest<AddPetResponse, AddPetCommand>(factory)
 {
 
@@ -26,15 +21,15 @@ public class AddPetTest(TestWebApplicationFactory factory)
         await Seeder.Seed(seedSpecies, _dbContext);
 
         var seedVolunteer = new VolunteerTestBuilder().Volunteer;
-        await Seeder.Seed(seedVolunteer, _dbContext); 
-        
+        await Seeder.Seed(seedVolunteer, _dbContext);
+
         var command = new AddPetCommand(
-            VolunteerId:seedVolunteer.Id,
-            PetName:"TestName",
-            DateOfBirth:null,
-            Description:"test description",
+            VolunteerId: seedVolunteer.Id,
+            PetName: "TestName",
+            DateOfBirth: null,
+            Description: "test description",
             IsVaccinated: true,
-            IsSterilized:true,
+            IsSterilized: true,
             Weight: 1,
             Height: 1,
             Color: "testColor",
@@ -48,7 +43,7 @@ public class AddPetTest(TestWebApplicationFactory factory)
             Region: "Region",
             Street: "Street",
             HomeNumber: "11",
-            Requisites: [new("testRequisites","test requisites description")]
+            Requisites: [new("testRequisites", "test requisites description")]
             );
         //ACT
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -57,7 +52,7 @@ public class AddPetTest(TestWebApplicationFactory factory)
 
         var updatedVolunteer = await _dbContext.Volunteers
             .AsNoTracking()
-            .Include(v=>v.Pets)
+            .Include(v => v.Pets)
             .SingleOrDefaultAsync();
         Assert.NotNull(updatedVolunteer);
 

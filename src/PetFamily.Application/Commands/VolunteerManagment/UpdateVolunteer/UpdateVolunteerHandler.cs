@@ -3,10 +3,8 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.Validations;
-using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 
 namespace PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
@@ -15,7 +13,7 @@ public class UpdateVolunteerHandler(
     IVolunteerWriteRepository volunteerRepository,
     ILogger<UpdateVolunteerHandler> logger,
     IVolunteerReadRepository volunteerReadRepository,
-    IValidator<UpdateVolunteerCommand> validator):ICommandHandler<Volunteer,UpdateVolunteerCommand>
+    IValidator<UpdateVolunteerCommand> validator) : ICommandHandler<Volunteer, UpdateVolunteerCommand>
 {
     private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
     private readonly IVolunteerReadRepository _volunteerReadRepository = volunteerReadRepository;
@@ -30,7 +28,7 @@ public class UpdateVolunteerHandler(
         {
             var errorResult = validateResult.ToResultFailure<Volunteer>();
             _logger.LogError(
-                "Fail validate volunteerRequest! Errors: {Errors}", 
+                "Fail validate volunteerRequest! Errors: {Errors}",
                 errorResult.ValidationMessagesToString());
 
             return errorResult;
@@ -54,7 +52,7 @@ public class UpdateVolunteerHandler(
         var fullName = FullName.Create(command.FirstName, command.LastName).Data!;
 
         var phone = Phone.CreateNotEmpty(command.PhoneNumber, command.PhoneRegionCode).Data!;
-    
+
         volunteer.UpdateMainInfo(fullName, command.Email, phone, command.ExperienceYears, command.Description);
 
         var updateResult = await _volunteerRepository.Save(volunteer, cancelToken);

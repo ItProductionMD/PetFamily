@@ -4,7 +4,7 @@ using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
-public class GetVolunteersTest(TestWebApplicationFactory factory) 
+public class GetVolunteersTest(TestWebApplicationFactory factory)
     : QueryHandlerTest<GetVolunteersResponse, GetVolunteersQuery>(factory)
 {
     [Theory]
@@ -17,7 +17,7 @@ public class GetVolunteersTest(TestWebApplicationFactory factory)
     [InlineData(25, 10, 0)]//the invalid value of page(0)
     [InlineData(25, 10, -1)]//the invalid value of page(negative)
     public async Task Should_get_volunteers_correctly(
-        int volunteersCount, 
+        int volunteersCount,
         int pageSize,
         int pageNumber)
     {

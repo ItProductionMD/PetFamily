@@ -1,11 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using PetFamily.Infrastructure.Contexts;
-using PetFamily.Infrastructure.Dapper;
-using PetFamily.Tools;
-using System.Reflection;
+﻿using PetFamily.Tools;
+using PetFamily.Tools.UsingsEdit;
 
 class Program
 {
@@ -18,8 +12,10 @@ class Program
                 "\n\tscaffold," +
                 "\n\tseed --volunteers=<volunteersCount>" +
                 "--pets=<petsOnVolunteersCount>," +
-                "\n\tclear --<tableName>");
-           
+                "\n\tclear --<tableName>," +
+                "\n\tusing --<operation> --usings:<old_using>%<new_using>" +
+                "\n\tusing --<operation> --usings:<static:old_using>|<static:new_using>");
+
             return;
         }
         switch (args[0].ToLower())
@@ -47,6 +43,11 @@ class Program
             case "clear":
                 var tableName = args[1].Remove(0, 2);
                 await Seeder.RunClear(tableName);
+                break;
+
+            case "using":
+                var usingEditHandler = new UsingEditHandler(args);
+                await usingEditHandler.Handle();
                 break;
 
             default:

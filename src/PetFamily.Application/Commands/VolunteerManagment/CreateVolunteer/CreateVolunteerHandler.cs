@@ -1,16 +1,12 @@
 ﻿using FluentValidation;
-using PetFamily.Application.Validations;
-using PetFamily.Domain.Shared.ValueObjects;
 using Microsoft.Extensions.Logging;
-using PetFamily.Domain.Shared;
-using System.Security.AccessControl;
-using PetFamily.Domain.Results;
+using PetFamily.Application.Abstractions;
+using PetFamily.Application.IRepositories;
+using PetFamily.Application.Validations;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.Shared.Validations;
-using PetFamily.Application.Abstractions;
+using PetFamily.Domain.Results;
+using PetFamily.Domain.Shared.ValueObjects;
 
 
 //-------------------------------Handler,UseCases,Services----------------------------------------//

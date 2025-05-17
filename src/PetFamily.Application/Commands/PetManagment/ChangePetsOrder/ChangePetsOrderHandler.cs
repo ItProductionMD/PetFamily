@@ -2,7 +2,6 @@
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
@@ -34,7 +33,7 @@ public class ChangePetsOrderHandler(
             var validationErrors = changePetsOrderResult.ValidationMessagesToString();
             _logger.LogError("Change pets order error for volunteer with Id:{id}!Error:{Message}" +
                 "ValidationErrors:{ValidationErrors}",
-                volunteer.Id, changePetsOrderResult.Error.Message,validationErrors);
+                volunteer.Id, changePetsOrderResult.Error.Message, validationErrors);
 
             return changePetsOrderResult;
         }

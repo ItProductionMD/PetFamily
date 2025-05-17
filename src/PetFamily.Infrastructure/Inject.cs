@@ -1,22 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using PetFamily.Application.Abstractions;
+using PetFamily.Application.IRepositories;
 using PetFamily.Infrastructure.Constants;
 using PetFamily.Infrastructure.Contexts;
 using PetFamily.Infrastructure.Contexts.ReadDbContext;
+using PetFamily.Infrastructure.Dapper;
 using PetFamily.Infrastructure.Repositories.Read;
 using PetFamily.Infrastructure.Repositories.Write;
 using PetFamily.Infrastructure.Services.BackgroundServices;
 using PetFamily.Infrastructure.Services.MinioService;
-using System.Data;
-using Npgsql;
-using PetFamily.Application.IRepositories;
-using PetFamily.Application.Dtos;
-using static PetFamily.Infrastructure.Dapper.Convertors;
-using PetFamily.Infrastructure.Dapper;
-using PetFamily.Application.Abstractions;
 
 namespace PetFamily.Infrastructure;
 
@@ -39,7 +33,7 @@ public static class Inject
             .AddScoped<IFileRepository, MinioFileRepository>()
             .AddDbContext<ReadDbContext>(options => options.UseNpgsql(postgresConnection))
             .ConfigDapper(configuration)
-            .AddTransient<IDbConnectionFactory>(_ =>new NpgSqlConnectionFactory(postgresConnection))
+            .AddSingleton<IDbConnectionFactory>(_ => new NpgSqlConnectionFactory(postgresConnection))
             .AddScoped<WriteDbContext>(_ => new WriteDbContext(postgresConnection))
             .AddHostedService<DbCleanupService>()
             .AddHostedService<MinioCleanupService>()

@@ -1,13 +1,9 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using Amazon.Runtime.Internal.Util;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
-using Polly;
-using Polly.Retry;
+using System.Collections.Concurrent;
+using System.Text;
 
 
 namespace PetFamily.Infrastructure.Services.MinioService;
@@ -46,7 +42,7 @@ public class MinioFilesHandler
 
         if (errors.IsEmpty == false)
         {
-            var errorsMessage = errors.Select(e=> e.Message).ToList();
+            var errorsMessage = errors.Select(e => e.Message).ToList();
 
             var sb = new StringBuilder();
             foreach (var error in errors)
@@ -54,7 +50,7 @@ public class MinioFilesHandler
                 sb.AppendLine(error.Message);
                 sb.AppendLine(";");
             }
-            _logger.LogError("ProcessFiles  error:{errors}",sb);
+            _logger.LogError("ProcessFiles  error:{errors}", sb);
 
             return Result
                 .Fail(Error.InternalServerError("Some files were not handled!"))
