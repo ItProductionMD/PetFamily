@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Infrastructure.Contexts;
+﻿using PetFamily.Infrastructure.Contexts;
 
 namespace PetFamily.IntegrationTests.Seeds;
 

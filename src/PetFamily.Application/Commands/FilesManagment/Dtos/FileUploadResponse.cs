@@ -10,8 +10,8 @@ public class FileUploadResponse(string originalName, string storedName)
     public FileUploadResponse(
         string originalName,
         string storedName,
-        bool isUploaded, 
-        string error) : this(originalName, storedName    )
+        bool isUploaded,
+        string error) : this(originalName, storedName)
     {
         IsUploaded = isUploaded;
         Error = error;

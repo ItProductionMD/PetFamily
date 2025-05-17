@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
-using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.Seeds;
+using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
-public class CreateVolunteerTest(TestWebApplicationFactory factory) 
+public class CreateVolunteerTest(TestWebApplicationFactory factory)
     : CommandHandlerTest<Guid, CreateVolunteerCommand>(factory)
 {
     [Fact]
@@ -48,7 +48,7 @@ public class CreateVolunteerTest(TestWebApplicationFactory factory)
         //ARRANGE
         var seedVolunteer = new VolunteerTestBuilder().Volunteer;
 
-        await Seeder.Seed(seedVolunteer,_dbContext);
+        await Seeder.Seed(seedVolunteer, _dbContext);
 
         var command = new CreateVolunteerCommand(
             "Iurii",

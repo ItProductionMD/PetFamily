@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PetFamily.API.Common.AppiValidators;
 using PetFamily.API.Common.Utilities;
-using PetFamily.API.Requests;
 using PetFamily.API.Extensions;
 using PetFamily.API.Responce;
 using PetFamily.Application.Commands.FilesManagment;
@@ -12,11 +9,7 @@ using PetFamily.Application.Commands.FilesManagment.Commands;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.IRepositories;
 using PetFamily.Application.SharedValidations;
-using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.Validations;
-using System.Runtime.CompilerServices;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PetFamily.API.Controllers;
 

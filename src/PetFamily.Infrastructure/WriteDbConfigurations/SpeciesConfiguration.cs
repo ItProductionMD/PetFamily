@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.PetTypeManagment.Root;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.WriteDbConfigurations;
 public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
@@ -15,7 +15,7 @@ public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
         builder.Property(s => s.Name)
             .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
             .IsRequired();
-            
+
         // One-to-many relationship with Breeds
         builder.HasMany(s => s.Breeds)
             .WithOne()

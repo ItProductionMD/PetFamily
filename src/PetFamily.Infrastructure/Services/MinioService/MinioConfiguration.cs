@@ -1,11 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Minio;
-using Minio.DataModel.Tracing;
-using Minio.Handlers;
-using System;
 
 namespace PetFamily.Infrastructure.Services.MinioService;
 

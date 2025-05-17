@@ -1,22 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Minio;
-using Minio.DataModel;
-using System.Collections.Generic;
-using Minio.ApiEndpoints;
-using Microsoft.Extensions.Options;
-using PetFamily.Infrastructure.Services.MinioService;
-using Minio.DataModel.Args;
-using System.Collections;
-using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.IRepositories;
-using static Azure.Core.HttpHeader;
 
 namespace PetFamily.Infrastructure.Services.BackgroundServices;
 
@@ -34,14 +21,14 @@ public class MinioCleanupService(
         {
             _logger.LogInformation("Minio Background Cleanup Service started!");
 
-            await CleanupOldFilesAsync(fileList,stoppingToken);
+            await CleanupOldFilesAsync(fileList, stoppingToken);
 
             _logger.LogInformation("Minio Background Cleanup Service ended!");
         }
 
     }
 
-    private async Task CleanupOldFilesAsync(List<AppFileDto> fileList,CancellationToken stoppingToken)
+    private async Task CleanupOldFilesAsync(List<AppFileDto> fileList, CancellationToken stoppingToken)
     {
         if (stoppingToken.IsCancellationRequested)
         {
@@ -80,7 +67,7 @@ public class MinioCleanupService(
         }
         else
         {
-            string names = string.Join(";", fileList.Select(f=>f.Name));
+            string names = string.Join(";", fileList.Select(f => f.Name));
             _logger.LogInformation("Minio Background Cleanup Service removed files:{names}", names);
         }
     }

@@ -2,5 +2,5 @@
 
 namespace PetFamily.Application.Commands.PetManagment.DeletePet;
 
-public record SoftDeletePetCommand(Guid VolunteerId,Guid PetId) : ICommand;
+public record SoftDeletePetCommand(Guid VolunteerId, Guid PetId) : ICommand;
 

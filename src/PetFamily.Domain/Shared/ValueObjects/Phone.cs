@@ -1,12 +1,10 @@
-﻿using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
-using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
+﻿using PetFamily.Domain.Results;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using PetFamily.Domain.Results;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
+using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
-public record Phone:IValueObject
+public record Phone : IValueObject
 {
     public string Number { get; }
     public string RegionCode { get; }
@@ -18,7 +16,7 @@ public record Phone:IValueObject
         RegionCode = regionCode;
     }
 
-    public static Phone CreateEmpty() => new Phone("","");
+    public static Phone CreateEmpty() => new Phone("", "");
 
     public static Result<Phone> CreateNotEmpty(string? number, string? regionCode)
     {
@@ -35,7 +33,7 @@ public record Phone:IValueObject
         if (validationResult.IsFailure)
             return validationResult;
 
-        if (IsPhoneEmpty(regionCode,number))
+        if (IsPhoneEmpty(regionCode, number))
             return Result.Ok(CreateEmpty());
 
         return Result.Ok(new Phone(number!, regionCode!));

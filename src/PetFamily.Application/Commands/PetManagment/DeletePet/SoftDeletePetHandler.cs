@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.IRepositories;
-using PetFamily.Domain.Results;
-using PetFamily.Domain.DomainError;
-using PetFamily.Application.Commands.FilesManagment;
 using Microsoft.Extensions.Options;
+using PetFamily.Application.Abstractions;
+using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
+using PetFamily.Application.IRepositories;
+using PetFamily.Domain.DomainError;
+using PetFamily.Domain.Results;
 using static PetFamily.Application.Commands.PetManagment.DeletePet.DeletePetValidation;
 
 namespace PetFamily.Application.Commands.PetManagment.DeletePet;

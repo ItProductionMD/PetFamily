@@ -38,5 +38,5 @@ public class SpeciesTestBuilder
         return this;
     }
 
-    public Species GetSpecies()=> Species;
+    public Species GetSpecies() => Species;
 }

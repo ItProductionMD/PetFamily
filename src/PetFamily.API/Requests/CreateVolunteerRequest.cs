@@ -3,7 +3,7 @@ using PetFamily.Application.Dtos;
 
 namespace PetFamily.API.Requests;
 
-public record CreateVolunteerRequest (
+public record CreateVolunteerRequest(
     string FirstName,
     string LastName,
     string Email,
@@ -15,15 +15,15 @@ public record CreateVolunteerRequest (
     IEnumerable<SocialNetworksDto> SocialNetworksList
 )
 {
-    public CreateVolunteerCommand ToCommand() => 
-        new(FirstName, 
-            LastName, 
-            Email, 
-            Description, 
-            PhoneNumber, 
+    public CreateVolunteerCommand ToCommand() =>
+        new(FirstName,
+            LastName,
+            Email,
+            Description,
+            PhoneNumber,
             PhoneRegionCode,
             ExperienceYears,
-            Requisites, 
+            Requisites,
             SocialNetworksList);
 }
 

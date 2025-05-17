@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PetFamily.Application.Queries.ForFilters;
+﻿using PetFamily.Application.Queries.ForFilters;
 using PetFamily.Domain.PetManagment.Enums;
-using System.Text.Json.Serialization;
 
 namespace PetFamily.Application.Queries.Pet.GetPets;
 
-public class  PetsFilter
+public class PetsFilter
 {
     public Guid? VolunteerId { get; set; }
     public List<Guid>? SpeciesIds { get; set; }
@@ -18,7 +16,7 @@ public class  PetsFilter
     public int MaxAgeInMonth { get; set; } = 0;
     public List<string>? OrderBy { get; set; }
 
-    public List<OrderBy> GetOrderBies()=>
+    public List<OrderBy> GetOrderBies() =>
         OrderBy?.Select(x =>
         {
             var parts = x.Split(':');

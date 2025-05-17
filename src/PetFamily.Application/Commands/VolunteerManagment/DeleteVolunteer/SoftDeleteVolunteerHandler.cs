@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Domain.Results;
 using Microsoft.Extensions.Options;
-using PetFamily.Application.IRepositories;
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
-using PetFamily.Application.Commands.SharedCommands;
-using PetFamily.Application.Abstractions;
+using PetFamily.Application.IRepositories;
+using PetFamily.Domain.Results;
 
 namespace PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
 
@@ -32,7 +31,7 @@ public class SoftDeleteVolunteerHandler(
 
         foreach (var pet in volunteer.Pets)
             imagesToDelete.AddRange(pet.Images.Select(i => new AppFileDto(i.Name, _fileFolders.Images)));
-        
+
         volunteer.SoftDelete();
 
         var result = await _volunteerRepository.Save(volunteer, cancelToken);
@@ -41,8 +40,8 @@ public class SoftDeleteVolunteerHandler(
 
         if (imagesToDelete.Count > 0)
             await _filesProcessingQueue.DeleteChannel.Writer.WriteAsync(imagesToDelete);
-        
-       _logger.LogInformation("Softdelete volunteer with id:{volunteerId} successful!",command.VolunteerId);
+
+        _logger.LogInformation("Softdelete volunteer with id:{volunteerId} successful!", command.VolunteerId);
 
         return Result.Ok(volunteer.Id);
     }

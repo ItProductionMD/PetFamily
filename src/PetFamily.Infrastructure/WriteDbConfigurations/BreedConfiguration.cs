@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.PetTypeManagment.Entities;
+using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 
 namespace PetFamily.Infrastructure.WriteDbConfigurations;
 public class BreedConfiguration : IEntityTypeConfiguration<Breed>
@@ -16,8 +16,8 @@ public class BreedConfiguration : IEntityTypeConfiguration<Breed>
             .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
             .IsRequired();
 
-        builder.Property(b=>b.Description)
+        builder.Property(b => b.Description)
             .HasMaxLength(MAX_LENGTH_MEDIUM_TEXT)
-            .IsRequired(); 
+            .IsRequired();
     }
 }

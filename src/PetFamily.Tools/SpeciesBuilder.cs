@@ -1,9 +1,6 @@
-﻿using Bogus.DataSets;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using PetFamily.Domain.PetManagment.ValueObjects;
+﻿using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.PetTypeManagment.Root;
-using System.Data.Common;
 
 namespace PetFamily.Tools;
 
@@ -19,7 +16,7 @@ public class SpeciesBuilder
     public static List<Species> Build()
     {
         var speciesBuilder = new SpeciesBuilder();
-        foreach( var species in SpeciesAndBreeds)
+        foreach (var species in SpeciesAndBreeds)
         {
             var speciesResult = Species.Create(SpeciesID.SetValue(Guid.NewGuid()), species.Key);
             if (speciesResult.IsFailure)

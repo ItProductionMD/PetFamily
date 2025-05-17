@@ -1,10 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.SharedValidations;
-using PetFamily.Application.Commands.FilesManagment;
 using PetFamily.Application.Abstractions;
-using PetFamily.Application.IRepositories;
+using PetFamily.Application.Commands.FilesManagment;
+using PetFamily.Application.SharedValidations;
 
 namespace PetFamily.Application;
 

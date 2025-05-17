@@ -18,12 +18,12 @@ namespace PetFamily.API.Extensions
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
                 ErrorType.Conflict => StatusCodes.Status409Conflict,
                 ErrorType.Exception => StatusCodes.Status500InternalServerError,
-                _=>StatusCodes.Status500InternalServerError
+                _ => StatusCodes.Status500InternalServerError
             };
 
             var envelope = Envelope.Failure(result.Error);
 
-            return new ObjectResult(envelope) { StatusCode= statusCode };
+            return new ObjectResult(envelope) { StatusCode = statusCode };
         }
 
         public static ActionResult ToErrorActionResult<T>(this Result<T> result)
@@ -40,7 +40,7 @@ namespace PetFamily.API.Extensions
                 _ => StatusCodes.Status500InternalServerError
             };
 
-            var envelope = Envelope.Failure(result.Error,result.Data);
+            var envelope = Envelope.Failure(result.Error, result.Data);
 
             return new ObjectResult(envelope) { StatusCode = statusCode };
         }

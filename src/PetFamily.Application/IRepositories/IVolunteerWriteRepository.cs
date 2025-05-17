@@ -1,5 +1,4 @@
-﻿using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.Root;
+﻿using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
 
@@ -13,7 +12,7 @@ public interface IVolunteerWriteRepository
 
     Task SaveWithRetry(Volunteer volunteer, CancellationToken cancelToken = default);
 
-    Task <Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken cancelToken = default);
+    Task<Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken cancelToken = default);
 
     Task Delete(Volunteer volunteer, CancellationToken cancelToken = default);
 

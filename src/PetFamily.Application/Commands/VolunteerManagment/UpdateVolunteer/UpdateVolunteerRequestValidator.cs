@@ -3,7 +3,6 @@ using PetFamily.Application.Validations;
 using PetFamily.Domain.Shared.Validations;
 using PetFamily.Domain.Shared.ValueObjects;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
-using static PetFamily.Domain.Shared.Validations.ValidationErrorCodes;
 
 
 namespace PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;

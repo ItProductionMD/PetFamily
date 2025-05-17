@@ -8,7 +8,7 @@ namespace PetFamily.IntegrationTests.VolunteerFeatures;
 public class SoftDeleteVolunteerTest(
     TestWebApplicationFactory factory) : CommandHandlerTest<Guid, SoftDeleteVolunteerCommand>(factory)
 {
-    
+
     [Fact]
     public async Task Should_soft_delete_one_volunteer_successfully()
     {

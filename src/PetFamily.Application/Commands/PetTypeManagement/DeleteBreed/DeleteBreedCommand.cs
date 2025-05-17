@@ -2,4 +2,4 @@
 
 namespace PetFamily.Application.Commands.PetTypeManagement.DeleteBreed;
 
-public record DeleteBreedCommand(Guid SpeciesId, Guid BreedId):ICommand;
+public record DeleteBreedCommand(Guid SpeciesId, Guid BreedId) : ICommand;

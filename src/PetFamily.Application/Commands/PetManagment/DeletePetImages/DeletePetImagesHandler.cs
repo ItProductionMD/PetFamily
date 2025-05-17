@@ -58,6 +58,6 @@ public class DeletePetImagesHandler(
         await _filesProcessingQueue.DeleteChannel.Writer
                 .WriteAsync(fileDtos, cancelToken);
 
-        return UnitResult.Ok();        
+        return UnitResult.Ok();
     }
 }

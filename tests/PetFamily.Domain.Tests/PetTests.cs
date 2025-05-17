@@ -1,7 +1,6 @@
 ﻿using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.Shared.ValueObjects;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 
 namespace TestPetFamilyDomain;
@@ -9,11 +8,11 @@ namespace TestPetFamilyDomain;
 public class PetTests
 {
     [Theory]
-    [InlineData("Tom", "Cute cat", "White","Healthy")]
-    [InlineData("Jerry",null, "White", "Healthy")]
+    [InlineData("Tom", "Cute cat", "White", "Healthy")]
+    [InlineData("Jerry", null, "White", "Healthy")]
     [InlineData("Jerry", "Cute cat", null, "Healthy")]
-    [InlineData("Max","Cute cat", "White",null)]
-    [InlineData("Jerry", null,null,null)]
+    [InlineData("Max", "Cute cat", "White", null)]
+    [InlineData("Jerry", null, null, null)]
 
     public void ValidatePets_ShouldValidatePetData_Ok(
         string name,
@@ -52,7 +51,7 @@ public class PetTests
         var validateResult = Pet.Validate(name, description, color, healthInfo);
         // ASSERT
         Assert.False(validateResult.IsSuccess);
-        Assert.Equal(Error.InvalidLength(fieldNameWithError).Type,validateResult.Error!.Type);
+        Assert.Equal(Error.InvalidLength(fieldNameWithError).Type, validateResult.Error!.Type);
     }
 
     [Theory]
@@ -76,14 +75,14 @@ public class PetTests
     }
 
     [Theory]
-    [InlineData("ubwuec12")] 
-    [InlineData("gvrjh!")] 
-    [InlineData("?ec")] 
-    [InlineData("wepc.")] 
+    [InlineData("ubwuec12")]
+    [InlineData("gvrjh!")]
+    [InlineData("?ec")]
+    [InlineData("wepc.")]
     public void ValidatePets_ShouldFail_WhenNamePatternIsNotCorresponding(string name)
     {
         // ACT
-        var validateResult = Pet.Validate(name,null,null,null);
+        var validateResult = Pet.Validate(name, null, null, null);
 
         // ASSERT
         Assert.False(validateResult.IsSuccess);
@@ -97,7 +96,7 @@ public class PetTests
     {
         // ARRANGE
         var volunteer = TestDataFactory.CreateVolunteer(1);
-        var pet =volunteer.Pets[0];
+        var pet = volunteer.Pets[0];
         // ACT
         pet.SoftDelete();
         // ASSERT
@@ -129,9 +128,9 @@ public class PetTests
 
         var imageName1 = Guid.NewGuid().ToString();
         var imageName2 = Guid.NewGuid().ToString();
-   
+
         // ACT
-        pet.AddImages([imageName1,imageName2]);
+        pet.AddImages([imageName1, imageName2]);
         // ASSERT
         Assert.Equal(2, pet.Images.Count);
     }
@@ -147,9 +146,9 @@ public class PetTests
         var imageName1 = Guid.NewGuid().ToString();
         var imageName2 = Guid.NewGuid().ToString();
 
-        pet.AddImages([imageName1,imageName2]);
+        pet.AddImages([imageName1, imageName2]);
         //ACT
-        var deleteImages = pet.DeleteImages([imageName1,imageName2]);
+        var deleteImages = pet.DeleteImages([imageName1, imageName2]);
         //ASSERT
         Assert.Empty(pet.Images);
     }
@@ -166,7 +165,7 @@ public class PetTests
         var imageName2 = Guid.NewGuid().ToString();
         var imageName3 = Guid.NewGuid().ToString();
 
-        pet.AddImages([imageName1,imageName2,imageName3]);
+        pet.AddImages([imageName1, imageName2, imageName3]);
         //ACT
         var deleteImages = pet.DeleteImages([imageName1]);
         //ASSERT

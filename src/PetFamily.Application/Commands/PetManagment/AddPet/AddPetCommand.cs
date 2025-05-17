@@ -23,4 +23,4 @@ public record AddPetCommand(
    string Region,
    string Street,
    string HomeNumber,
-   IEnumerable<RequisitesDto> Requisites): ICommand;
+   IEnumerable<RequisitesDto> Requisites) : ICommand;

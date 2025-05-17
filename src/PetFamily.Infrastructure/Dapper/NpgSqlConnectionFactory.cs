@@ -1,6 +1,4 @@
-﻿
-using Microsoft.Extensions.Configuration;
-using Npgsql;
+﻿using Npgsql;
 using PetFamily.Application.Abstractions;
 using System.Data;
 using System.Data.Common;

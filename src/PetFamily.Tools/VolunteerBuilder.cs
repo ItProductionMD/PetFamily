@@ -1,13 +1,11 @@
-﻿using System;
-using System.Text;
+﻿using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.PetManagment.Enums;
 using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.PetManagment.Enums;
 using PetFamily.Tools.Extensions;
-using Amazon.Runtime;
+using System.Text;
 
 namespace PetFamily.Tools;
 
@@ -137,7 +135,7 @@ public class VolunteerBuilder
         return pet;
     }
 
-    public static string GetRandomName(int minLength,int maxLength)
+    public static string GetRandomName(int minLength, int maxLength)
     {
         var random = new Random();
         var randomLength = random.Next(minLength, maxLength);
@@ -150,7 +148,7 @@ public class VolunteerBuilder
             else
                 result[i] = char.ToLowerInvariant(result[i]);
         }
-        
+
         return new string(result);
     }
 }

@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Infrastructure.Contexts;
-using System.Reflection.Emit;
-using System.Text.Json;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Infrastructure.WriteDbConfigurations.Converters;
 
@@ -53,19 +50,19 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 .HasColumnName("phone_number");
 
             //pn.HasIndex(p => new { p.Number, p.RegionCode })
-             // .IsUnique();
+            // .IsUnique();
         });
 
-       /* builder.ComplexProperty(v => v.Phone, pn =>
-        {
-            pn.Property(p => p.RegionCode)
-               .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
-               .HasColumnName("phone_region_code");
-
-            pn.Property(p => p.Number)
+        /* builder.ComplexProperty(v => v.Phone, pn =>
+         {
+             pn.Property(p => p.RegionCode)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
-                .HasColumnName("phone_number");
-        });*/
+                .HasColumnName("phone_region_code");
+
+             pn.Property(p => p.Number)
+                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
+                 .HasColumnName("phone_number");
+         });*/
 
         builder.Property(v => v.Requisites)
             .HasConversion(new ReadOnlyListConverter<RequisitesInfo>())
@@ -89,7 +86,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         // Relationships
         builder.HasMany(v => v.Pets)
             .WithOne()
-            .HasForeignKey("volunteer_id") 
+            .HasForeignKey("volunteer_id")
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.ApplyUniqueConstraints();

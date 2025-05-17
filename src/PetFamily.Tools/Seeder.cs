@@ -1,10 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.Infrastructure.Contexts;
 using static PetFamily.Tools.ToolsExtensions;
-using PetFamily.Domain.PetTypeManagment.Root;
 
 namespace PetFamily.Tools;
 
@@ -35,7 +34,7 @@ public static class Seeder
             {
                 Console.WriteLine("###Species already exists!###");
                 speciesList = await _dbContext.AnimalTypes
-                    .Include(s=>s.Breeds)               
+                    .Include(s => s.Breeds)
                     .ToListAsync();
             }
             Console.WriteLine("###Create Volunteers data");

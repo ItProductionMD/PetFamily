@@ -40,7 +40,7 @@ public static class StringBuilderExtensions
                 parameters.Add("VolunteerId", filter.VolunteerId.Value);
         }
 
-        if (filter.HelpStatuses !=null && filter.HelpStatuses.Any())
+        if (filter.HelpStatuses != null && filter.HelpStatuses.Any())
         {
             List<string> statusStrings = filter.HelpStatuses
                 .Select(s => s.ToString())
@@ -74,8 +74,8 @@ public static class StringBuilderExtensions
             parameters.Add("City", $"%{filter.City}%");
         }
 
-        if(filter.SpeciesIds != null && filter.SpeciesIds.Any()
-            ||filter.BreedIds!=null && filter.BreedIds.Any())
+        if (filter.SpeciesIds != null && filter.SpeciesIds.Any()
+            || filter.BreedIds != null && filter.BreedIds.Any())
         {
             sqlBuilder.AppendLine(" AND (");
             string or = string.Empty;

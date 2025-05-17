@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.Results;
-using System.Numerics;
 
 namespace PetFamily.Application.Queries.PetType.GetListOfSpecies;
 

@@ -1,11 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace PetFamily.Infrastructure.WriteDbConfigurations;
 
@@ -18,5 +12,5 @@ public static class Converters
             v => JsonSerializer.Deserialize<IReadOnlyList<T>>(v, JsonSerializerOptions.Default) ?? new List<T>())
         { }
     }
-    
+
 }

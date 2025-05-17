@@ -1,7 +1,4 @@
-﻿using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
-using Amazon.Runtime;
+﻿using Amazon.S3;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Infrastructure.Services.MinioService;
@@ -17,7 +14,7 @@ public static class AWSConfiguration
 
         var config = new AmazonS3Config
         {
-            ServiceURL = "http://"+minioOptions.Endpoint,
+            ServiceURL = "http://" + minioOptions.Endpoint,
             ForcePathStyle = true
         };
 

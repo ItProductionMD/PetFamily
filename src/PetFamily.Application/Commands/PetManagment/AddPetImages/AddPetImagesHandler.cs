@@ -16,7 +16,7 @@ public class AddPetImagesHandler(
     ILogger<AddPetImagesHandler> logger,
     IOptions<FileFolders> filePathOptions,
     IOptions<FileValidatorOptions> fileValidatorOptions,
-    FilesProcessingQueue filesProcessingQueue) 
+    FilesProcessingQueue filesProcessingQueue)
     : ICommandHandler<List<FileUploadResponse>, AddPetImagesCommand>
 {
     private readonly IFileRepository _fileRepository = fileRepository;

@@ -1,7 +1,7 @@
-﻿using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
-using Microsoft.EntityFrameworkCore;
-using PetFamily.IntegrationTests.TestData;
+﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
 using PetFamily.IntegrationTests.Seeds;
+using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.PetTypeFeatures;
 

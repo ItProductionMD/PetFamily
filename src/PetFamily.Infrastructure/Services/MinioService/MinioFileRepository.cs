@@ -1,29 +1,17 @@
-﻿using Amazon.Runtime.Internal;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Minio;
-using Minio.ApiEndpoints;
-using Minio.DataModel;
 using Minio.DataModel.Args;
 using Minio.DataModel.ILM;
-using Minio.DataModel.Notification;
 using Minio.Exceptions;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
 using PetFamily.Application.IRepositories;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Results;
 using Polly;
-using Polly.Retry;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reactive.Linq;
-using System.Security.AccessControl;
-using System.Threading;
-using System.Xml.Linq;
 using LifecycleConfiguration = Minio.DataModel.ILM.LifecycleConfiguration;
 using LifecycleRule = Minio.DataModel.ILM.LifecycleRule;
 
@@ -372,7 +360,7 @@ public class MinioFileRepository(
         var deleteResult = await DeleteFileListAsync(filesToDelete, cancelToken);
         if (deleteResult.IsFailure)
         {
-            errorMessage = errorMessage+", "+restoreResult.Error.Message;
+            errorMessage = errorMessage + ", " + restoreResult.Error.Message;
             _logger.LogCritical("Fail delete some files!Error:{Message}",
              deleteResult.Error.Message);
         }

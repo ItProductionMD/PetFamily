@@ -31,7 +31,7 @@ public class PetController : ControllerBase
         [FromQuery] bool hasDataForFilter = false,
         CancellationToken cancellationToken = default)
     {
-        var getPetsQuery = new GetPetsQuery(pageNumber, pageSize, filter);      
+        var getPetsQuery = new GetPetsQuery(pageNumber, pageSize, filter);
         var getPetsFilterQuery = new GetPetsFilterQuery(hasDataForFilter);
 
         var petsTask = handler.Handle(getPetsQuery, cancellationToken);

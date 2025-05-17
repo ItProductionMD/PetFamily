@@ -22,24 +22,24 @@ public class GetPetsQueryTest(
         var species = SpeciesTestBuilderNew.Build();
         await Seeder.SeedRange(species, _dbContext);
 
-        var volunteers = VolunteerTestBuilder.Build(volunteersCount,petsInVolunteersCount, species);
+        var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
         await Seeder.SeedRange(volunteers, _dbContext);
 
-        var command = new GetPetsQuery(pageNumber,pageSize);
+        var command = new GetPetsQuery(pageNumber, pageSize);
         //ACT
-        var result = await _sut.Handle(command,CancellationToken.None);
+        var result = await _sut.Handle(command, CancellationToken.None);
         //ASSERT
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Data);
-        Assert.Equal(totalPetsCount, result.Data.TotalCount);       
+        Assert.Equal(totalPetsCount, result.Data.TotalCount);
     }
 
     [Fact]
     public async Task Should_GetPets_Successfully_WithFilter_BySpeciesId()
     {
         //ARRANGE
-        var pageNumber = 1;     
+        var pageNumber = 1;
         var volunteersCount = 10;
         var petsInVolunteersCount = 15;
         var totalPetsCount = volunteersCount * petsInVolunteersCount;
@@ -55,7 +55,7 @@ public class GetPetsQueryTest(
         {
             SpeciesIds = [species[0].Id]
         };
-        var command = new GetPetsQuery(pageNumber, pageSize,petsFilter);
+        var command = new GetPetsQuery(pageNumber, pageSize, petsFilter);
         //ACT
         var result = await _sut.Handle(command, CancellationToken.None);
         //ASSERT
@@ -134,7 +134,7 @@ public class GetPetsQueryTest(
         var petsFilter = new PetsFilter()
         {
             MinAgeInMonth = minAgeInMonths,
-            MaxAgeInMonth = maxAgeInMonths 
+            MaxAgeInMonth = maxAgeInMonths
         };
 
         var minDateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddMonths(-maxAgeInMonths));
@@ -156,8 +156,8 @@ public class GetPetsQueryTest(
         Assert.Equal(expectedSpeciesCount, result.Data.TotalCount);
 
         Assert.All(
-            result.Data.Pets, 
-            p => Assert.True(p.AgeInMonths >= minAgeInMonths  && p.AgeInMonths <= maxAgeInMonths)
+            result.Data.Pets,
+            p => Assert.True(p.AgeInMonths >= minAgeInMonths && p.AgeInMonths <= maxAgeInMonths)
             );
     }
 
@@ -210,7 +210,7 @@ public class GetPetsQueryTest(
         var petsInVolunteersCount = 15;
         var totalPetsCount = volunteersCount * petsInVolunteersCount;
         var pageSize = totalPetsCount;
-        var status  = HelpStatus.Helped;
+        var status = HelpStatus.Helped;
 
         var species = SpeciesTestBuilderNew.Build();
         await Seeder.SeedRange(species, _dbContext);

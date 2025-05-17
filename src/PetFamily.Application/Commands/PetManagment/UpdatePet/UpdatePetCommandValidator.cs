@@ -2,16 +2,9 @@
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
 using PetFamily.Domain.Shared.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+using static PetFamily.Domain.Shared.Validations.ValidationExtensions;
 using static PetFamily.Domain.Shared.Validations.ValidationPatterns;
-using static PetFamily.Application.Validations.ValidationExtensions;
-using PetFamily.Application.SharedValidations;
 
 namespace PetFamily.Application.Commands.PetManagment.UpdatePet;
 
@@ -21,7 +14,7 @@ public static class UpdatePetCommandValidator
     {
         return UnitResult.ValidateCollection(
 
-            ()=> ValidateIfGuidIsNotEpmty(command.PetId,"Pet id"),
+            () => ValidateIfGuidIsNotEpmty(command.PetId, "Pet id"),
 
             () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "Volunteer id"),
 

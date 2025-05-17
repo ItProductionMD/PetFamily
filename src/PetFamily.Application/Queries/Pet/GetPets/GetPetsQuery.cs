@@ -5,4 +5,4 @@ namespace PetFamily.Application.Queries.Pet.GetPets;
 public record GetPetsQuery(
     int PageNumber,
     int PageSize,
-    PetsFilter? PetsFilter = null):IQuery;
+    PetsFilter? PetsFilter = null) : IQuery;

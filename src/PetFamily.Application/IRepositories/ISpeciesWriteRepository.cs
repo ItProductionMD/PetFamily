@@ -1,7 +1,6 @@
-﻿using PetSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
+﻿using PetFamily.Domain.PetTypeManagment.Entities;
 using PetFamily.Domain.Results;
-using System.Net;
-using PetFamily.Domain.PetTypeManagment.Entities;
+using PetSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
 
 namespace PetFamily.Application.IRepositories;
 

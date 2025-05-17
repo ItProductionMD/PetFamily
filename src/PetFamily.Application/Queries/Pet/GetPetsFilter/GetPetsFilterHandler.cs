@@ -7,7 +7,7 @@ namespace PetFamily.Application.Queries.Pet.GetPetsFilter;
 
 public class GetPetsFilterHandler(
     ISpeciesReadRepository speciesReadRepository)
-    : IQueryHandler<GetPetsFilterDto,GetPetsFilterQuery>
+    : IQueryHandler<GetPetsFilterDto, GetPetsFilterQuery>
 {
     private readonly ISpeciesReadRepository _speciesReadRepository = speciesReadRepository;
 

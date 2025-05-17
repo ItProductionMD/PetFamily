@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,10 +7,7 @@ using PetFamily.Application.IRepositories;
 using PetFamily.Application.Validations;
 using PetFamily.Domain.DomainError;
 using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.ValueObjects;
-using Xunit;
 
 namespace PetFamily.Application.Tests;
 

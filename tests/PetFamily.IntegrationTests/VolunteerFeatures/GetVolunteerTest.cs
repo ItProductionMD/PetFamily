@@ -6,7 +6,7 @@ using PetFamily.IntegrationTests.TestData;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
-public class GetVolunteerTest(TestWebApplicationFactory factory) 
+public class GetVolunteerTest(TestWebApplicationFactory factory)
     : QueryHandlerTest<VolunteerDto, GetVolunteerQuery>(factory)
 {
     [Fact]

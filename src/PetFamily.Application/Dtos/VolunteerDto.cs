@@ -31,6 +31,6 @@ public class VolunteerDto
         Email = email;
         SocialNetworkDtos = socialNetworkDtos;
         RequisitesDtos = requisitesDtos;
-        PetDtos = petDtos??[];
+        PetDtos = petDtos ?? [];
     }
 }

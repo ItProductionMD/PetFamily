@@ -1,12 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.Shared.ValueObjects;
-using Polly;
-using System.Net.NetworkInformation;
-using System.Text.Json;
 using static PetFamily.Domain.Shared.Validations.ValidationConstants;
 using static PetFamily.Infrastructure.WriteDbConfigurations.Converters;
 
@@ -36,11 +31,11 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.Property(p => p.DateOfBirth)
             .HasConversion(
                 v => v.HasValue  // Convert DateOnly to DateTime for Db
-                    ? v.Value.ToDateTime(TimeOnly.MinValue) 
-                    : (DateTime?)null,          
+                    ? v.Value.ToDateTime(TimeOnly.MinValue)
+                    : (DateTime?)null,
                 v => v.HasValue  // Convert DateTime to DateOnly from Db
-                    ? DateOnly.FromDateTime(v.Value) 
-                    : (DateOnly?)null         
+                    ? DateOnly.FromDateTime(v.Value)
+                    : (DateOnly?)null
             )
             .HasColumnType("date") // Map to the PostgreSQL DATE type
             .IsRequired(false);    // Adjust nullability as needed
@@ -81,7 +76,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
 
             address.Property(a => a.Number)
-                .HasMaxLength (MAX_LENGTH_SHORT_TEXT);
+                .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
         });
 
         builder.ComplexProperty(p => p.SerialNumber, v =>

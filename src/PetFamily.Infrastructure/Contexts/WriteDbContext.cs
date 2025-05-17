@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using PetFamily.Domain.PetManagment.Root;
 using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Domain.Shared;
-using PetFamily.Infrastructure.Constants;
-using System.Reflection;
 
 
 namespace PetFamily.Infrastructure.Contexts;
@@ -24,7 +20,7 @@ public class WriteDbContext : DbContext
     {
 
         optionsBuilder
-            .UseNpgsql(_connectionString) 
+            .UseNpgsql(_connectionString)
             .UseSnakeCaseNamingConvention()
             .UseLoggerFactory(MyLoggerFactory.LoggerFactoryInstance)
             .EnableSensitiveDataLogging();
@@ -34,7 +30,7 @@ public class WriteDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(WriteDbContext).Assembly);
 
-        base.OnModelCreating(modelBuilder); 
+        base.OnModelCreating(modelBuilder);
     }
 
 }

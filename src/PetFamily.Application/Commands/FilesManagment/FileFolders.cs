@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-
-namespace PetFamily.Application.Commands.FilesManagment;
+﻿namespace PetFamily.Application.Commands.FilesManagment;
 
 public class FileFolders
 {

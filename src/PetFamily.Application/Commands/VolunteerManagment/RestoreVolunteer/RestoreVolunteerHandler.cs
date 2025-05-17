@@ -13,7 +13,7 @@ public class RestoreVolunteerHandler(
 ILogger<RestoreVolunteerHandler> logger,
 IVolunteerWriteRepository volunteerRepository,
 IFileRepository fileRepository,
-IOptions<FileFolders> fileFoldersOptions):ICommandHandler<RestoreVolunteerCommand>
+IOptions<FileFolders> fileFoldersOptions) : ICommandHandler<RestoreVolunteerCommand>
 {
     private readonly FileFolders _fileFolders = fileFoldersOptions.Value;
     private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
@@ -38,13 +38,13 @@ IOptions<FileFolders> fileFoldersOptions):ICommandHandler<RestoreVolunteerComman
                 .Select(x => new AppFileDto(x.Name, _fileFolders.Images)));
 
         var restoreResult = await _volunteerRepository.Save(volunteer, cancelToken);
-        if(restoreResult.IsFailure)
+        if (restoreResult.IsFailure)
             return restoreResult;
 
         if (imagesToRestore.Count > 0)
         {
             var result = await _fileRepository.RestoreFileListAsync(imagesToRestore);
-            if(result.Data!=null && result.Data.Count < imagesToRestore.Count)
+            if (result.Data != null && result.Data.Count < imagesToRestore.Count)
             {
                 var unrestoredFiles = imagesToRestore
                     .Select(f => f.Name)
@@ -71,7 +71,7 @@ IOptions<FileFolders> fileFoldersOptions):ICommandHandler<RestoreVolunteerComman
             }
         }
 
-        _logger.LogInformation("Restore volunteer with Id:{Id} successful",command.VolunteerId);
+        _logger.LogInformation("Restore volunteer with Id:{Id} successful", command.VolunteerId);
 
         return UnitResult.Ok();
     }

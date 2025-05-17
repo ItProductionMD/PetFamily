@@ -9,8 +9,8 @@ public static class MyLoggerFactory
         builder
             .AddConsole()
             .AddFilter((category, level) =>
-                category == DbLoggerCategory.Database.Command.Name 
-                && level == LogLevel.Information); 
+                category == DbLoggerCategory.Database.Command.Name
+                && level == LogLevel.Information);
     });
 
 }

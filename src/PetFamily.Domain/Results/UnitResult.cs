@@ -1,6 +1,5 @@
 ﻿using PetFamily.Domain.DomainError;
 using PetFamily.Domain.Shared.Validations;
-using System.Runtime.CompilerServices;
 
 namespace PetFamily.Domain.Results;
 public class UnitResult : Result
@@ -9,7 +8,7 @@ public class UnitResult : Result
 
     public static UnitResult ValidateCollection(params Func<UnitResult>[] validators)
     {
-        
+
         var validationErrors = new List<ValidationError>();
         for (int i = 0; i < validators.Length; i++)
         {
@@ -18,12 +17,12 @@ public class UnitResult : Result
             if (result.IsFailure && result.Error != null && result.Error.ValidationErrors.Any())
                 validationErrors.AddRange(result.Error.ValidationErrors);
         }
-        return validationErrors.Count > 0 
-            ? Fail(Error.ValidationError(validationErrors)) 
+        return validationErrors.Count > 0
+            ? Fail(Error.ValidationError(validationErrors))
             : Ok();
     }
 
-    public  Result<T> WithData<T>(T data)
+    public Result<T> WithData<T>(T data)
     {
         Result<T> result = new Result<T>() { Data = data };
         if (IsFailure)

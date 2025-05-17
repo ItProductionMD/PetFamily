@@ -1,9 +1,5 @@
 ﻿using PetFamily.Application.Abstractions;
 using PetFamily.Application.Commands.FilesManagment.Dtos;
-using PetFamily.Domain.Shared.ValueObjects;
-using System.Drawing;
-using System.IO;
-using System.Xml.Linq;
 
 namespace PetFamily.Application.Commands.FilesManagment.Commands;
 

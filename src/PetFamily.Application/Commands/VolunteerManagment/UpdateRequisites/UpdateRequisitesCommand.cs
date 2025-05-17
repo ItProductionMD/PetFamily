@@ -5,5 +5,5 @@ namespace PetFamily.Application.Commands.VolunteerManagment.UpdateRequisites;
 
 public record class UpdateRequisitesCommand(
     Guid VolunteerId,
-    IEnumerable<RequisitesDto> RequisitesDtos): ICommand;
+    IEnumerable<RequisitesDto> RequisitesDtos) : ICommand;
 
