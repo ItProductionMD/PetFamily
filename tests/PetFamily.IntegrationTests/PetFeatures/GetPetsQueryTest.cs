@@ -1,7 +1,8 @@
-﻿using PetFamily.Application.Queries.Pet.GetPets;
-using PetFamily.Domain.PetManagment.Enums;
-using PetFamily.IntegrationTests.Seeds;
+﻿using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Queries.GetPets;
+using Volunteers.Application.Queries.GetPets.ForFilter;
+using Volunteers.Domain.Enums;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
@@ -20,10 +21,10 @@ public class GetPetsQueryTest(
         var totalPetsCount = volunteersCount * petsInVolunteersCount;
 
         var species = SpeciesTestBuilderNew.Build();
-        await Seeder.SeedRange(species, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_speciesDbContext, species);
 
         var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
-        await Seeder.SeedRange(volunteers, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
 
         var command = new GetPetsQuery(pageNumber, pageSize);
         //ACT
@@ -46,10 +47,10 @@ public class GetPetsQueryTest(
         var pageSize = totalPetsCount;
 
         var species = SpeciesTestBuilderNew.Build();
-        await Seeder.SeedRange(species, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_speciesDbContext, species);
 
         var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
-        await Seeder.SeedRange(volunteers, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
 
         var petsFilter = new PetsFilter()
         {
@@ -83,10 +84,10 @@ public class GetPetsQueryTest(
         var pageSize = totalPetsCount;
 
         var species = SpeciesTestBuilderNew.Build();
-        await Seeder.SeedRange(species, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_speciesDbContext, species);
 
         var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
-        await Seeder.SeedRange(volunteers, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
 
         var filterBreedId = species[0].Breeds[0].Id;
 
@@ -124,10 +125,10 @@ public class GetPetsQueryTest(
         var maxAgeInMonths = 2;
 
         var species = SpeciesTestBuilderNew.Build();
-        await Seeder.SeedRange(species, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_speciesDbContext, species);
 
         var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
-        await Seeder.SeedRange(volunteers, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
 
         var filterBreedId = species[0].Breeds[0].Id;
 
@@ -173,10 +174,10 @@ public class GetPetsQueryTest(
         var color = "red";
 
         var species = SpeciesTestBuilderNew.Build();
-        await Seeder.SeedRange(species, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_speciesDbContext, species);
 
         var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
-        await Seeder.SeedRange(volunteers, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
 
         var petsFilter = new PetsFilter()
         {
@@ -213,10 +214,10 @@ public class GetPetsQueryTest(
         var status = HelpStatus.Helped;
 
         var species = SpeciesTestBuilderNew.Build();
-        await Seeder.SeedRange(species, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_speciesDbContext, species);
 
         var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
-        await Seeder.SeedRange(volunteers, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
 
         var petsFilter = new PetsFilter()
         {

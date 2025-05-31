@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
-using PetFamily.Domain.PetManagment.Root;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
+using Volunteers.Domain;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
@@ -14,7 +14,7 @@ public class UpdateVolunteerTest(TestWebApplicationFactory factory)
     {
         //ARRANGE
         var seedVolunteer = new VolunteerTestBuilder().Volunteer;
-        await Seeder.Seed(seedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var command = new UpdateVolunteerCommand(
             seedVolunteer.Id,
@@ -30,7 +30,7 @@ public class UpdateVolunteerTest(TestWebApplicationFactory factory)
         //ARRANGE
         Assert.True(updateResult.IsSuccess);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .FirstOrDefaultAsync(v => v.Id == seedVolunteer.Id);
 
         AssertCustom.AreEqualData(command, updatedVolunteer);

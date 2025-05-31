@@ -1,6 +1,6 @@
-﻿using PetFamily.Domain.DomainError;
-using PetFamily.Domain.Results;
-using PetFamily.Domain.Shared.Validations;
+﻿using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Results;
+using PetFamily.SharedKernel.Validations;
 
 namespace TestPetFamilyDomain;
 

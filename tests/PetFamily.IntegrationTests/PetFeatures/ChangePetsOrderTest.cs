@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.PetManagment.ChangePetsOrder;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetSpecies.Domain;
+using Volunteers.Application.Commands.PetManagement.ChangePetsOrder;
+using Volunteers.Domain;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
@@ -34,7 +34,7 @@ public class ChangePetsOrderTest(TestWebApplicationFactory factory)
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .SingleOrDefaultAsync();
@@ -53,10 +53,10 @@ public class ChangePetsOrderTest(TestWebApplicationFactory factory)
 
         SeedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["breedOne", "breedTwo"]).Species;
-        await Seeder.Seed(SeedSpecies, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, SeedSpecies);
 
         SeedVolunteer = new VolunteerTestBuilder()
             .WithPets(10, SeedSpecies).Volunteer;
-        await Seeder.Seed(SeedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, SeedVolunteer);
     }
 }

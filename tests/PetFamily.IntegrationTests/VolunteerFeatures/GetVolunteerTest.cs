@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Dtos;
-using PetFamily.Application.Queries.Volunteer.GetVolunteer;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Queries.GetVolunteer;
+using Volunteers.Application.ResponseDtos;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
@@ -13,9 +13,9 @@ public class GetVolunteerTest(TestWebApplicationFactory factory)
     public async Task Should_get_volunteer_correctly()
     {
         //ARRANGE
-        var seedVolunteer = new VolunteerTestBuilder().Volunteer;
+        var seedVolunteer = new VolunteerTestBuilder(volunteersCount:1).Volunteer;
 
-        await Seeder.Seed(seedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var query = new GetVolunteerQuery(seedVolunteer.Id);
         //ACT
@@ -23,7 +23,7 @@ public class GetVolunteerTest(TestWebApplicationFactory factory)
         //ASSERT
         Assert.True(result.IsSuccess);
 
-        var addedVolunteer = await _dbContext.Volunteers
+        var addedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == seedVolunteer.Id);
 

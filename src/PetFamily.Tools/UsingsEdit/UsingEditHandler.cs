@@ -108,9 +108,9 @@ public class UsingEditHandler
                 ? $"static {usingDirective.Name}"
                 : usingDirective.Name?.ToString();
 
-            
 
-            if (ClassUsings.TryGetValue(currentNamespace, out var replacement)==false)
+
+            if (ClassUsings.TryGetValue(currentNamespace, out var replacement) == false)
                 continue;
 
             switch (Operation)

@@ -1,8 +1,7 @@
-﻿using PetFamily.Application.Commands.PetManagment.AddPet;
-using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
-using PetFamily.Application.Commands.VolunteerManagment.UpdateVolunteer;
-using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.Root;
+﻿using Volunteers.Application.Commands.PetManagement.AddPet;
+using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
+using Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
+using Volunteers.Domain;
 
 namespace PetFamily.IntegrationTests;
 

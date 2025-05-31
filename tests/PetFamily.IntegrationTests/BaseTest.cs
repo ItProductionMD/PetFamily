@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Infrastructure.Contexts;
+using PetFamily.Application.Abstractions.CQRS;
+using PetSpecies.Infrastructure.Contexts;
+using Volunteers.Infrastructure.Contexts;
 
 namespace PetFamily.IntegrationTests;
 
@@ -10,12 +11,16 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
     protected readonly TestWebApplicationFactory _factory = factory;
     protected IServiceScope? _scope { get; set; }
     protected IServiceProvider _services => _scope!.ServiceProvider;
-    protected WriteDbContext _dbContext = null!;
+    protected VolunteerWriteDbContext _volunteerDbContext = null!;
+    protected SpeciesWriteDbContext _speciesDbContext = null!;
 
     public virtual Task InitializeAsync()
     {
         _scope = _factory.Services.CreateScope();
-        _dbContext = _scope.ServiceProvider.GetService<WriteDbContext>()!;
+
+        _volunteerDbContext = _scope.ServiceProvider.GetService<VolunteerWriteDbContext>()!;
+        _speciesDbContext = _scope.ServiceProvider.GetService<SpeciesWriteDbContext>()!;
+
         return Task.CompletedTask;
     }
     public virtual async Task DisposeAsync()

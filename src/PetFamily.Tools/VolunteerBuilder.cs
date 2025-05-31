@@ -1,11 +1,10 @@
-﻿using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.Enums;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Domain.Shared.ValueObjects;
+﻿using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.Tools.Extensions;
+using PetSpecies.Domain;
 using System.Text;
+using Volunteers.Domain;
+using Volunteers.Domain.Enums;
+using Volunteers.Domain.ValueObjects;
 
 namespace PetFamily.Tools;
 
@@ -20,7 +19,7 @@ public class VolunteerBuilder
     public Random Random = new Random();
     private List<Species> speciesList;
 
-    private VolunteerBuilder(List<Domain.PetTypeManagment.Root.Species> speciesList)
+    private VolunteerBuilder(List<Species> speciesList)
     {
         this.speciesList = speciesList;
     }

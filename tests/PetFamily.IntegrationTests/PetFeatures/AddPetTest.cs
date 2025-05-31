@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.PetManagment.AddPet;
-using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Commands.PetManagement.AddPet;
+using Volunteers.Domain;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
@@ -18,10 +18,10 @@ public class AddPetTest(TestWebApplicationFactory factory)
 
         var seedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["testBreed"]).Species;
-        await Seeder.Seed(seedSpecies, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, seedSpecies);
 
         var seedVolunteer = new VolunteerTestBuilder().Volunteer;
-        await Seeder.Seed(seedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var command = new AddPetCommand(
             VolunteerId: seedVolunteer.Id,
@@ -50,7 +50,7 @@ public class AddPetTest(TestWebApplicationFactory factory)
         //ASSERT
         Assert.True(result.IsSuccess);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .SingleOrDefaultAsync();

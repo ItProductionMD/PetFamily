@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
@@ -29,7 +29,7 @@ public class CreateVolunteerTest(TestWebApplicationFactory factory)
         //ASSERT
         Assert.True(handleResult.IsSuccess);
 
-        var addedVolunteer = await _dbContext.Volunteers
+        var addedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
@@ -48,7 +48,7 @@ public class CreateVolunteerTest(TestWebApplicationFactory factory)
         //ARRANGE
         var seedVolunteer = new VolunteerTestBuilder().Volunteer;
 
-        await Seeder.Seed(seedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var command = new CreateVolunteerCommand(
             "Iurii",

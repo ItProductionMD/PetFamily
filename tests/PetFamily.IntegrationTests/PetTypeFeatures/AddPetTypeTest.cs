@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
-using PetFamily.Domain.PetTypeManagment.Root;
+using PetSpecies.Application.Commands.AddSpecies;
+using PetSpecies.Domain;
 
 namespace PetFamily.IntegrationTests.PetTypeFeatures;
 
@@ -18,7 +18,7 @@ public class AddPetTypeTest(TestWebApplicationFactory factory)
         //ACT
         var result = await _sut.Handle(command, CancellationToken.None);
         //ASSERT
-        var addedPetType = await _dbContext.AnimalTypes
+        var addedPetType = await _speciesDbContext.AnimalTypes
             .AsNoTracking()
             .Include(s => s.Breeds)
             .FirstOrDefaultAsync();

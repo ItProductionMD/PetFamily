@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Infrastructure.Contexts;
+using PetSpecies.Domain;
+using PetSpecies.Infrastructure.Contexts;
+using Volunteers.Infrastructure.Contexts;
 using static PetFamily.Tools.ToolsExtensions;
 
 namespace PetFamily.Tools;
@@ -18,32 +19,42 @@ public static class Seeder
     /// <exception cref="Exception"></exception>
     public static async Task RunSeed(int volunteersCount, int volunteerPetsCount)
     {
-        var (scope, _dbContext) = CreateDbContext();
-        using (scope)
+        Console.WriteLine("###Preparing Species data...###");
+
+        var speciesList = new List<Species>();
+        speciesList = SpeciesBuilder.Build();
+
+        var (speciesScope, speciesDbContext) = CreateSpeciesDbContext();
+
+        using (speciesScope)
         {
-            var speciesList = new List<Species>();
-            if (await _dbContext.AnimalTypes.AnyAsync() == false)
+            if (await speciesDbContext.AnimalTypes.AnyAsync() == false)
             {
-                Console.WriteLine("###Preparing Species data...###");
-                speciesList = SpeciesBuilder.Build();
-                await _dbContext.AnimalTypes.AddRangeAsync(speciesList);
-                await _dbContext.SaveChangesAsync();
+                await speciesDbContext.AnimalTypes.AddRangeAsync(speciesList);
+                await speciesDbContext.SaveChangesAsync();
                 Console.WriteLine("###seed species to db...###");
             }
             else
             {
                 Console.WriteLine("###Species already exists!###");
-                speciesList = await _dbContext.AnimalTypes
+                speciesList = await speciesDbContext.AnimalTypes
                     .Include(s => s.Breeds)
                     .ToListAsync();
             }
-            Console.WriteLine("###Create Volunteers data");
-            var volunteers = VolunteerBuilder.Build(volunteersCount, volunteerPetsCount, speciesList);
+        }
 
-            Console.WriteLine($"###Created volunteers({volunteers.Count}) and pets({volunteers[0].Pets.Count})###");
+        Console.WriteLine("###Create Volunteers data");
 
-            await _dbContext.Volunteers.AddRangeAsync(volunteers);
-            await _dbContext.SaveChangesAsync();
+        var volunteers = VolunteerBuilder.Build(volunteersCount, volunteerPetsCount, speciesList);
+
+        Console.WriteLine($"###Created volunteers({volunteers.Count}) and pets({volunteers[0].Pets.Count})###");
+
+        var (volunteerScope, _volunteerDbContext) = CreateVolunteerDbContext();
+
+        using (volunteerScope)
+        {
+            await _volunteerDbContext.Volunteers.AddRangeAsync(volunteers);
+            await _volunteerDbContext.SaveChangesAsync();
 
             Console.WriteLine("###seed all data to db is ok!###");
         }
@@ -56,19 +67,29 @@ public static class Seeder
     /// <returns></returns>
     public static async Task RunClear(string tableName)
     {
-        var (scope, dbContext) = CreateDbContext();
-        using (scope)
+        var (speciesScope, speciesDbContext) = CreateSpeciesDbContext();
+        var (volunteerScope, volunteerDbContext) = CreateVolunteerDbContext();
+
+        using (volunteerScope)
+        using (speciesScope)
         {
             switch (tableName.ToLower())
             {
                 case "volunteers":
-                    await dbContext.Volunteers.ExecuteDeleteAsync();
+                    await volunteerDbContext.Volunteers.ExecuteDeleteAsync();
                     Console.WriteLine($"###Table {tableName} cleared successfully!###");
                     break;
 
                 case "species":
-                    await dbContext.AnimalTypes.ExecuteDeleteAsync();
+                    await speciesDbContext.AnimalTypes.ExecuteDeleteAsync();
                     Console.WriteLine($"###Table {tableName} cleared successfully!###");
+                    break;
+
+                case "all":
+                    await volunteerDbContext.Volunteers.ExecuteDeleteAsync();
+                    await speciesDbContext.AnimalTypes.ExecuteDeleteAsync();
+                    Console.WriteLine($"###All Tables cleared successfully!###");
+
                     break;
 
                 default:
@@ -76,9 +97,37 @@ public static class Seeder
                     break;
             }
         }
+
+
     }
 
-    private static (IServiceScope scope, WriteDbContext context) CreateDbContext()
+    private static (IServiceScope scope, SpeciesWriteDbContext context) CreateSpeciesDbContext()
+    {
+        Console.WriteLine("###GetConnectionString...###");
+
+        var connectionString = GetConnectionString();
+        Console.WriteLine("###Creating host...###");
+
+        var host = Host.CreateDefaultBuilder()
+            .ConfigureServices((context, services) =>
+            {
+                services.AddScoped<SpeciesWriteDbContext>(_ =>
+                new SpeciesWriteDbContext(connectionString));
+            })
+       .Build();
+
+        var scope = host.Services.CreateScope();
+
+        Console.WriteLine("###Getting Species dbContext...###");
+
+        var _dbContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
+        if (_dbContext == null)
+            throw new Exception("###species _dbContext is null!###");
+
+        return (scope, _dbContext);
+    }
+
+    private static (IServiceScope scope, VolunteerWriteDbContext context) CreateVolunteerDbContext()
     {
         var connectionString = GetConnectionString();
         Console.WriteLine("###Creating host...###");
@@ -86,18 +135,18 @@ public static class Seeder
         var host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
-                services.AddScoped<WriteDbContext>(_ =>
-                new WriteDbContext(connectionString));
+                services.AddScoped<VolunteerWriteDbContext>(_ =>
+                new VolunteerWriteDbContext(connectionString));
             })
        .Build();
 
         var scope = host.Services.CreateScope();
 
-        Console.WriteLine("###Getting dbContext...###");
+        Console.WriteLine("###Getting Species dbContext...###");
 
-        var _dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+        var _dbContext = scope.ServiceProvider.GetRequiredService<VolunteerWriteDbContext>();
         if (_dbContext == null)
-            throw new Exception("###_dbContext is null!###");
+            throw new Exception("###species _dbContext is null!###");
 
         return (scope, _dbContext);
     }

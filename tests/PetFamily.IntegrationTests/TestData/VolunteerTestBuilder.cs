@@ -1,8 +1,8 @@
-﻿using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.Enums;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.Shared.ValueObjects;
+﻿using PetFamily.SharedKernel.ValueObjects;
+using PetSpecies.Domain;
+using Volunteers.Domain;
+using Volunteers.Domain.Enums;
+using Volunteers.Domain.ValueObjects;
 using static PetFamily.IntegrationTests.TestData.RandomAddressGenerator;
 using static PetFamily.IntegrationTests.TestData.RandomEnumGenerator;
 
@@ -11,14 +11,14 @@ namespace PetFamily.IntegrationTests.TestData;
 public class VolunteerTestBuilder
 {
     public Volunteer Volunteer => Volunteers.First();
-    private List<Domain.PetTypeManagment.Root.Species> speciesList = [];
+    private List<Species> speciesList = [];
     public List<Volunteer> Volunteers { get; set; } = [];
     public const string VALID_EMAIL = "email@gmail.com";
     public const string VALID_PHONE_CODE = "+373";
     public string[] Colors = ["black", "red", "gray", "yellow", "brown", "green", "white"];
     public const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    private VolunteerTestBuilder(List<Domain.PetTypeManagment.Root.Species> speciesList)
+    private VolunteerTestBuilder(List<Species> speciesList)
     {
         this.speciesList = speciesList;
     }
@@ -69,7 +69,7 @@ public class VolunteerTestBuilder
     public static List<Volunteer> Build(
         int volunteersCount,
         int volunteerPetsCount,
-        List<Domain.PetTypeManagment.Root.Species> speciesList)
+        List<Species> speciesList)
     {
         var volunteerBuilder = new VolunteerTestBuilder(speciesList);
         for (int i = 0; i < volunteersCount; i++)
@@ -89,7 +89,7 @@ public class VolunteerTestBuilder
     private Pet AddRandomPetToVolunteer(
        int j,
        Volunteer volunteer,
-       List<Domain.PetTypeManagment.Root.Species> speciesList)
+       List<Species> speciesList)
     {
         var randomName = GetRandomName(3, 8);
         var randomBirthday = GetRandomBirthDateForPet();
@@ -124,7 +124,7 @@ public class VolunteerTestBuilder
 
         return pet;
     }
-    public VolunteerTestBuilder WithPets(int petsCount, Domain.PetTypeManagment.Root.Species species)
+    public VolunteerTestBuilder WithPets(int petsCount, Species species)
     {
         foreach (var volunteer in Volunteers)
         {

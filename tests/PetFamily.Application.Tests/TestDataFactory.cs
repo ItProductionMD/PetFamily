@@ -1,6 +1,6 @@
-﻿using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.Shared.ValueObjects;
+﻿using PetFamily.SharedKernel.ValueObjects;
+using Volunteers.Domain;
+using Volunteers.Domain.ValueObjects;
 
 namespace PetFamily.Application.Tests;
 

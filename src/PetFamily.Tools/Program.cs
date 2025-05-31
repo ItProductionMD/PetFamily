@@ -1,4 +1,5 @@
 ﻿using PetFamily.Tools;
+using PetFamily.Tools.DependencyProjectView;
 using PetFamily.Tools.UsingsEdit;
 
 class Program
@@ -14,7 +15,8 @@ class Program
                 "--pets=<petsOnVolunteersCount>," +
                 "\n\tclear --<tableName>," +
                 "\n\tusing --<operation> --usings:<old_using>%<new_using>" +
-                "\n\tusing --<operation> --usings:<static:old_using>|<static:new_using>");
+                "\n\tusing --<operation> --usings:<static:old_using>|<static:new_using>"+
+                "\n\tdiagram ");
 
             return;
         }
@@ -50,10 +52,39 @@ class Program
                 await usingEditHandler.Handle();
                 break;
 
+            case "diagram":
+                var solutionPath = GetPathToSolution();
+                var graphGenerator = new SolutionDependencyGraphGenerator(
+                    solutionPath,
+                    ["Test","Tools"]);
+
+                graphGenerator.GenerateDependencyGraph();
+
+                break;
+
             default:
                 Console.WriteLine($"unknown command: {args[0]}");
                 break;
         }
     }
+
+    public static string GetPathToSolution()
+    {
+        string parent1 = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
+        string parent2 = Directory.GetParent(parent1)!.FullName;
+        string pathSolutoion = Path.Combine(parent2,"PetFamily.sln");
+
+        Console.WriteLine("#######################################################");
+        Console.WriteLine($"\tSolution = {pathSolutoion}");
+        Console.WriteLine("#######################################################");
+
+
+        if (!File.Exists(pathSolutoion))
+            throw new FileNotFoundException($"Assemby fail not found: {pathSolutoion}");
+
+        return pathSolutoion;
+    }
+
+
 }
 

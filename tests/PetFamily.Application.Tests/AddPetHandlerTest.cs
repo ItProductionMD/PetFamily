@@ -1,39 +1,38 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Application.Commands.PetManagment.AddPet;
-using PetFamily.Application.IRepositories;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetTypeManagment.Entities;
-using PetFamily.Domain.Results;
-using DomainSpecies = PetFamily.Domain.PetTypeManagment.Root.Species;
+using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Results;
+using PetFamily.SharedKernel.ValueObjects;
+using PetSpecies.Domain;
+using PetSpecies.Public.IContracts;
+using Volunteers.Application.Commands.PetManagement.AddPet;
+using Volunteers.Application.IRepositories;
+using Volunteers.Domain;
+using DomainSpecies = PetSpecies.Domain.Species;
 
 namespace PetFamily.Application.Tests;
 
 public class AddPetHandlerTests
 {
+    private readonly AddPetHandler _handler;
     private readonly Mock<ILogger<AddPetHandler>> _loggerMock;
     private readonly Mock<IVolunteerWriteRepository> _volunteerRepositoryMock;
-    private readonly Mock<ISpeciesWriteRepository> _speciesRepositoryMock;
-    private readonly AddPetHandler _handler;
-    private readonly CancellationToken _token;
     private readonly Mock<IVolunteerReadRepository> _volunteerReadRepositoryMock;
-    private readonly Mock<ISpeciesReadRepository> _speciesReadRepository;
+    private readonly Mock<ISpeciesExistenceContract> _petTypeCheckerMock;
+    private readonly CancellationToken _token;
 
     public AddPetHandlerTests()
     {
         _loggerMock = new Mock<ILogger<AddPetHandler>>();
         _volunteerRepositoryMock = new Mock<IVolunteerWriteRepository>();
-        _speciesRepositoryMock = new Mock<ISpeciesWriteRepository>();
         _volunteerReadRepositoryMock = new Mock<IVolunteerReadRepository>();
-        _speciesReadRepository = new Mock<ISpeciesReadRepository>();
+        _petTypeCheckerMock = new Mock<ISpeciesExistenceContract>();
+
 
         _handler = new AddPetHandler(
             _loggerMock.Object,
             _volunteerRepositoryMock.Object,
-            _speciesReadRepository.Object,
-            _speciesRepositoryMock.Object);
+            _petTypeCheckerMock.Object);
 
         _token = CancellationToken.None;
     }
@@ -52,7 +51,7 @@ public class AddPetHandlerTests
     [InlineData("healthInfoLength", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 5000, 0, "Trento", "jrfoe", "ehbhb", "21a")]//Health info size is too big
     [InlineData("helpStatusNumber", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 50, 100, "Trento", "jrfoe", "ehbhb", "21a")]//Help status doesnt exist
     [InlineData("cityPattern", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 50, 0, "Trento%!331", "jrfoe", "ehbhb", "21a")]//City doesnt mutch its pattern
-    public async Task Handle_ShouldReturnValidationError_WhenCommand_IsInvalid(
+    public async Task Handle_ShouldReturn_Validation_Error_WhenCommand_IsInvalid(
         string invalidField,
         bool volunteerId,
         string nickName,
@@ -108,7 +107,7 @@ public class AddPetHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnNotFoundError_WhenBreedOrSpecies_DoesNotExist()
+    public async Task Handle_ShouldReturn_NotFound_Error_WhenBreedOrSpecies_DoesNotExist()
     {
         // ARRANGE
         DomainSpecies? nullSpecies = null;
@@ -135,8 +134,8 @@ public class AddPetHandlerTests
             HomeNumber: "11a",
             []);
 
-        _speciesReadRepository
-            .Setup(x => x.CheckIfPetTypeExists(command.SpeciesId, command.BreedId, _token))
+        _petTypeCheckerMock
+            .Setup(x => x.VerifySpeciesAndBreedExist(command.SpeciesId, command.BreedId, _token))
             .ReturnsAsync(UnitResult.Fail(Error.NotFound("Species")));
 
         // ACT
@@ -150,7 +149,7 @@ public class AddPetHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnUnitResultOkWithAddPetResponse()
+    public async Task Handle_ShouldReturn_UnitResult_Ok_With_AddPetResponse()
     {
         // ARRANGE
         DomainSpecies species = DomainSpecies.Create(SpeciesID.NewGuid(), "dog").Data!;
@@ -181,8 +180,8 @@ public class AddPetHandlerTests
             HomeNumber: "11a",
             []);
 
-        _speciesReadRepository
-            .Setup(x => x.CheckIfPetTypeExists(command.SpeciesId, command.BreedId, _token))
+        _petTypeCheckerMock
+            .Setup(x => x.VerifySpeciesAndBreedExist(command.SpeciesId, command.BreedId, _token))
             .ReturnsAsync(UnitResult.Ok());
 
         _volunteerRepositoryMock

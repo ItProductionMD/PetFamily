@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.PetManagment.DeletePet;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetSpecies.Domain;
+using Volunteers.Application.Commands.PetManagement.DeletePet;
+using Volunteers.Domain;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
@@ -25,7 +25,7 @@ public class HardDeletePetTest(TestWebApplicationFactory factory)
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(p => p.Pets)
             .FirstOrDefaultAsync();
@@ -49,7 +49,7 @@ public class HardDeletePetTest(TestWebApplicationFactory factory)
         Assert.NotNull(result);
         Assert.True(result.IsFailure);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(p => p.Pets)
             .FirstOrDefaultAsync();
@@ -64,11 +64,11 @@ public class HardDeletePetTest(TestWebApplicationFactory factory)
 
         _species = new SpeciesTestBuilder()
             .WithBreeds(["testBreed"]).Species;
-        await Seeder.Seed<Species>(_species, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, _species);
 
         _volunteer = new VolunteerTestBuilder()
             .WithPets(2, _species).Volunteer;
-        await Seeder.Seed<Volunteer>(_volunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, _volunteer);
     }
 
 }

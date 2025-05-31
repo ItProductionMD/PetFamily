@@ -1,7 +1,6 @@
-﻿using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.Root;
-using static PetFamily.Domain.Shared.Validations.ValidationConstants;
+﻿using PetFamily.SharedKernel.Errors;
+using Volunteers.Domain;
+using static PetFamily.SharedKernel.Validations.ValidationConstants;
 
 namespace TestPetFamilyDomain;
 

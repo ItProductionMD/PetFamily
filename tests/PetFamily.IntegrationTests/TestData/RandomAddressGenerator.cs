@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.Shared.ValueObjects;
+﻿using PetFamily.SharedKernel.ValueObjects;
 
 namespace PetFamily.IntegrationTests.TestData;
 
