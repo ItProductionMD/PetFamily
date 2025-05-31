@@ -17,7 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PetFamily.Infrastructure\PetFamily.Infrastructure.csproj" />
+    <ProjectReference Include="..\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
+    <ProjectReference Include="..\Shared\PetFamily.SharedInfrastructure\PetFamily.SharedInfrastructure.csproj" />
+    <ProjectReference Include="..\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
+    <ProjectReference Include="..\Modules\PetSpecies\PetSpecies.Application\PetSpecies.Application.csproj" />
+    <ProjectReference Include="..\Modules\PetSpecies\PetSpecies.Infrastructure\PetSpecies.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\PetSpecies\PetSpecies.Public\PetSpecies.Public.csproj" />
+    <ProjectReference Include="..\Modules\Volunteer\Volunteers.Domain\Volunteers.Domain.csproj" />
+    <ProjectReference Include="..\Modules\Volunteer\Volunteers.Infrastructure\Volunteers.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Volunteer\Volunteers.Public\Volunteers.Public.csproj" />
   </ItemGroup>
 
 </Project>

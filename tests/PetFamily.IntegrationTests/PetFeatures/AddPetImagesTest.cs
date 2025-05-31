@@ -1,15 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FileStorage.Public.Dtos;
+using Microsoft.EntityFrameworkCore;
 using Moq;
-using PetFamily.Application.Commands.FilesManagment.Commands;
-using PetFamily.Application.Commands.FilesManagment.Dtos;
-using PetFamily.Application.Commands.PetManagment.AddPetImages;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetTypeManagment.Entities;
-using PetFamily.Domain.PetTypeManagment.Root;
-using PetFamily.Domain.Results;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Results;
+using PetSpecies.Domain;
+using Volunteers.Application.Commands.PetManagement.AddPetImages;
+using Volunteers.Domain;
 
 
 namespace PetFamily.IntegrationTests.PetFeatures;
@@ -34,7 +32,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
         //ACT
         var result = await _sut.Handle(command, CancellationToken.None);
         //ARRANGE
-        var addedVolunteer = await _dbContext.Volunteers
+        var addedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == SeedVolunteer.Id);
@@ -56,7 +54,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
         //ACT
         var result = await _sut.Handle(command, CancellationToken.None);
         //ARRANGE
-        var addedVolunteer = await _dbContext.Volunteers
+        var addedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == SeedVolunteer.Id);
@@ -78,7 +76,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
         //ACT
         var result = await _sut.Handle(command, CancellationToken.None);
         //ARRANGE
-        var addedVolunteer = await _dbContext.Volunteers
+        var addedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == SeedVolunteer.Id);
@@ -96,7 +94,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
 
     private AddPetImagesCommand CreateCommandWithFileNames(List<string> fileNames, Volunteer volunteer)
     {
-        var uploadFileCommands = new List<UploadFileCommand>();
+        var uploadFileCommands = new List<UploadFileDto>();
         foreach (var name in fileNames)
         {
             uploadFileCommands.Add(new(
@@ -127,15 +125,15 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
 
     private void SetupIFileService(List<FileUploadResponse>? response)
     {
-        var fileServiceResult = response == null
+        var fileUploaderResult = response == null
             ? Result<List<FileUploadResponse>>.Fail(Error.InternalServerError("Error handle file!"))
             : Result<List<FileUploadResponse>>.Ok(response);
 
         _factory.FileServiceMock.Reset();
 
         _factory.FileServiceMock
-            .Setup(x => x.UploadFileListAsync(It.IsAny<List<AppFileDto>>(), CancellationToken.None))
-            .ReturnsAsync(fileServiceResult);
+            .Setup(x => x.UploadFilesAsync(It.IsAny<List<FileDto>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => fileUploaderResult);
     }
 
     public override async Task InitializeAsync()
@@ -144,10 +142,11 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
 
         SeedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["breedOne"]).Species;
-        await Seeder.Seed(SeedSpecies, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, SeedSpecies);
 
         SeedVolunteer = new VolunteerTestBuilder()
             .WithPets(1, SeedSpecies).Volunteer;
-        await Seeder.Seed(SeedVolunteer, _dbContext);
+
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, SeedVolunteer);
     }
 }

@@ -1,6 +1,5 @@
-﻿using PetFamily.Domain.PetManagment.ValueObjects;
-using PetFamily.Domain.PetTypeManagment.Entities;
-using PetFamily.Domain.PetTypeManagment.Root;
+﻿using PetFamily.SharedKernel.ValueObjects;
+using PetSpecies.Domain;
 
 namespace PetFamily.IntegrationTests.TestData;
 

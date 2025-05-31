@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Abstractions;
+﻿using PetFamily.Application.Abstractions.CQRS;
 
 namespace PetFamily.IntegrationTests;
 

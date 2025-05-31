@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.PetManagment.ChangeMainPetImage;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.PetTypeManagment.Root;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetSpecies.Domain;
+using Volunteers.Application.Commands.PetManagement.ChangeMainPetImage;
+using Volunteers.Domain;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
@@ -30,7 +30,7 @@ public class ChangePetMainImageTest(TestWebApplicationFactory factory)
         Assert.True(result.IsSuccess);
         Assert.Equal(FIRST_IMAGE, initialMainPhoto);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .SingleOrDefaultAsync();
@@ -57,7 +57,7 @@ public class ChangePetMainImageTest(TestWebApplicationFactory factory)
         Assert.True(result.IsSuccess);
         Assert.Equal(FIRST_IMAGE, initialMainPhoto);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .SingleOrDefaultAsync();
@@ -83,7 +83,7 @@ public class ChangePetMainImageTest(TestWebApplicationFactory factory)
         Assert.True(result.IsFailure);
         Assert.Equal(FIRST_IMAGE, initialMainPhoto);
 
-        var updatedVolunteer = await _dbContext.Volunteers.SingleOrDefaultAsync();
+        var updatedVolunteer = await _volunteerDbContext.Volunteers.SingleOrDefaultAsync();
         Assert.NotNull(updatedVolunteer);
 
         var updatedPet = updatedVolunteer.Pets[0];
@@ -98,13 +98,13 @@ public class ChangePetMainImageTest(TestWebApplicationFactory factory)
         SeedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["testBreed"]).Species;
 
-        await Seeder.Seed(SeedSpecies, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, SeedSpecies);
 
         SeedVolunteer = new VolunteerTestBuilder()
             .WithPets(1, SeedSpecies).Volunteer;
 
         SeedVolunteer.Pets[0].AddImages([FIRST_IMAGE, SECOND_IMAGE]);
 
-        await Seeder.Seed(SeedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, SeedVolunteer);
     }
 }

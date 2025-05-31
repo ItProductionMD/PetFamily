@@ -1,13 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FileStorage.Public.Dtos;
+using Microsoft.EntityFrameworkCore;
 using Moq;
-using PetFamily.Application.Commands.FilesManagment.Dtos;
-using PetFamily.Application.Commands.PetManagment.DeletePetImages;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.Results;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Results;
+using Volunteers.Application.Commands.PetManagement.DeletePetImages;
+using Volunteers.Domain;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
@@ -25,7 +24,7 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
         var seedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["testBreed"])
             .GetSpecies();
-        await Seeder.Seed(seedSpecies, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, seedSpecies);
 
         _seedVolunteer = new VolunteerTestBuilder()
             .WithPets(1, seedSpecies)
@@ -33,7 +32,7 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
 
         _seedVolunteer.Pets[0].AddImages([IMAGE_NAME]);
 
-        await Seeder.Seed(_seedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, _seedVolunteer);
 
         _seedPet = _seedVolunteer.Pets[0] ?? throw new Exception("seeded Pet is Null!");
     }
@@ -43,14 +42,14 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
     {
         //ARRANGE
         var sutCommand = new DeletePetImagesCommand(_seedVolunteer.Id, _seedPet.Id, [IMAGE_NAME]);
-        SetupIFileService([IMAGE_NAME]);
+        SetupIFileServiceToOk([IMAGE_NAME]);
         //ACT
         var sutResult = await _sut.Handle(sutCommand, CancellationToken.None);
         //ASSERT
         Assert.NotNull(sutResult);
         Assert.True(sutResult.IsSuccess);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .SingleOrDefaultAsync();
@@ -71,7 +70,7 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
         Assert.True(sutResult.IsFailure);
         Assert.Equal(ErrorType.NotFound, sutResult.Error.Type);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .SingleOrDefaultAsync();
@@ -85,14 +84,14 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
     {
         //ARRANGE
         var sutCommand = new DeletePetImagesCommand(_seedVolunteer.Id, _seedPet.Id, [IMAGE_NAME]);
-        SetupIFileServiceWithError();
+        SetupIFileServiceToError();
         //ACT
         var sutResult = await _sut.Handle(sutCommand, CancellationToken.None);
         //ASSERT
         Assert.NotNull(sutResult);
         Assert.True(sutResult.IsSuccess);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .AsNoTracking()
             .Include(v => v.Pets)
             .SingleOrDefaultAsync();
@@ -101,24 +100,25 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
         Assert.Empty(updatedVolunteer.Pets[0].Images);
     }
 
-    private void SetupIFileService(List<string> fileServiceResponse)
+    private void SetupIFileServiceToOk(List<string> fileServiceResponse)
     {
-        var fileServiceResult = Result<List<string>>.Ok(fileServiceResponse);
+        var fileRemover = Result<List<string>>.Ok(fileServiceResponse);
 
         _factory.FileServiceMock.Reset();
 
         _factory.FileServiceMock
-            .Setup(x => x.SoftDeleteFileListAsync(It.IsAny<List<AppFileDto>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(fileServiceResult);
+            .Setup(x => x.DeleteFilesUsingMessageQueue(It.IsAny<List<FileDto>>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
-    private void SetupIFileServiceWithError()
+    private void SetupIFileServiceToError()
     {
-        var fileServiceResult = Result<List<string>>.Fail(Error.InternalServerError("FileService doesn't answer"));
+        var fileRemover = Result<List<string>>
+            .Fail(Error.InternalServerError("FileService doesn't answer"));
 
         _factory.FileServiceMock.Reset();
 
         _factory.FileServiceMock
-            .Setup(x => x.SoftDeleteFileListAsync(It.IsAny<List<AppFileDto>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(fileServiceResult);
+            .Setup(x => x.DeleteFilesUsingMessageQueue(It.IsAny<List<FileDto>>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 }

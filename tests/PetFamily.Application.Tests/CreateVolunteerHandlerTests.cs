@@ -2,12 +2,12 @@
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Application.Commands.VolunteerManagment.CreateVolunteer;
-using PetFamily.Application.IRepositories;
 using PetFamily.Application.Validations;
-using PetFamily.Domain.DomainError;
-using PetFamily.Domain.PetManagment.Root;
-using PetFamily.Domain.Results;
+using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Results;
+using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
+using Volunteers.Application.IRepositories;
+using Volunteers.Domain;
 
 namespace PetFamily.Application.Tests;
 

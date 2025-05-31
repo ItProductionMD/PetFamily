@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.SharedCommands;
-using PetFamily.Application.Commands.VolunteerManagment.DeleteVolunteer;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Commands.VolunteerManagement.RestoreVolunteer;
+using Volunteers.Application.Commands.VolunteerManagement.SoftDeleteVolunteer;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
@@ -17,11 +17,11 @@ public class RestoreVolunteerTest(TestWebApplicationFactory factory)
 
         var seedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["breedOne", "breedTwo"]).Species;
-        await Seeder.Seed(seedSpecies, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, seedSpecies);
 
         var seedVolunteer = new VolunteerTestBuilder()
             .WithPets(10, seedSpecies).Volunteer;
-        await Seeder.Seed(seedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         await softDeleteHandler.Handle(new(seedVolunteer.Id), CancellationToken.None);
 
@@ -31,7 +31,7 @@ public class RestoreVolunteerTest(TestWebApplicationFactory factory)
         //ASSERT
         Assert.True(result.IsSuccess);
 
-        var restoredVolunteer = await _dbContext.Volunteers
+        var restoredVolunteer = await _volunteerDbContext.Volunteers
             .Include(x => x.Pets)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == seedVolunteer.Id);

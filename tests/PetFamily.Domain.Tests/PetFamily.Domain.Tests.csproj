@@ -23,7 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\PetFamily.Domain\PetFamily.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\src\Modules\PetSpecies\PetSpecies.Domain\PetSpecies.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Volunteer\Volunteers.Domain\Volunteers.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

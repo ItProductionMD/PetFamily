@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.VolunteerManagment.UpdateRequisites;
-using PetFamily.Application.Dtos;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Commands.VolunteerManagement.UpdateRequisites;
+using Volunteers.Application.ResponseDtos;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
@@ -14,7 +14,7 @@ public class UpdateRequisitesTest(TestWebApplicationFactory factory)
     {
         //ARRANGE
         var seedVolunteer = new VolunteerTestBuilder().Volunteer;
-        await Seeder.Seed(seedVolunteer, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var command = new UpdateRequisitesCommand(
             seedVolunteer.Id,
@@ -29,7 +29,7 @@ public class UpdateRequisitesTest(TestWebApplicationFactory factory)
         Assert.NotNull(updateRequisitesResult);
         Assert.True(updateRequisitesResult.IsSuccess);
 
-        var updatedVolunteer = await _dbContext.Volunteers
+        var updatedVolunteer = await _volunteerDbContext.Volunteers
             .FirstOrDefaultAsync(v => v.Id == seedVolunteer.Id);
 
         Assert.NotNull(updatedVolunteer);

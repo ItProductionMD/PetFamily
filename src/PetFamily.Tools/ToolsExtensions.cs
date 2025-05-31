@@ -16,8 +16,8 @@ public static class ToolsExtensions
     {
         string pathToDll = Path.Combine(
            Directory.GetParent(Directory.GetCurrentDirectory())!.FullName,
-           "PetFamily.API",
-           "bin", "Debug", "net9.0", "PetFamily.API.dll"
+           "PetFamily.Host.Api",
+           "bin", "Debug", "net9.0", "PetFamily.Host.Api.dll"
        );
 
         if (!File.Exists(pathToDll))

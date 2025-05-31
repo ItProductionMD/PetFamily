@@ -1,6 +1,6 @@
-﻿using PetFamily.Application.Queries.Volunteer.GetVolunteers;
-using PetFamily.IntegrationTests.Seeds;
+﻿using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using Volunteers.Application.Queries.GetVolunteers;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
@@ -30,7 +30,7 @@ public class GetVolunteersTest(TestWebApplicationFactory factory)
 
         var volunteers = new VolunteerTestBuilder(volunteersCount: volunteersCount).Volunteers;
 
-        await Seeder.SeedRange(volunteers, _dbContext);
+        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
         //ACT
         var result = await _sut.Handle(query, CancellationToken.None);
         //ASSERT

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Commands.PetTypeManagement.DeleteSpecies;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetSpecies.Application.Commands.DeleteSpecies;
 
 namespace PetFamily.IntegrationTests.PetTypeFeatures;
 
@@ -14,7 +14,7 @@ public class DeleteSpeciesTest(TestWebApplicationFactory factory)
     {
         //ARRANGE
         var seedSpecies = new SpeciesTestBuilder().Species;
-        await Seeder.Seed(seedSpecies, _dbContext);
+        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, seedSpecies);
 
         var command = new DeleteSpeciesCommand(seedSpecies.Id);
         //ACT
@@ -22,7 +22,7 @@ public class DeleteSpeciesTest(TestWebApplicationFactory factory)
         //ASSERT
         Assert.True(result.IsSuccess);
 
-        var deletedSpecies = await _dbContext.AnimalTypes.FirstOrDefaultAsync();
+        var deletedSpecies = await _speciesDbContext.AnimalTypes.FirstOrDefaultAsync();
         Assert.Null(deletedSpecies);
     }
 }
