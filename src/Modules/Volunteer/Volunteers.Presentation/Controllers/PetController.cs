@@ -9,7 +9,7 @@ namespace Volunteers.Presentation.Controllers;
 
 [Route("api/pets")]
 [ApiController]
-public class PetController(ISpeciesQueryContract speciesForFilter) : ControllerBase
+public class PetController(ISpeciesQueryContract speciesForFilter) : Controller
 {
     private readonly ISpeciesQueryContract _speciesForFilter = speciesForFilter;
 

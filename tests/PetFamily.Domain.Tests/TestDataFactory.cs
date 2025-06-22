@@ -1,4 +1,5 @@
 ﻿using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.SharedKernel.ValueObjects.Ids;
 using Volunteers.Domain;
 using Volunteers.Domain.Enums;
 using Volunteers.Domain.ValueObjects;
@@ -31,13 +32,12 @@ public static class TestDataFactory
 
         var volunteer = Volunteer.Create(
             volunteerId,
+            UserId.NewGuid(),
             fullName,
-            email,
-            phoneNumber,
             0,
             null,
-            donateDetailsList,
-            socialNetworksList).Data!;
+            phoneNumber,
+            donateDetailsList).Data!;
 
         SetUpVolunteer(volunteer, numberOfPets);
 
@@ -85,8 +85,7 @@ public static class TestDataFactory
                 Phone.CreateNotEmpty("+373", "123456789").Data!,
                 [RequisitesInfo.Create("Bank1", "Nr. 765753757835157").Data!],
                 HelpStatus.ForHelp,
-                "",
-                Address.CreatePossibleEmpty("", "", "", "11").Data!);
+                "");
         }
     }
 

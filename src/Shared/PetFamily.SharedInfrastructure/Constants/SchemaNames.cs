@@ -4,4 +4,6 @@ public static class SchemaNames
 {
     public const string VOLUNTEER = "volunteer";
     public const string SPECIES = "species";
+    public const string USERS = "users";
+    public const string AUTH = "auth";
 }

@@ -1,4 +1,4 @@
-﻿using FileStorage.Public;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,8 +9,6 @@ using PetFamily.Framework.FormFiles;
 using PetFamily.Framework.Utilities;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
-using System.Text;
-using Volunteers.Presentation.Requests;
 using Volunteers.Application;
 using Volunteers.Application.Commands.PetManagement.AddPet;
 using Volunteers.Application.Commands.PetManagement.AddPetImages;
@@ -31,7 +29,9 @@ using Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
 using Volunteers.Application.Queries.GetVolunteer;
 using Volunteers.Application.Queries.GetVolunteers;
 using Volunteers.Application.ResponseDtos;
+using Volunteers.Presentation.Requests;
 using static PetFamily.Framework.Extensions.ResultExtensions;
+using static PetFamily.SharedKernel.Authorization.PermissionCodes.VolunteerManagement;
 
 namespace Volunteers.Presentation.Controllers;
 
@@ -45,22 +45,16 @@ public class VolunteerController(
     private readonly ILogger<VolunteerController> _logger = logger;
 
     //------------------------------------Create volunteer----------------------------------------//
-    /// <summary>
-    /// Create a volunteer
-    /// </summary>
-    /// <param name="handler"></param>
-    /// <param name="volunteerRequest"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns>201</returns>
+    [Authorize(Policy = VolunteerCreate)]
     [HttpPost]
     public async Task<ActionResult<Envelope>> Create(
         [FromServices] CreateVolunteerHandler handler,
         [FromBody] CreateVolunteerRequest volunteerRequest,
-        CancellationToken cancelToken = default)
+        CancellationToken ct = default)
     {
         var command = volunteerRequest.ToCommand();
 
-        var handlerResult = await handler.Handle(command, cancelToken);
+        var handlerResult = await handler.Handle(command, ct);
 
         return handlerResult.IsFailure
             ? handlerResult.ToErrorActionResult()
@@ -76,6 +70,7 @@ public class VolunteerController(
     /// <param name="Id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns> Code:200 </returns>
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPatch("{volunteerId}")]
     public async Task<ActionResult<Envelope>> Update(
         [FromServices] UpdateVolunteerHandler handler,
@@ -123,6 +118,7 @@ public class VolunteerController(
     /// <param name="volunteerId"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = VolunteerDelete)]
     [HttpDelete("{volunteerId}/soft")]
     public async Task<ActionResult<Envelope>> SoftDelete(
         [FromServices] SoftDeleteVolunteerHandler handler,
@@ -146,6 +142,7 @@ public class VolunteerController(
     /// <param name="volunteerId"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = VolunteerDelete)]
     [HttpDelete("{volunteerId}/hard")]
     public async Task<ActionResult<Envelope>> Delete(
        [FromServices] DeleteVolunteerHandler handler,
@@ -153,31 +150,6 @@ public class VolunteerController(
        CancellationToken cancelToken = default)
     {
         var command = new HardDeleteVolunteerCommand(volunteerId);
-
-        var handlerResult = await handler.Handle(command, cancelToken);
-
-        return handlerResult.IsFailure
-            ? handlerResult.ToErrorActionResult()
-            : Ok(handlerResult.ToEnvelope());
-    }
-
-    //------------------------------------UpdateSocialNetworks------------------------------------//
-    /// <summary>
-    /// Update SocialNetworks
-    /// </summary>
-    /// <param name="handler"></param>
-    /// <param name="dtos"></param>
-    /// <param name="volunteerId"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns></returns>
-    [HttpPatch("{volunteerId}/social_networks")]
-    public async Task<ActionResult<Envelope>> UpdateSocialNetworks(
-        [FromServices] UpdateSocialNetworkHandler handler,
-        [FromBody] IEnumerable<SocialNetworksDto> dtos,
-        [FromRoute] Guid volunteerId,
-        CancellationToken cancelToken = default)
-    {
-        var command = new UpdateSocialNetworksCommand(volunteerId, dtos);
 
         var handlerResult = await handler.Handle(command, cancelToken);
 
@@ -195,6 +167,7 @@ public class VolunteerController(
     /// <param name="volunteerId"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPatch("{volunteerId}/requisites")]
     public async Task<ActionResult<Envelope>> UpdateRequisites(
         [FromServices] UpdateRequisitesHandler handler,
@@ -219,6 +192,7 @@ public class VolunteerController(
     /// <param name="volunteerId"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = VolunteerRestore)]
     [HttpPost("{volunteerId}/restore")]
     public async Task<ActionResult<Envelope>> Restore(
         [FromServices] RestoreVolunteerHandler handler,
@@ -248,6 +222,7 @@ public class VolunteerController(
     /// - **400 Bad Request** if the request is invalid or contains errors.
     /// - **500 Internal Server Error** if an unexpected error occurs.
     /// </returns>
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPost("{volunteerId:Guid}/pets")]
     public async Task<ActionResult<Envelope>> Add(
         [FromServices] AddPetHandler handler,
@@ -265,6 +240,7 @@ public class VolunteerController(
     }
 
     //-----------------------------------------UpdatePet------------------------------------------//
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPatch("{volunteerId:Guid}/pets/{petId:Guid}")]
     public async Task<ActionResult<Envelope>> UpdatePet(
         [FromRoute] Guid volunteerId,
@@ -283,6 +259,7 @@ public class VolunteerController(
     }
 
     //------------------------------------UpdatePetStatus-----------------------------------------//
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPatch("{volunteerId:Guid}/pets/{petId:Guid}/help_status")]
     public async Task<ActionResult<Envelope>> UpdatePetStatus(
         [FromRoute] Guid volunteerId,
@@ -310,6 +287,7 @@ public class VolunteerController(
     /// <param name="images"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = VolunteerEdit)]
     [HttpDelete("{volunteerId:Guid}/pets/{petId:Guid}/images")]
     public async Task<ActionResult<Envelope>> UpdateImages(
         [FromServices] DeletePetImagesHandler handler,
@@ -340,6 +318,7 @@ public class VolunteerController(
     /// <param name="images"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPost("{volunteerId:Guid}/pets/{petId:Guid}/images")]
     public async Task<ActionResult<Envelope>> AddImages(
         [FromServices] AddPetImagesHandler handler,
@@ -366,6 +345,7 @@ public class VolunteerController(
     }
 
     //------------------------------------Change main pet image-----------------------------------//
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPost("{volunteerId:Guid}/pets{petId:Guid}/images/main_image")]
     public async Task<ActionResult<Envelope>> ChangeMainPetImage(
         [FromRoute] Guid volunteerId,
@@ -393,7 +373,7 @@ public class VolunteerController(
     /// <param name="handler"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
-
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPatch("{volunteerId:Guid}/pets")]
     public async Task<ActionResult<Envelope>> ChangePetsOrder(
         [FromRoute] Guid volunteerId,
@@ -411,6 +391,7 @@ public class VolunteerController(
     }
 
     //---------------------------------Soft delete pet--------------------------------------------//
+    [Authorize (Policy = VolunteerEdit)]
     [HttpDelete("{volunteerId:Guid}/pets/{petId:Guid}/soft")]
     public async Task<ActionResult<Envelope>> SoftDeletePet(
         [FromRoute] Guid volunteerId,
@@ -428,6 +409,7 @@ public class VolunteerController(
     }
 
     //---------------------------------Hard delete pet--------------------------------------------//
+    [Authorize(Policy = VolunteerEdit)]
     [HttpDelete("{volunteerId:Guid}/pets/{petId:Guid}/hard")]
     public async Task<ActionResult<Envelope>> HardDeletePet(
         [FromRoute] Guid volunteerId,
@@ -445,6 +427,7 @@ public class VolunteerController(
     }
 
     //-------------------------------------Restore pet--------------------------------------------//
+    [Authorize(Policy = VolunteerEdit)]
     [HttpPost("{volunteerId:Guid}/pets/{petId:Guid}/restore")]
     public async Task<ActionResult<Envelope>> RestorePet(
         [FromRoute] Guid volunteerId,
@@ -485,59 +468,5 @@ public class VolunteerController(
             ? response.ToErrorActionResult()
             : response.ToEnvelope();
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="count"></param>
-    /// <param name="handler"></param>
-    /// <returns></returns>
-    [HttpPost("addfakevolunteers")]
-    public async Task<ActionResult<Envelope>> AddFakeVolunteers(
-        [FromQuery] int count,
-        [FromServices] CreateVolunteerHandler handler)
-    {
-        var random = new Random();
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        List<CreateVolunteerCommand> commands = [];
-        for (int i = 0; i < count; i++)
-        {
-            var builder = new StringBuilder();
-            var reverseBuilder = new StringBuilder();
-            for (int j = 0; j < 10; j++)
-            {
-                builder.Append(chars[random.Next(chars.Length)]);
-            }
-            string firstName = builder.ToString();
-            string lastName = new string(firstName.ToCharArray().Reverse().ToArray());
-            var fakeEmail = i + "@gmail.com";
-            var randomNumber = new Random();
-            var randomPhoneNumber = randomNumber.Next(10000000, 100000000).ToString();
-            string randomPhoneRegion = "+" + randomNumber.Next(20, 400).ToString();
-            CreateVolunteerCommand command = new(firstName,
-                lastName,
-                fakeEmail,
-                string.Empty,
-                randomPhoneNumber,
-                randomPhoneRegion,
-                0,
-                [],
-                []);
-
-            commands.Add(command);
-        }
-        foreach (var command in commands)
-        {
-            var result = await handler.Handle(command, CancellationToken.None);
-            Console.WriteLine($"Task Result:{result.IsSuccess}");
-            if (result.IsFailure)
-                Console.WriteLine($"Error:{result.Error.Message},ValidationErrors:" +
-                    $"{result.ValidationMessagesToString()}");
-        }
-        var response = UnitResult.Ok().ToEnvelope();
-        return Ok(response);
-    }
-
-
 }
 

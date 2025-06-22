@@ -1,4 +1,5 @@
 ﻿using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.SharedKernel.ValueObjects.Ids;
 using Volunteers.Domain;
 using Volunteers.Domain.ValueObjects;
 
@@ -10,7 +11,7 @@ public static class TestDataFactory
     {
         //
         var fullName = FullName.Create("John", "Doe").Data!;
-        var phoneNumber = Phone.CreateNotEmpty("123456789", "+373").Data!;
+        var phone = Phone.CreateNotEmpty("123456789", "+373").Data!;
         var email = "testemail@m.com";
 
         var volunteerId = VolunteerID.NewGuid();
@@ -29,13 +30,12 @@ public static class TestDataFactory
 
         var volunteer = Volunteer.Create(
             volunteerId,
+            UserId.NewGuid(),
             fullName,
-            email,
-            phoneNumber,
             0,
             null,
-            donateDetailsList,
-            socialNetworksList).Data!;
+            phone,
+            donateDetailsList).Data!;
 
         return volunteer!;
     }

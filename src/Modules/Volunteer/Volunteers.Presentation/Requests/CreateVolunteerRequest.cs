@@ -6,24 +6,15 @@ namespace Volunteers.Presentation.Requests;
 public record CreateVolunteerRequest(
     string FirstName,
     string LastName,
-    string Email,
     string Description,
-    string PhoneNumber,
-    string PhoneRegionCode,
     int ExperienceYears,
-    IEnumerable<RequisitesDto> Requisites,
-    IEnumerable<SocialNetworksDto> SocialNetworksList
-)
+    IEnumerable<RequisitesDto> Requisites)
 {
     public CreateVolunteerCommand ToCommand() =>
         new(FirstName,
             LastName,
-            Email,
-            Description,
-            PhoneNumber,
-            PhoneRegionCode,
+            Description,    
             ExperienceYears,
-            Requisites,
-            SocialNetworksList);
+            Requisites);
 }
 

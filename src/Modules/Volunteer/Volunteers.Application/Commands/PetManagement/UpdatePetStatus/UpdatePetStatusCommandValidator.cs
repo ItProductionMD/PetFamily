@@ -8,7 +8,7 @@ public static class UpdatePetStatusCommandValidator
 {
     public static UnitResult Validate(UpdatePetStatusCommand command)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "Volunteer Id"),
 

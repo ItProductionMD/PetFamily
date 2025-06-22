@@ -7,7 +7,7 @@ public static class DeletePetCommandValidator
 {
     public static UnitResult Validate(SoftDeletePetCommand command)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "VolunteerId"),
 
@@ -15,7 +15,7 @@ public static class DeletePetCommandValidator
     }
     public static UnitResult Validate(HardDeletePetCommand command)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "VolunteerId"),
 

@@ -17,5 +17,8 @@ public static class ErrorCodes
     public const string DATABASE_ERROR = "database.error";
     public const string CONFLICT_ERROR = "database.conflict";
     public const string CONNECTION_ERROR = "database.connection.error";
+
+    //authentication errors
+    public const string AUTHENTICATION_ERROR = "authentication.error";
 }
 

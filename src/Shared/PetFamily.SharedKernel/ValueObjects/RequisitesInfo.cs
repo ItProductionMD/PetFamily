@@ -32,7 +32,7 @@ public record RequisitesInfo
 
     public static UnitResult Validate(string? name, string? description) =>
 
-        UnitResult.ValidateCollection(
+        UnitResult.FromValidationResults(
 
             () => ValidateRequiredField(
 

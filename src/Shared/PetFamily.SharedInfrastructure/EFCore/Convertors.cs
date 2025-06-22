@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using PetFamily.SharedKernel.Abstractions;
+using PetFamily.SharedKernel.ValueObjects;
 using System.Text.Json;
 
 namespace PetFamily.SharedInfrastructure.Shared.EFCore;
@@ -12,5 +14,4 @@ public static class Convertors
             v => JsonSerializer.Deserialize<IReadOnlyList<T>>(v, JsonSerializerOptions.Default) ?? new List<T>())
         { }
     }
-
 }

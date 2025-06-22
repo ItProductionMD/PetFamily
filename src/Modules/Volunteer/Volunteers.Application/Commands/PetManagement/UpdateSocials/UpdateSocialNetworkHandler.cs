@@ -38,8 +38,6 @@ public class UpdateSocialNetworkHandler(
         var socialNetworks = command.SocialNetworksDtos
             .Select(social => SocialNetworkInfo.Create(social.Name, social.Url).Data) ?? [];
 
-        volunteer.UpdateSocialNetworks(socialNetworks!);
-
         await _volunteerRepository.Save(volunteer, cancelToken);
 
         _logger.LogInformation("Update SocialNetworks for volunteer with id:{Id} successfull.",

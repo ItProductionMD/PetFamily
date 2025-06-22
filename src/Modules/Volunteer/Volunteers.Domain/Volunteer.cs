@@ -3,6 +3,7 @@ using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Uniqness;
 using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.SharedKernel.ValueObjects.Ids;
 using Volunteers.Domain.Enums;
 using Volunteers.Domain.ValueObjects;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
@@ -15,20 +16,18 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 {
     public FullName FullName { get; private set; }
     [Unique]
-    public string Email { get; private set; }
-    [Unique]
-    public Phone Phone { get; private set; }
+    public string Phone { get; private set; }
     public int ExperienceYears { get; private set; }
     public string? Description { get; private set; }
     public int Rating { get; private set; }
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
-    public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
     public IReadOnlyList<Pet> Pets => _pets;
     private List<Pet> _pets { get; set; } = [];
     public bool IsDeleted => _isDeleted;
     private bool _isDeleted;
     public DateTime? DeletedDateTime => _deletedDateTime;
     private DateTime? _deletedDateTime;
+    public UserId UserId { get; private set; }
     private Volunteer(Guid id) : base(id) { } //Ef core needs this
     public int PetsForAdoptCount => Pets
         .Where(p => p.HelpStatus == HelpStatus.ForAdoption && p.IsDeleted == false)
@@ -46,60 +45,61 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
     private Volunteer(
         Guid id,
+        UserId userId,
         FullName fullName,
-        string email,
-        Phone phoneNumber,
         int experienceYears,
         string? description,
-        List<RequisitesInfo> requisites,
-        List<SocialNetworkInfo> socialNetworks
-        ) : base(id)
+        string phone,
+        List<RequisitesInfo> requisites) : base(id)
     {
+        UserId = userId;
         FullName = fullName;
-        Email = email.Trim();
-        Phone = phoneNumber;
+        Phone = phone;
         ExperienceYears = experienceYears;
         Description = description?.Trim();
         Requisites = requisites; // List Can be empty
-        SocialNetworks = socialNetworks;//list can be emty
     }
     //--------------------------------------Factory method----------------------------------------//
     public static Result<Volunteer> Create(
         VolunteerID id,
+        UserId userId,
         FullName fullName,
-        string email,
-        Phone phoneNumber,
         int expirienceYears,
         string? description,
-        List<RequisitesInfo> requisites,
-        List<SocialNetworkInfo> socialNetworkList
+        Phone phone,
+        List<RequisitesInfo> requisites
         )
     {
-        var validationResult = Validate(fullName, email, phoneNumber, expirienceYears, description);
+        var validationResult = Validate(fullName, expirienceYears, description);
         if (validationResult.IsFailure)
             return validationResult;
 
+        var validatePhone = ValidateRequiredObject(phone, "Volunteer phone");
+        if (validatePhone.IsFailure)
+            return validatePhone;
+
+        var stringPhone = phone.ToString();
+
         return Result.Ok(new Volunteer(
-                id.Value, fullName!,
-                email!, phoneNumber!,
+                id.Value,
+                userId,
+                fullName!,
                 expirienceYears,
                 description,
-                requisites,
-                socialNetworkList));
+                stringPhone,
+                requisites));
     }
 
     public static UnitResult Validate(
         FullName? fullName,
-        string? email,
-        Phone? phone,
         int experienceYears,
         string? description)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
             () => ValidateRequiredObject(fullName, "Volunteer fullName"),
-            () => ValidateRequiredObject(phone, "volunteer phone"),
+            //() => ValidateRequiredObject(phone, "volunteer phone"),
             () => ValidateIntegerNumber(experienceYears, "volunteer experienece", 0, 100),
-            () => ValidateRequiredField(email, "Volunteer email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
+            //() => ValidateRequiredField(email, "Volunteer email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
             () => ValidateNonRequiredField(description, "Volunteer description", MAX_LENGTH_LONG_TEXT));
     }
 
@@ -146,11 +146,11 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         Phone ownerPhone,
         IReadOnlyList<RequisitesInfo> requisites,
         HelpStatus helpStatus,
-        string? healthInfo,
-        Address address)
+        string? healthInfo)
     {
         var serialNumberValue = ExistingPetsCount + 1;
         var serialNumber = PetSerialNumber.Create(serialNumberValue, this).Data!;
+
         var pet = Pet.Create(
             name,
             dateOfBirth,
@@ -165,7 +165,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
             requisites,
             helpStatus,
             healthInfo,
-            address,
+            Address.CreateEmpty(),
             serialNumber).Data!;
 
         _pets.Add(pet);
@@ -260,19 +260,15 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     //------------------------------------Update Main Info----------------------------------------//
     public UnitResult UpdateMainInfo(
         FullName fullName,
-        string email,
-        Phone phoneNumber,
         int experienceYears,
         string description
         )
     {
-        var validationResult = Validate(fullName, email, phoneNumber, experienceYears, description);
+        var validationResult = Validate(fullName, experienceYears, description);
         if (validationResult.IsFailure)
             return validationResult;
 
         FullName = fullName;
-        Email = email;
-        Phone = phoneNumber;
         ExperienceYears = experienceYears;
         Description = description;
 
@@ -285,11 +281,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         Requisites = requisites.ToList();
     }
 
-    //------------------------------------Update Social Networks----------------------------------//
-    public void UpdateSocialNetworks(IEnumerable<SocialNetworkInfo> socialNetworks)
-    {
-        SocialNetworks = socialNetworks.ToList();
-    }
+  
     public Pet GetPet(Guid petId)
     {
         var pet = Pets.FirstOrDefault(p => p.Id == petId);
@@ -377,6 +369,17 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
             }
         }
         return uniqueProps.ToArray();
+    }
+
+    public Result<UnitResult> UpdatePhone(Phone newPhone)
+    {
+        var validateRequiredPhone = ValidateRequiredObject(newPhone,"Phone for volunteer");
+        if (validateRequiredPhone.IsFailure)
+            return Result.Fail(validateRequiredPhone.Error);
+
+        Phone = newPhone.ToString();
+
+        return UnitResult.Ok();
     }
 
 }

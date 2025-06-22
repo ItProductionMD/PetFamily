@@ -15,13 +15,9 @@ public class CreateVolunteerTest(TestWebApplicationFactory factory)
         var command = new CreateVolunteerCommand(
             "Iurii",
             "Godina",
-            "iyrii@gmail.com",
             "description",
-            "68756643",
-            "+373",
             1,
-            [new("victoriabank", "iban12345")],
-            [new("google", "google.com/aswmsnjnij/jneijn")]);
+            [new("victoriabank", "iban12345")]);
 
         //ACT
         var handleResult = await _sut.Handle(command, CancellationToken.None);
@@ -53,13 +49,9 @@ public class CreateVolunteerTest(TestWebApplicationFactory factory)
         var command = new CreateVolunteerCommand(
             "Iurii",
             "Godina",
-            isEmailUniquenessOK ? "uniqueEmail@gmail.com" : seedVolunteer.Email,
             "description",
-            isPhoneUniquenessOk ? "12312310" : seedVolunteer.Phone.Number,
-            seedVolunteer.Phone.RegionCode,
             1,
-            [new("victoriabank", "iban12345")],
-            [new("google", "google.com/aswmsnjnij/jneijn")]);
+            [new("victoriabank", "iban12345")]);
 
         //ACT
         var handleResult = await _sut.Handle(command, CancellationToken.None);

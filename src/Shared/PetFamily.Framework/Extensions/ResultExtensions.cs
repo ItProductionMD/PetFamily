@@ -14,6 +14,7 @@ namespace PetFamily.Framework.Extensions
 
             var statusCode = result.Error.Type switch
             {
+                ErrorType.Authentication => StatusCodes.Status401Unauthorized,
                 ErrorType.Validation => StatusCodes.Status400BadRequest,
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
                 ErrorType.Conflict => StatusCodes.Status409Conflict,
@@ -33,6 +34,7 @@ namespace PetFamily.Framework.Extensions
 
             var statusCode = result.Error.Type switch
             {
+                ErrorType.Authentication => StatusCodes.Status401Unauthorized,
                 ErrorType.Validation => StatusCodes.Status400BadRequest,
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
                 ErrorType.Conflict => StatusCodes.Status409Conflict,

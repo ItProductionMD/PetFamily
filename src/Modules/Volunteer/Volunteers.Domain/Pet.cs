@@ -118,7 +118,7 @@ public class Pet : Entity<Guid>, ISoftDeletable
         string? color,
         string? healthInfo)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateRequiredField(name, "Pet name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 

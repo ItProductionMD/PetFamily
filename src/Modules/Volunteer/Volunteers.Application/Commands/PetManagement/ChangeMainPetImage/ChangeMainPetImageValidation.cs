@@ -9,7 +9,7 @@ public static class ChangeMainPetImageValidation
 {
     public static UnitResult Validate(ChangePetMainImageCommand command)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "VolunteerId"),
 

@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PetFamily.Application.Validations;
+using PetFamily.Auth.Public.IContracts;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
@@ -19,6 +20,7 @@ public class CreateVolunteerHandlerTests
     private readonly Mock<ILogger<CreateVolunteerHandler>> _loggerMock;
     private readonly CreateVolunteerHandler _handler;
     private readonly CreateVolunteerCommandValidator _validator;
+    private readonly Mock<IUserContext> _userContextMock;
 
     public CreateVolunteerHandlerTests()
     {
@@ -27,10 +29,12 @@ public class CreateVolunteerHandlerTests
         _loggerMock = new Mock<ILogger<CreateVolunteerHandler>>();
         _validator = new CreateVolunteerCommandValidator();
         _volunteerReadRepositoryMock = new Mock<IVolunteerReadRepository>();
+        _userContextMock = new Mock<IUserContext>();
         _handler = new CreateVolunteerHandler(
             _volunteerRepositoryMock.Object,
             _volunteerReadRepositoryMock.Object,
             _validatorMock.Object,
+            _userContextMock.Object,
             _loggerMock.Object);
     }
 
@@ -53,13 +57,9 @@ public class CreateVolunteerHandlerTests
         // ARRANGE
         var command = new CreateVolunteerCommand(
             firstName,
-            lastName,
-            email,
-            "Description",
-            phoneNumber,
-            phoneRegionCode,
+            lastName,        
+            "Description",           
             expirienceYears,
-            [],
             []);
 
         //ACT
@@ -87,13 +87,9 @@ public class CreateVolunteerHandlerTests
 
         var command = new CreateVolunteerCommand(
             firstName,
-            lastName,
-            email,
+            lastName,     
             "Description",
-            "765367992",
-            "+373",
             0,
-            [],
             []);
 
         //ACT
@@ -113,12 +109,8 @@ public class CreateVolunteerHandlerTests
         var command = new CreateVolunteerCommand(
             "invalidName!@",
             "lastName",
-            "email@gmail.com",
-            "Description",
-            "765367992",
-            "+373",
+            "Description",         
             0,
-            [],
             []);
 
         var validationResult = new ValidationResult([new ValidationFailure()]);
@@ -141,12 +133,8 @@ public class CreateVolunteerHandlerTests
         var command = new CreateVolunteerCommand(
             "firstName",
             "lastName",
-            "email@gmail.com",
-            "Description",
-            "765367992",
-            "+373",
+            "Description",           
             0,
-            [],
             []);
 
         var volunteer = TestDataFactory.CreateVolunteer();
@@ -156,14 +144,6 @@ public class CreateVolunteerHandlerTests
             .Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
 
-        _volunteerReadRepositoryMock
-            .Setup(v => v.CheckUniqueFields(
-                Guid.Empty,
-                command.PhoneRegionCode,
-                command.PhoneNumber,
-                command.Email,
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(UnitResult.Ok());
 
         _volunteerRepositoryMock
             .Setup(x => x.AddAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))

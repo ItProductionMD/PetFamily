@@ -6,7 +6,7 @@ using PetSpecies.Infrastructure.Contexts;
 using Volunteers.Infrastructure.Contexts;
 using static PetFamily.Tools.ToolsExtensions;
 
-namespace PetFamily.Tools;
+namespace PetFamily.Tools.Seeders;
 
 public static class Seeder
 {
@@ -24,7 +24,7 @@ public static class Seeder
         var speciesList = new List<Species>();
         speciesList = SpeciesBuilder.Build();
 
-        var (speciesScope, speciesDbContext) = CreateSpeciesDbContext();
+        var (speciesScope, speciesDbContext) = ContextsCreator.CreateSpeciesDbContext();
 
         using (speciesScope)
         {
@@ -49,7 +49,7 @@ public static class Seeder
 
         Console.WriteLine($"###Created volunteers({volunteers.Count}) and pets({volunteers[0].Pets.Count})###");
 
-        var (volunteerScope, _volunteerDbContext) = CreateVolunteerDbContext();
+        var (volunteerScope, _volunteerDbContext) = ContextsCreator.CreateVolunteerDbContext();
 
         using (volunteerScope)
         {
@@ -67,8 +67,8 @@ public static class Seeder
     /// <returns></returns>
     public static async Task RunClear(string tableName)
     {
-        var (speciesScope, speciesDbContext) = CreateSpeciesDbContext();
-        var (volunteerScope, volunteerDbContext) = CreateVolunteerDbContext();
+        var (speciesScope, speciesDbContext) = ContextsCreator.CreateSpeciesDbContext();
+        var (volunteerScope, volunteerDbContext) = ContextsCreator.CreateVolunteerDbContext();
 
         using (volunteerScope)
         using (speciesScope)
@@ -97,57 +97,6 @@ public static class Seeder
                     break;
             }
         }
-
-
-    }
-
-    private static (IServiceScope scope, SpeciesWriteDbContext context) CreateSpeciesDbContext()
-    {
-        Console.WriteLine("###GetConnectionString...###");
-
-        var connectionString = GetConnectionString();
-        Console.WriteLine("###Creating host...###");
-
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
-            {
-                services.AddScoped<SpeciesWriteDbContext>(_ =>
-                new SpeciesWriteDbContext(connectionString));
-            })
-       .Build();
-
-        var scope = host.Services.CreateScope();
-
-        Console.WriteLine("###Getting Species dbContext...###");
-
-        var _dbContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
-        if (_dbContext == null)
-            throw new Exception("###species _dbContext is null!###");
-
-        return (scope, _dbContext);
-    }
-
-    private static (IServiceScope scope, VolunteerWriteDbContext context) CreateVolunteerDbContext()
-    {
-        var connectionString = GetConnectionString();
-        Console.WriteLine("###Creating host...###");
-
-        var host = Host.CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
-            {
-                services.AddScoped<VolunteerWriteDbContext>(_ =>
-                new VolunteerWriteDbContext(connectionString));
-            })
-       .Build();
-
-        var scope = host.Services.CreateScope();
-
-        Console.WriteLine("###Getting Species dbContext...###");
-
-        var _dbContext = scope.ServiceProvider.GetRequiredService<VolunteerWriteDbContext>();
-        if (_dbContext == null)
-            throw new Exception("###species _dbContext is null!###");
-
-        return (scope, _dbContext);
     }
 }
+

@@ -9,7 +9,7 @@ public static class AddPetTypeCommandValidator
 {
     public static UnitResult Validate(AddPetTypeComand command)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
             () => ValidateItems(command.BreedList, b => Breed.Validate(b.Name, b.Description)),
             () => Species.Validate(command.SpeciesName));
     }

@@ -18,9 +18,7 @@ public interface IVolunteerReadRepository
 
     Task<UnitResult> CheckUniqueFields(
         Guid volunteerId,
-        string phoneRegionCode,
-        string phoneNuber,
-        string email,
+        string phone,
         CancellationToken cancelToken = default);
 
     Task<Result<GetPetsResponse>> GetPetPagedList(

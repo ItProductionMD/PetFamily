@@ -20,10 +20,7 @@ public class UpdateVolunteerTest(TestWebApplicationFactory factory)
             seedVolunteer.Id,
             "updatedFirstName",
             "updatedLastName",
-            "updatedEmail@gmail.com",
             "updated description",
-            "06666666",
-            "+333",
             10);
         //ACT
         var updateResult = await _sut.Handle(command, CancellationToken.None);

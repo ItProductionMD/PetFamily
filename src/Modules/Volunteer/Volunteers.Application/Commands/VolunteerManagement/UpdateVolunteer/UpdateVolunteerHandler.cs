@@ -35,15 +35,6 @@ public class UpdateVolunteerHandler(
             return errorResult;
         }
 
-        var checkUniqueness = await _readRepository.CheckUniqueFields(
-            cmd.VolunteerId,
-            cmd.PhoneRegionCode,
-            cmd.PhoneNumber,
-            cmd.Email,
-            ct);
-        if (checkUniqueness.IsFailure)
-            return checkUniqueness;
-
         var getVolunteer = await _writeRepository.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return getVolunteer;
@@ -52,9 +43,8 @@ public class UpdateVolunteerHandler(
 
         var fullName = FullName.Create(cmd.FirstName, cmd.LastName).Data!;
 
-        var phone = Phone.CreateNotEmpty(cmd.PhoneNumber, cmd.PhoneRegionCode).Data!;
 
-        volunteer.UpdateMainInfo(fullName, cmd.Email, phone, cmd.ExperienceYears, cmd.Description);
+        volunteer.UpdateMainInfo(fullName, cmd.ExperienceYears, cmd.Description);
 
         var updateResult = await _writeRepository.Save(volunteer, ct);
         if (updateResult.IsFailure)

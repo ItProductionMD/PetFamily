@@ -41,7 +41,7 @@ public record Address
 
     public static UnitResult ValidateRequired(string? region, string? city, string? street, string? number)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateRequiredField(
                 valueToValidate: region,

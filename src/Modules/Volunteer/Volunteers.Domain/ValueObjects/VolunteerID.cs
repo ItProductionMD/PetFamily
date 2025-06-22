@@ -9,5 +9,6 @@ public record VolunteerID
     }
 
     public static VolunteerID NewGuid() => new(Guid.NewGuid());
+    public static VolunteerID Create(Guid id) => new(id);
 }
 

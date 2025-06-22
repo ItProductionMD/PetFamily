@@ -93,9 +93,7 @@ public class VolunteerTests
             Phone.CreateNotEmpty("67777745222", "+373").Data!,
             [],
             HelpStatus.ForHelp,
-            null,
-            Address.CreatePossibleEmpty("", "Florence", "Barca", "11A").Data!);
-
+            null);
         //ASSERT
         Assert.NotNull(pet);
         Assert.Equal(petInitialCount + 1, volunteer.Pets.Count);
@@ -123,8 +121,6 @@ public class VolunteerTests
         //ACT
         var validationResult = Volunteer.Validate(
             FullName.Create(FirstName, LastName).Data,
-            email,
-            Phone.CreateNotEmpty(phoneNumber, phoneRegionCode).Data,
             experienceYears,
             description);
 
@@ -164,8 +160,6 @@ public class VolunteerTests
         //ACT
         var validationResult = Volunteer.Validate(
             FullName.Create(FirstName, LastName).Data,
-            email,
-            Phone.CreateNotEmpty(phoneNumber, phoneRegionCode).Data,
             experienceYears,
             description);
 
@@ -214,11 +208,9 @@ public class VolunteerTests
         var newFullName = FullName.Create(FirstName, LastName).Data!;
         var phone = Phone.CreateNotEmpty(PhoneNumber, RegionCode).Data!;
         //ACT
-        var updateResult = volunteer.UpdateMainInfo(newFullName, email, phone, experienceYears, description);
+        var updateResult = volunteer.UpdateMainInfo(newFullName, experienceYears, description);
         //ASSERT
         Assert.Equal(newFullName, volunteer.FullName);
-        Assert.Equal(email, volunteer.Email);
-        Assert.Equal(phone, volunteer.Phone);
         Assert.Equal(experienceYears, volunteer.ExperienceYears);
         Assert.Equal(description, volunteer.Description);
         Assert.True(updateResult.IsSuccess);
@@ -242,7 +234,7 @@ public class VolunteerTests
         var newFullName = FullName.Create(FirstName, LastName).Data!;
         var phone = Phone.CreateNotEmpty(PhoneNumber, RegionCode).Data!;
         //ACT
-        var updateResult = volunteer.UpdateMainInfo(newFullName, email, phone, experienceYears, description);
+        var updateResult = volunteer.UpdateMainInfo(newFullName, experienceYears, description);
         //ASSERT
         Assert.False(updateResult.IsSuccess);
     }

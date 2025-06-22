@@ -42,7 +42,7 @@ public class UploadFileDtoValidator : IUploadFileDtoValidator
                  .ValidationErrors.FirstOrDefault()!);
 
         if (validationErrors.Count > 0)
-            return UnitResult.Fail(Error.ValidationError(validationErrors));
+            return UnitResult.Fail(Error.FromValidationErrors(validationErrors));
 
         return UnitResult.Ok();
     }
@@ -75,7 +75,7 @@ public class UploadFileDtoValidator : IUploadFileDtoValidator
                 validationErrors.AddRange(validationResult.Error.ValidationErrors);
         }
         if (validationErrors.Count > 0)
-            return UnitResult.Fail(Error.ValidationError(validationErrors));
+            return UnitResult.Fail(Error.FromValidationErrors(validationErrors));
 
         return UnitResult.Ok();
     }
