@@ -24,7 +24,11 @@ public class UserReadRepository(
         throw new NotImplementedException();
     }
 
-    public async Task<UnitResult> CheckUniqueFields(string email, string login, Phone phone, CancellationToken ct)
+    public async Task<UnitResult> CheckUniqueFields(
+        string email,
+        string login,
+        Phone phone, 
+        CancellationToken ct)
     {
         var sql = $@"
         SELECT 

@@ -9,7 +9,11 @@ using PetSpecies.Infrastructure;
 using Serilog;
 using Volunteers.Infrastructure;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
+
+var c = builder.Configuration;
 
 builder.Services.AddOptions<Program>();
 
@@ -86,11 +90,16 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
     //await app.ApplyMigration();    
 
     using var scope = app.Services.CreateScope();
-    var seeder = scope.ServiceProvider.GetRequiredService<RolesSeeder>();
-    await seeder.SeedAsync();
+
+    var rolesSeeder = scope.ServiceProvider.GetRequiredService<RolesSeeder>();
+    var adminSeeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+
+    await rolesSeeder.SeedAsync();
+    await adminSeeder.SeedAsync();
 }
 
 app.UseHttpsRedirection();

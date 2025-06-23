@@ -32,14 +32,14 @@ public class RolesSeeder(
         var result = await _roleReadRepository.GetRoles(default);
         if (result.Count > 0)
         {
-            _logger.LogInformation("Roles already exist. Skipping seeding.");
+            _logger.LogInformation("ROLE SEEDER: Roles already exist. Skipping seeding.");
             return;
         }
 
         var permissionResult = await _permissionReadRepository.GetPermissionsAsync(default);
         if (permissionResult.Count > 0)
         {
-            _logger.LogInformation("Permissions already exist. Skipping seeding.");
+            _logger.LogInformation("ROLE SEEDER: Permissions already exist. Skipping seeding.");
             return;
         }
 
@@ -119,7 +119,7 @@ public class RolesSeeder(
 
             await _authUnitOfWork.SaveChangesAsync(default);
 
-            _logger.LogInformation("Roles seeding completed with Admin: {AdminRole}, User: {UserRole}," +
+            _logger.LogInformation("ROLE SEEDER: Roles seeding completed with Admin: {AdminRole}, User: {UserRole}," +
                 " Volunteer: {VolunteerRole}, UnconfirmedUser: {UnconfirmedUserRole}",
                 _adminRole.Code, _userRole.Code, _volunteerRole.Code, _unconfirmedUserRole.Code);
 
@@ -127,7 +127,7 @@ public class RolesSeeder(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while seeding roles. Performing rollback.");
+            _logger.LogError(ex, "ROLE SEEDER: Error while seeding roles. Performing rollback.");
 
             await _authUnitOfWork.RollbackAsync();
 

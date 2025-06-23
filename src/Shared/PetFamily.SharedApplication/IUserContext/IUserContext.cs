@@ -1,6 +1,6 @@
 ﻿using PetFamily.SharedKernel.Results;
 
-namespace PetFamily.Auth.Public.IContracts;
+namespace PetFamily.SharedApplication.IUserContext;
 
 public interface IUserContext
 {
@@ -9,3 +9,4 @@ public interface IUserContext
     string Email { get; }
     string Phone { get; }
 }
+

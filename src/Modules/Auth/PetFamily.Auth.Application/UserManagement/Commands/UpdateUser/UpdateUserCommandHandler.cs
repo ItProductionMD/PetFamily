@@ -3,7 +3,7 @@ using PetFamily.Application.Abstractions.CQRS;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
 using PetFamily.Auth.Domain.Entities.UserAggregate;
-using PetFamily.Auth.Public.IContracts;
+using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;

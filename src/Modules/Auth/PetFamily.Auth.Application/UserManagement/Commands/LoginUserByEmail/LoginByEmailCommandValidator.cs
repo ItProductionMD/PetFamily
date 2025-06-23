@@ -1,5 +1,6 @@
 ﻿using PetFamily.SharedKernel.Results;
 using static PetFamily.SharedKernel.Validations.ValueObjectValidations;
+using static PetFamily.Auth.Domain.Validations.Validations;
 
 namespace PetFamily.Auth.Application.UserManagement.Commands.LoginUserByEmail;
 
