@@ -11,15 +11,6 @@ public class UpdateVolunteerRequestValidator : AbstractValidator<UpdateVolunteer
 {
     public UpdateVolunteerRequestValidator()
     {
-        RuleFor(c => c.Email)
-           .NotEmpty()
-           .MaximumLength(MAX_LENGTH_SHORT_TEXT)
-           .EmailAddress()
-           .WithErrorCode(ValidationErrorCodes.VALUE_INVALID_LENGTH);
-
-        RuleFor(c => new { c.PhoneNumber, c.PhoneRegionCode })
-            .MustBeValueObject(phone => Phone.Validate(phone.PhoneNumber, phone.PhoneRegionCode));
-
         RuleFor(c => new { c.FirstName, c.LastName })
             .MustBeValueObject(fullName => FullName.Validate(fullName.FirstName, fullName.LastName));
 

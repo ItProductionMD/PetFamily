@@ -19,7 +19,7 @@ namespace Volunteers.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("volunteer")
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -194,15 +194,15 @@ namespace Volunteers.Infrastructure.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("description");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("email");
-
                     b.Property<int>("ExperienceYears")
                         .HasColumnType("integer")
                         .HasColumnName("experience_years");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("phone");
 
                     b.Property<int>("Rating")
                         .HasColumnType("integer")
@@ -213,10 +213,9 @@ namespace Volunteers.Infrastructure.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("requisites");
 
-                    b.Property<string>("SocialNetworks")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("social_networks");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
 
                     b.Property<DateTime?>("_deletedDateTime")
                         .HasColumnType("timestamp with time zone")
@@ -246,9 +245,9 @@ namespace Volunteers.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_volunteers");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("Phone")
                         .IsUnique()
-                        .HasDatabaseName("ix_volunteers_email");
+                        .HasDatabaseName("ix_volunteers_phone");
 
                     b.ToTable("volunteers", "volunteer");
                 });
@@ -260,43 +259,6 @@ namespace Volunteers.Infrastructure.Migrations
                         .HasForeignKey("volunteer_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_pets_volunteers_volunteer_id");
-                });
-
-            modelBuilder.Entity("Volunteers.Domain.Volunteer", b =>
-                {
-                    b.OwnsOne("PetFamily.SharedKernel.ValueObjects.Phone", "Phone", b1 =>
-                        {
-                            b1.Property<Guid>("VolunteerId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
-
-                            b1.Property<string>("Number")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
-                                .HasColumnName("phone_number");
-
-                            b1.Property<string>("RegionCode")
-                                .IsRequired()
-                                .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
-                                .HasColumnName("phone_region_code");
-
-                            b1.HasKey("VolunteerId");
-
-                            b1.HasIndex("Number", "RegionCode")
-                                .IsUnique()
-                                .HasDatabaseName("ix_volunteers_phone_number_phone_region_code");
-
-                            b1.ToTable("volunteers", "volunteer");
-
-                            b1.WithOwner()
-                                .HasForeignKey("VolunteerId")
-                                .HasConstraintName("fk_volunteers_volunteers_id");
-                        });
-
-                    b.Navigation("Phone")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Volunteers.Domain.Volunteer", b =>

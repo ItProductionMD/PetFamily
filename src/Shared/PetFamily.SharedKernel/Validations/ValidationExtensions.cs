@@ -85,7 +85,7 @@ public static class ValidationExtensions
                 validationErrors.AddRange(unitResult.Error.ValidationErrors);
         }
         return validationErrors.Count > 0
-            ? UnitResult.Fail(Error.ValidationError(validationErrors))
+            ? UnitResult.Fail(Error.FromValidationErrors(validationErrors))
             : UnitResult.Ok();
     }
 }

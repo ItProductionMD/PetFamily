@@ -6,10 +6,7 @@ public record UpdateVolunteerCommand
 (
     Guid VolunteerId,
     string FirstName,
-    string LastName,
-    string Email,
+    string LastName, 
     string Description,
-    string PhoneNumber,
-    string PhoneRegionCode,
     int ExperienceYears
 ) : ICommand;

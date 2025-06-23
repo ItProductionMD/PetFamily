@@ -1,4 +1,5 @@
-﻿using PetFamily.SharedKernel.Results;
+﻿using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Results;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
 using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 using static PetFamily.SharedKernel.Validations.ValidationPatterns;
@@ -41,7 +42,7 @@ public record Phone : IValueObject
 
     public static UnitResult Validate(string? number, string? regionCode) =>
 
-        UnitResult.ValidateCollection(
+        UnitResult.FromValidationResults(
 
             () => ValidateRequiredField(
 
@@ -74,5 +75,23 @@ public record Phone : IValueObject
     {
         yield return Number;
         yield return RegionCode;
+    }
+    public override string ToString()
+    {
+        return $"{RegionCode}-{Number}";
+    }
+
+    public string ToStringFormattedPhone()
+    {
+        return $"{RegionCode}-{Number}";
+    }
+
+    public static Result<Phone> FromStringFormattedPhone(string formattedPhone)
+    {
+        var parts = formattedPhone.Split('-');
+        if (parts.Length != 2)
+            Result.Fail(Error.InvalidFormat("Phone"));
+
+        return Result.Ok(new Phone(parts[1], parts[0]));
     }
 }

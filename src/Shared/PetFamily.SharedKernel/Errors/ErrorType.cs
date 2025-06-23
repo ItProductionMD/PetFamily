@@ -7,5 +7,7 @@ public enum ErrorType
     Conflict,
     Exception,
     InternalServerError,
-    Cancellation
+    Cancellation,
+    Forbidden,
+    Authentication
 }

@@ -18,10 +18,7 @@ public record UpdateVolunteerRequest
             volunteerId,
             FirstName,
             LastName,
-            Email,
             Description,
-            PhoneNumber,
-            PhoneRegionCode,
             ExperienceYears);
 }
 

@@ -1,4 +1,5 @@
 ﻿using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.SharedKernel.ValueObjects.Ids;
 using PetSpecies.Domain;
 using Volunteers.Domain;
 using Volunteers.Domain.Enums;
@@ -47,16 +48,16 @@ public class VolunteerTestBuilder
 
             var randomLastName = GetRandomName(5, 10);
 
+            var phone = phoneResult.Data!;
+
             var result = Volunteer.Create(
                 VolunteerID.NewGuid(),
+                UserId.NewGuid(),
                 FullName.Create(randomFirstName, randomLastName).Data!,
-                randomFirstName + "-" + randomLastName + "-" + email,
-                phoneResult.Data!,
                  1,
                 "test description",
-                [],
-                []
-            );
+                phone,
+                []);
 
             if (result.IsFailure)
                 throw new Exception($"Cant create volunteer with builder!Error:" +
@@ -110,11 +111,10 @@ public class VolunteerTestBuilder
            PetType.Create(
                BreedID.SetValue(randomBreed.Id),
                SpeciesID.SetValue(randomSpecies.Id)).Data!,
-           volunteer.Phone,
+           Phone.CreateEmpty(),
            [],
            randomHelpStatus,
-           "health info",
-           randomAddress);
+           "health info");
 
         if (pet == null)
             throw new Exception($"Cant create and add pet to volunteer with builder!");
@@ -145,8 +145,7 @@ public class VolunteerTestBuilder
                     Phone.CreateEmpty(),
                     [],
                     GetRandomValue<HelpStatus>(),
-                    "health info",
-                    GenerateRandomAddress());
+                    "health info");
             }
         }
         return this;
@@ -210,16 +209,16 @@ public class VolunteerTestBuilder
             throw new Exception($"Cant create volunteer with builder!Error:" +
                 $"{phoneResult.ValidationMessagesToString()}");
 
+        var phone = phoneResult.Data!;  
+
         var volunteerResult = Volunteer.Create(
             VolunteerID.NewGuid(),
+            UserId.NewGuid(),
             FullName.Create(firstName, lastName).Data!,
-            randomEmail,
-            phoneResult.Data!,
             Random.Shared.Next(1, 25),
             "test description",
-            [],
-            []
-        );
+            phone,
+            []);
 
         if (volunteerResult.IsFailure)
             throw new Exception($"Cant create volunteer with builder!Error:" +

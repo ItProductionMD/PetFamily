@@ -12,7 +12,7 @@ public static class ValidationExtensions
         this IRuleBuilder<T, TElement> ruleBuilder,
         Func<TElement, UnitResult> validate)
     {
-        return ruleBuilder.Custom((value, context) =>
+        return ruleBuilder.Custom((Action<TElement, ValidationContext<T>>)((value, context) =>
         {
             UnitResult result = validate(value);
 
@@ -23,14 +23,14 @@ public static class ValidationExtensions
             {
                 if (validationError != null)
                 {
-                    var failure = new ValidationFailure(validationError.ObjectName, validationError.ErrorCode)
+                    var failure = new ValidationFailure((string)validationError.ObjectName, (string)validationError.ErrorCode)
                     {
                         ErrorCode = validationError.ErrorCode
                     };
                     context.AddFailure(failure);
                 }
             }
-        });
+        }));
     }
 
     public static Result<T> ToResultFailure<T>(this ValidationResult validationResult)
@@ -49,7 +49,7 @@ public static class ValidationExtensions
 
             validationErrors.Add(validationError);
         }
-        return Result.Fail(Error.ValidationError(validationErrors));
+        return Result.Fail(Error.FromValidationErrors(validationErrors));
     }
 
     public static UnitResult ToResultFailure(this ValidationResult validationResult)
@@ -68,6 +68,6 @@ public static class ValidationExtensions
 
             validationErrors.Add(validationError);
         }
-        return Result.Fail(Error.ValidationError(validationErrors));
+        return Result.Fail(Error.FromValidationErrors(validationErrors));
     }
 }

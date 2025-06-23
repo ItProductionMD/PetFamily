@@ -2,11 +2,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PetFamily.Application.Abstractions;
+using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
 using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
-using PetFamily.SharedKernel.Validations;
 using System.Text;
 using Volunteers.Application.IRepositories;
 using Volunteers.Application.Queries.GetPets;
@@ -14,7 +14,6 @@ using Volunteers.Application.Queries.GetPets.ForFilter;
 using Volunteers.Application.Queries.GetVolunteers;
 using Volunteers.Application.ResponseDtos;
 using Volunteers.Infrastructure.Extensions;
-using Volunteers.Public.IContracts;
 
 using static PetFamily.SharedInfrastructure.Shared.Extensions.DynamicParametersExtensions;
 
@@ -32,58 +31,41 @@ public class VolunteerReadRepository(
 
     public async Task<UnitResult> CheckUniqueFields(
         Guid volunteerId,
-        string phoneRegionCode,
-        string phoneNumber,
-        string email,
+        string phone,
         CancellationToken cancellationToken = default)
     {
         var sql = $@"
         SELECT 
-            CASE WHEN EXISTS (SELECT 1 
-                FROM {VolunteerTable.TableFullName}
-                WHERE {VolunteerTable.PhoneRegionCode} = @PhoneRegionCode 
-                AND {VolunteerTable.PhoneNumber} = @PhoneNumber 
-                AND {VolunteerTable.Id} <> @Id) 
-                THEN 'Phone' ELSE NULL END AS PhoneTaken,
             CASE WHEN EXISTS (
-                SELECT 1 FROM {VolunteerTable.TableFullName} WHERE email = @Email 
+                SELECT 1 
+                FROM {VolunteerTable.TableFullName}
+                WHERE {VolunteerTable.Phone} = @Phone
                 AND {VolunteerTable.Id} <> @Id) 
-                THEN 'Email' ELSE NULL END AS EmailTaken";
+                THEN 'Phone' ELSE NULL END AS PhoneTaken;";
 
-        _logger.LogInformation("Executing(CheckUniqueFields) SQL Query: {sql} with Parameters:" +
-            " {volunteerId}, {phoneRegionCode}, {phoneNumber}, {email}",
-            sql, volunteerId, phoneRegionCode, phoneNumber, email);
+        _logger.LogInformation("EXECUTING QUERY(CheckUniqueFields) SQL Query: {sql} with Parameters:" +
+            " {volunteerId}, {phone}",
+            sql, volunteerId, phone);
 
         await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
-        var result = await dbConnection.QuerySingleAsync<(string PhoneTaken, string EmailTaken)>(
+        var result = await dbConnection.QuerySingleAsync<string>(
             sql,
             new
             {
                 Id = volunteerId,
-                PhoneRegionCode = phoneRegionCode,
-                PhoneNumber = phoneNumber,
-                Email = email
+                Phone = phone
             },
             commandTimeout: _options.QueryTimeout);
 
-        List<ValidationError> validationErrors = [];
-
-        if (string.IsNullOrWhiteSpace(result.PhoneTaken) == false)
-            validationErrors.Add(Error.ValueIsAlreadyExist("Phone").ValidationErrors.FirstOrDefault()!);
-
-        if (string.IsNullOrWhiteSpace(result.EmailTaken) == false)
-            validationErrors.Add(Error.ValueIsAlreadyExist("Email").ValidationErrors.FirstOrDefault()!);
-
-        if (validationErrors.Count > 0)
+        if (string.IsNullOrWhiteSpace(result) == false)
         {
-            _logger.LogWarning("Volunteer {phone} {email} is/are already busy!",
-                result.PhoneTaken ?? "", result.EmailTaken ?? "");
+            _logger.LogWarning("Volunteer with phone {phone} already exists!", result);
 
-            return Result.Fail(Error.ValuesAreAlreadyExist(validationErrors));
+            return UnitResult.Fail(Error.ValueIsAlreadyExist("Phone"));
         }
-        _logger.LogInformation("Volunteer {phone} {email} is/are unique!",
-            result.PhoneTaken ?? "", result.EmailTaken ?? "");
+       
+        _logger.LogInformation("Volunteer {phone} is unique!", result);
 
         return UnitResult.Ok();
     }
@@ -97,13 +79,12 @@ public class VolunteerReadRepository(
             -- The PetDtos column is stored as JSONB, containing an array of pet objects.
             SELECT 
                 v.{VolunteerTable.Id} AS Id, 
-                v.{VolunteerTable.LastName} AS lastName, 
-                v.{VolunteerTable.FirstName} AS firstName, 
-                v.{VolunteerTable.PhoneRegionCode} AS phoneRegionCode,
-                v.{VolunteerTable.PhoneNumber} AS phoneNumber,
-                v.{VolunteerTable.Email} AS Email,
-                v.{VolunteerTable.SocialNetworks} AS socialNetworkDtos,
-                v.{VolunteerTable.Requisites} AS requisitesDtos,
+                v.{VolunteerTable.UserId} AS UserId,
+                v.{VolunteerTable.LastName} AS LastName, 
+                v.{VolunteerTable.FirstName} AS FirstName, 
+                v.{VolunteerTable.Phone} AS Phone,
+                v.{VolunteerTable.Rating} AS Rating,
+                v.{VolunteerTable.Requisites} AS RequisitesDtos,
                 COALESCE(
                     jsonb_agg(
                         jsonb_build_object(
@@ -178,11 +159,15 @@ public class VolunteerReadRepository(
         }
 
         var sql = $@"
-            SELECT v.Id, 
-            CONCAT(v.last_name, ' ', v.first_name) AS FullName, 
-            CONCAT(v.phone_region_code, '-', v.phone_number) AS Phone, 
-            v.rating
+            SELECT 
+            v.{VolunteerTable.Id} AS Id, 
+            v.{VolunteerTable.UserId} AS UserId,
+            CONCAT(v.{VolunteerTable.LastName}, ' ', v.{VolunteerTable.FirstName}) AS FullName, 
+            v.{VolunteerTable.Phone} AS Phone, 
+            v.{VolunteerTable.Rating} AS Rating,
+            v.{VolunteerTable.Requisites} AS RequisitesDtos
             FROM {VolunteerTable.TableFullName} v
+            LEFT JOIN {UserTable.TableFullName} u ON u.{UserTable.Id} = v.{VolunteerTable.Id}
             WHERE v.{VolunteerTable.IsDeleted} = FALSE
             ORDER BY {orderBy} {orderDirection}
             LIMIT @Limit OFFSET @Offset";

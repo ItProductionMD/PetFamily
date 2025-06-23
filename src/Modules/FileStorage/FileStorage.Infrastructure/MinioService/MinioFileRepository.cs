@@ -277,7 +277,7 @@ public class MinioFileRepository(
         foreach (var obj in response.Versions)
         {
             Console.WriteLine($"File is DeletedMarker {obj.IsDeleteMarker}, versionId:{obj.VersionId}");
-            if (obj.IsDeleteMarker)
+            if (obj.IsDeleteMarker!= null && obj.IsDeleteMarker.Value == true)
             {
                 var deleteMarkerArgs = new RemoveObjectArgs()
                     .WithBucket(file.Folder)
@@ -311,7 +311,7 @@ public class MinioFileRepository(
 
         foreach (var obj in response.Versions)
         {
-            if (obj.IsDeleteMarker)
+            if (obj.IsDeleteMarker != null && obj.IsDeleteMarker.Value == true)
             {
                 var deleteMarkerArgs = new DeleteObjectRequest
                 {

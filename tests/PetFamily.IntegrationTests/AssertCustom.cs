@@ -10,16 +10,12 @@ public static class AssertCustom
     public static void AreEqualData(CreateVolunteerCommand command, Volunteer? volunteer)
     {
         var commandRequisites = command.Requisites.ToList();
-        var commandSocialNetworks = command.SocialNetworksList.ToList();
 
         Assert.NotNull(volunteer);
         Assert.NotEqual(Guid.Empty, volunteer.Id);
         Assert.Equal(command.FirstName, volunteer.FullName.FirstName);
         Assert.Equal(command.LastName, volunteer.FullName.LastName);
-        Assert.Equal(command.Email, volunteer.Email);
         Assert.Equal(command.Description, volunteer.Description);
-        Assert.Equal(command.PhoneNumber, volunteer.Phone.Number);
-        Assert.Equal(command.PhoneRegionCode, volunteer.Phone.RegionCode);
         Assert.Equal(command.ExperienceYears, volunteer.ExperienceYears);
 
         Assert.Equal(commandRequisites.Count, volunteer.Requisites.Count);
@@ -27,13 +23,6 @@ public static class AssertCustom
         {
             Assert.Equal(commandRequisites[i].Name, volunteer.Requisites[i].Name);
             Assert.Equal(commandRequisites[i].Description, volunteer.Requisites[i].Description);
-        }
-
-        Assert.Equal(commandSocialNetworks.Count, volunteer.SocialNetworks.Count);
-        for (int i = 0; i < commandSocialNetworks.Count; i++)
-        {
-            Assert.Equal(commandSocialNetworks[i].Name, volunteer.SocialNetworks[i].Name);
-            Assert.Equal(commandSocialNetworks[i].Url, volunteer.SocialNetworks[i].Url);
         }
     }
 
@@ -44,10 +33,7 @@ public static class AssertCustom
         Assert.NotEqual(Guid.Empty, volunteer.Id);
         Assert.Equal(command.FirstName, volunteer.FullName.FirstName);
         Assert.Equal(command.LastName, volunteer.FullName.LastName);
-        Assert.Equal(command.Email, volunteer.Email);
         Assert.Equal(command.Description, volunteer.Description);
-        Assert.Equal(command.PhoneNumber, volunteer.Phone.Number);
-        Assert.Equal(command.PhoneRegionCode, volunteer.Phone.RegionCode);
         Assert.Equal(command.ExperienceYears, volunteer.ExperienceYears);
     }
 

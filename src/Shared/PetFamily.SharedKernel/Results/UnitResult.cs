@@ -6,7 +6,7 @@ public class UnitResult : Result
 {
     public static UnitResult Ok() => new() { IsSuccess = true };
 
-    public static UnitResult ValidateCollection(params Func<UnitResult>[] validators)
+    public static UnitResult FromValidationResults(params Func<UnitResult>[] validators)
     {
 
         var validationErrors = new List<ValidationError>();
@@ -18,7 +18,7 @@ public class UnitResult : Result
                 validationErrors.AddRange(result.Error.ValidationErrors);
         }
         return validationErrors.Count > 0
-            ? Fail(Error.ValidationError(validationErrors))
+            ? Fail(Error.FromValidationErrors(validationErrors))
             : Ok();
     }
 

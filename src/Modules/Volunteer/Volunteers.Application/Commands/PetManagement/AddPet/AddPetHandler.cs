@@ -84,7 +84,6 @@ public class AddPetHandler(
             ownerPhone,
             requisites,
             helpStatus,
-            cmd.HealthInfo,
-            address);
+            cmd.HealthInfo);
     }
 }

@@ -33,7 +33,7 @@ public record SocialNetworkInfo
         if (IsSocialNetworkEmpty(name, url))
             return UnitResult.Ok();
 
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateRequiredField(
 

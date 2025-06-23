@@ -1,4 +1,5 @@
 ﻿using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.SharedKernel.ValueObjects.Ids;
 using PetFamily.Tools.Extensions;
 using PetSpecies.Domain;
 using System.Text;
@@ -68,16 +69,16 @@ public class VolunteerBuilder
             throw new Exception($"Cant create volunteer with builder!Error:" +
                 $"{phoneResult.ValidationMessagesToString()}");
 
+        var phone = phoneResult.Data!;
+
         var volunteerResult = Volunteer.Create(
             VolunteerID.NewGuid(),
+            UserId.NewGuid(),
             FullName.Create(firstName, lastName).Data!,
-            fakeEmail,
-            phoneResult.Data!,
             i > 50 ? 1 : i,
             "test description",
-            [],
-            []
-        );
+            phone,
+            []);
 
         if (volunteerResult.IsFailure)
             throw new Exception($"Cant create volunteer with builder!Error:" +
@@ -119,11 +120,10 @@ public class VolunteerBuilder
            PetType.Create(
                BreedID.SetValue(randomBreed.Id),
                SpeciesID.SetValue(randomSpecies.Id)).Data!,
-           volunteer.Phone,
+           Phone.CreateEmpty(),
            [],
            randomHelpStatus,
-           "health info",
-           randomAddress);
+           "health info");
 
         for (int i = 0; i < 9; i++)
             pet.AddImages([$"{Guid.NewGuid().ToString()}" + ".jpg"]);

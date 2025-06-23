@@ -144,26 +144,6 @@ public class VolunteerWriteRepository(
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<UnitResult> UpdateSocialNetworks(
-        Guid volunteerId,
-        List<SocialNetworkInfo> socialNetworks,
-        CancellationToken ct = default)
-    {
-        var socialNetworksValue = await _context.Volunteers
-             .Where(v => v.Id == volunteerId)
-             .Select(v => v.SocialNetworks)
-             .FirstOrDefaultAsync(ct);
-
-        if (socialNetworksValue == null)
-            return Result.Fail(Error.NotFound("Volunteer"));
-
-        if (socialNetworksValue == socialNetworks)
-            return UnitResult.Ok();
-
-        await _context.SaveChangesAsync(ct);
-
-        return UnitResult.Ok();
-    }
 
     public async Task SaveWithRetry(VolunteerDomain volunteer, CancellationToken ct = default)
     {

@@ -7,7 +7,7 @@ public static class RestorePetCommandValidation
 {
     public static UnitResult Validate(RestorePetCommand command)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "VolunteerId"),
 

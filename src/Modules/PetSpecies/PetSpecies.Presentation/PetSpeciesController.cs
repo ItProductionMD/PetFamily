@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PetFamily.Framework;
-using PetFamily.Framework.Extensions;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
 using PetFamily.Application.Dtos;
-using PetSpecies.Presentation.Requests;
+using PetFamily.Framework;
+using PetFamily.Framework.Extensions;
 using PetSpecies.Application.Commands.DeleteBreed;
 using PetSpecies.Application.Commands.DeleteSpecies;
 using PetSpecies.Application.Queries.GetBreedPagedList;
 using PetSpecies.Application.Queries.GetSpeciesPagedList;
+using PetSpecies.Presentation.Requests;
+using static PetFamily.SharedKernel.Authorization.PermissionCodes.SpeciesManagement;
 
 namespace PetSpecies.Presentation.Controllers;
 
@@ -23,6 +25,7 @@ public class PetSpeciesController : ControllerBase
     /// <param name="handler">The handler for processing the add species command.</param>
     /// <param name="cancelToken">A token to cancel the operation.</param>
     /// <returns>Returns a response with the operation result (200 OK or an error).</returns>
+    [Authorize(Policy = SpeciesCreate)]
     [HttpPost]
     public async Task<ActionResult<Envelope>> AddSpecies(
         [FromBody] AddPetTypeRequest request,
@@ -43,6 +46,7 @@ public class PetSpeciesController : ControllerBase
     /// <param name="handler"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = SpeciesDelete)]
     [HttpDelete("{speciesId}")]
     public async Task<ActionResult<Envelope>> DeleteSpecies(
         [FromRoute] Guid speciesId,
@@ -66,6 +70,7 @@ public class PetSpeciesController : ControllerBase
     /// <param name="handler"></param>
     /// <param name="cancelToken"></param>
     /// <returns></returns>
+    [Authorize(Policy = SpeciesEdit)]
     [HttpDelete("{speciesId}/{breedId}")]
     public async Task<ActionResult<Envelope>> DeleteBreed(
         [FromRoute] Guid speciesId,

@@ -31,7 +31,7 @@ public class Breed : Entity<Guid>
 
     public static UnitResult Validate(string? name, string? description) =>
 
-        UnitResult.ValidateCollection(
+        UnitResult.FromValidationResults(
 
             () => ValidateRequiredField(name, "Breed name", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 

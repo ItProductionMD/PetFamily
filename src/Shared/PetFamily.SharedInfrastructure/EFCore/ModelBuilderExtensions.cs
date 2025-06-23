@@ -1,11 +1,30 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.SharedKernel.Uniqness;
+using PetFamily.SharedKernel.ValueObjects;
 using System.Reflection;
+using static PetFamily.SharedInfrastructure.Shared.EFCore.Convertors;
 
 namespace PetFamily.SharedInfrastructure.Shared.EFCore;
 
 public static class ModelBuilderExtensions
 {
+    public static void ApplyUniqueConstraintsFromAttributes(this ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var clrType = entityType.ClrType;
+
+            // Создаём EntityTypeBuilder<T> с помощью рефлексии
+            var method = typeof(ModelBuilderExtensions)
+                .GetMethod(nameof(ApplyUniqueConstraints), BindingFlags.Static | BindingFlags.NonPublic)!
+                .MakeGenericMethod(clrType);
+
+            var entityBuilder = modelBuilder.Entity(clrType);
+            method.Invoke(null, new object[] { entityBuilder });
+        }
+    }
+
     public static void ApplyUniqueConstraints<T>(this EntityTypeBuilder<T> builder) where T : class
     {
         foreach (var property in typeof(T).GetProperties())
@@ -38,6 +57,15 @@ public static class ModelBuilderExtensions
                     Console.WriteLine("Ok!");
                 });
             }
+        }
+    }
+
+    public static void ApplyIdConversions(this ModelBuilder modelBuilder)
+    {
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            var clrType = entity.ClrType;
+            var builder = modelBuilder.Entity(clrType);
         }
     }
 

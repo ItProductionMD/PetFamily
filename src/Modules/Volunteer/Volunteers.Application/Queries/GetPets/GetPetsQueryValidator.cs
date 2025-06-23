@@ -14,7 +14,7 @@ public static class GetPetsQueryValidator
 
     public static UnitResult Validate(GetPetsQuery query)
     {
-        var paginationResult = UnitResult.ValidateCollection(
+        var paginationResult = UnitResult.FromValidationResults(
             () => ValidateNumber(query.PageNumber, "pageNumber", 1, int.MaxValue),
             () => ValidateNumber(query.PageSize, "pageSize", 1, MAX_PAGE_SIZE));
 
@@ -28,7 +28,7 @@ public static class GetPetsQueryValidator
             filter.SpeciesIds = filter.SpeciesIds?.Distinct().ToList();
             filter.BreedIds = filter.BreedIds?.Distinct().ToList();
 
-            filterResult = UnitResult.ValidateCollection(
+            filterResult = UnitResult.FromValidationResults(
 
                 () => ValidateNumber(
                     filter.MinAgeInMonth,
@@ -68,7 +68,7 @@ public static class GetPetsQueryValidator
                     NAME_PATTERN));
         }
 
-        return UnitResult.ValidateCollection(() => paginationResult, () => filterResult);
+        return UnitResult.FromValidationResults(() => paginationResult, () => filterResult);
     }
 
     private static UnitResult ValidateGuidList(List<Guid>? list, string listName)

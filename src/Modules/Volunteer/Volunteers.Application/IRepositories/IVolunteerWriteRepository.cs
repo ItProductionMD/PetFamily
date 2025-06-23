@@ -15,9 +15,4 @@ public interface IVolunteerWriteRepository
     Task<Result<VolunteerFromDomain>> GetByIdAsync(Guid id, CancellationToken cancelToken = default);
 
     Task Delete(VolunteerFromDomain volunteer, CancellationToken cancelToken = default);
-
-    Task<UnitResult> UpdateSocialNetworks(
-        Guid volunteerId,
-        List<SocialNetworkInfo> socialNetworks,
-        CancellationToken cancelToken = default);
 }

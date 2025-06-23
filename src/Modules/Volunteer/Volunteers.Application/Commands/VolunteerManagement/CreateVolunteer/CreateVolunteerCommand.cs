@@ -6,10 +6,6 @@ namespace Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 public record CreateVolunteerCommand(
     string FirstName,
     string LastName,
-    string Email,
     string Description,
-    string PhoneNumber,
-    string PhoneRegionCode,
     int ExperienceYears,
-    IEnumerable<RequisitesDto> Requisites,
-    IEnumerable<SocialNetworksDto> SocialNetworksList) : ICommand;
+    IEnumerable<RequisitesDto> Requisites) : ICommand;

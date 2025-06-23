@@ -11,7 +11,7 @@ public static class AddPetCommandValidator
 {
     public static UnitResult Validate(AddPetCommand command)
     {
-        return UnitResult.ValidateCollection(
+        return UnitResult.FromValidationResults(
 
             () => ValidateIfGuidIsNotEpmty(command.VolunteerId, "Volunteer id"),
 

@@ -9,6 +9,7 @@ public record FullName
     public string FirstName { get; }
     public string LastName { get; }
 
+    private FullName() { } // EF Core needs this
     private FullName(string firstName, string lastName)
     {
         FirstName = firstName;
@@ -26,7 +27,7 @@ public record FullName
 
     public static UnitResult Validate(string? firstName, string? lastName) =>
 
-        UnitResult.ValidateCollection(
+        UnitResult.FromValidationResults(
 
             () => ValidateRequiredField(lastName, "LastName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
 

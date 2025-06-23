@@ -29,7 +29,7 @@ public record Error
         ValidationErrors.AddRange(validationErrors);
     }
     //--------------------------------------Validation Errors-------------------------------------//
-    public static Error ValidationError(List<ValidationError> validationErrors) =>
+    public static Error FromValidationErrors(List<ValidationError> validationErrors) =>
         new(ErrorCodes.VALIDATION_ERROR,
             string.Empty,
             ErrorType.Validation,
@@ -115,5 +115,19 @@ public record Error
         new(ErrorCodes.CONFLICT_ERROR,
             message,
             ErrorType.Conflict);
+
+    public static Error RoleIsNotAssignable(string name) =>
+        new(ErrorCodes.ACCESS_FORBIDDEN,
+            $"Role '{name}' cannot be assigned manually",
+            ErrorType.Forbidden);
+
+    public static Error Authentication(string message)
+    {
+        return Error.Custom(
+            ErrorCodes.AUTHENTICATION_ERROR,
+            message,
+            ErrorType.Authentication
+        );
+    }
 }
 
