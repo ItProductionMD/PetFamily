@@ -9,10 +9,8 @@ using PetFamily.Auth.Infrastructure.Dapper;
 using PetFamily.Auth.Infrastructure.Repository;
 using PetFamily.Auth.Infrastructure.Services.AuthorizationService;
 using PetFamily.Auth.Infrastructure.Services.EmailService;
-using PetFamily.Auth.Infrastructure.Services.HttpUserContext;
 using PetFamily.Auth.Infrastructure.Services.JwtProvider;
 using PetFamily.Auth.Infrastructure.Services.PasswordHasher;
-using PetFamily.Auth.Public.IContracts;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using static PetFamily.Auth.Infrastructure.AuthInjector.JwtAuthenticationInjector;
 using static PetFamily.Auth.Infrastructure.AuthInjector.PermissionsPolicesAuthorizationInjector;
@@ -56,9 +54,7 @@ public static class PetFamilyAuthInjector
 
             .AddSingleton<IAuthorizationHandler, AuthorizationHandlerByPermissions>()
 
-            .AddHttpContextAccessor()
-
-            .AddScoped<IUserContext, HttpUserContext>();
+            .AddHttpContextAccessor();
 
         AuthDapperConverters.Register();
 

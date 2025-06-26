@@ -8,8 +8,9 @@ using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Uniqness;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;
-using System.Diagnostics;
-using System.Runtime;
+using static PetFamily.Auth.Domain.Validations.Validations;
+
+
 
 namespace PetFamily.Auth.Domain.Entities.UserAggregate;
 
@@ -27,7 +28,7 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
     public string Email { get; set; }
     public bool IsTwoFactorEnabled { get; set; }
     public bool IsBlocked { get; set; } = false;
-    public DateTime? BlockedAt { get; set; } 
+    public DateTime? BlockedAt { get; set; }
     public DateTime? LastLoginDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
@@ -77,7 +78,8 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
             .Select(roleId => new UserRole(id, roleId))
             .ToList();
 
-        //TODO Add Validation
+        var validationResult = ValidateUser(email, login, hashedPassword, LoginOptions.Default);
+
         var user = new User(
             id,
             email,
@@ -91,18 +93,16 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
         return Result.Ok(user);
     }
 
-    private static UnitResult ValidateUser(string login, LoginOptions options)
-    {
-        if (string.IsNullOrWhiteSpace(login))
-        {
-            return Result.Fail(Error.StringIsNullOrEmpty("Login"));
-        }
-        if (login.Length < options.minLength || login.Length > options.maxLength)
-        {
-            return Result.Fail(Error.InvalidLength("Login"));
-        }
-        return UnitResult.Ok();
-    }
+    private static UnitResult ValidateUser(
+        string email,
+        string login,
+        string password,
+        LoginOptions options) =>
+
+        UnitResult.FromValidationResults(
+            () => ValidateLogin(login, options),
+            () => ValidateEmail(email),
+            () => ValidatePassword(password));
 
     public void SoftDelete()
     {
@@ -132,8 +132,8 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
 
     public void AddRole(RoleId roleId)
     {
-        if (!_userRoles.Any(r=>r.RoleId == roleId))
-            _userRoles.Add(new UserRole(Id,roleId));
+        if (!_userRoles.Any(r => r.RoleId == roleId))
+            _userRoles.Add(new UserRole(Id, roleId));
     }
 
     public void RemoveRoleId(RoleId roleId)
@@ -152,10 +152,10 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
 
     public void UpdateRoles(IEnumerable<RoleId> roleIds)
     {
-        
+
         _userRoles.Clear();
         var userRoles = roleIds.Select(rId => new UserRole(Id, rId)).ToList();
-        _userRoles.AddRange(userRoles);    
+        _userRoles.AddRange(userRoles);
     }
 
     public void ErrorAttemptLogin()
@@ -181,6 +181,8 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
         Phone = profile.Phone;
         SocialNetworks = SocialNetworks;
     }
+
+
 }
 public record Profile(
     string Login,

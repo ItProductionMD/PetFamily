@@ -3,7 +3,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PetFamily.Application.Validations;
-using PetFamily.Auth.Public.IContracts;
+using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;

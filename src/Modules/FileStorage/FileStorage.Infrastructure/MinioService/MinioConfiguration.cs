@@ -12,6 +12,7 @@ public static class MinioConfiguration
         IConfiguration configuration)
     {
         services.Configure<MinioOptions>(configuration.GetSection("MinioOptions"));
+
         var logger = LoggerFactoryInstance.CreateLogger("MinioLogger");
 
         return services.AddMinio(options =>

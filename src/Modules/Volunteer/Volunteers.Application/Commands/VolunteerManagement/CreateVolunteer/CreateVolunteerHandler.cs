@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions.CQRS;
 using PetFamily.Application.Validations;
-using PetFamily.Auth.Public.IContracts;
+using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
