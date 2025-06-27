@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
+using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities.UserAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
@@ -71,14 +72,29 @@ public class UserReadRepository(
             : UnitResult.Ok();
     }
 
-    public Task<User?> GetByEmailAsync(string email, CancellationToken ct)
+    public async Task<Result<UserDto>> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
-    }
+        var sql = $@"
+        SELECT 
+            {UserTable.Id} As Id,           
+            {UserTable.Email} AS Email,
+            {UserTable.Login} AS Login,
+        CONCAT({UserTable.PhoneRegionCode},'-',{UserTable.PhoneNumber}) AS Phone
+        FROM {UserTable.TableFullName}
+        WHERE {UserTable.Id} = @Id         
+        LIMIT 1;";
 
-    public Task<User?> GetByIdAsync(Guid id, CancellationToken ct)
-    {
-        throw new NotImplementedException();
+        _logger.LogInformation("EXECURING QUERY:{sql} with params:{id}",sql,id);
+        await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+
+        var user = await connection.QuerySingleOrDefaultAsync<UserDto>(sql, new { Id = id});
+
+        if(user == null)
+        {
+            _logger.LogWarning("User with Id:{Id} not found!", id);
+            return Result.Fail(Error.NotFound("User"));
+        }
+        return Result.Ok(user);
     }
 
     public async Task<User?> GetByLoginAndPasswordAsync(
@@ -113,4 +129,6 @@ public class UserReadRepository(
         public string? PhoneRegionCode { get; set; }
         public string? PhoneNumber { get; set; }
     }
+
+    
 }

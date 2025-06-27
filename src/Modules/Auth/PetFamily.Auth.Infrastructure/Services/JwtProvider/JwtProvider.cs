@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using PetFamily.Auth.Application.Constants;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IServices;
 using PetFamily.Auth.Infrastructure.Services.AuthorizationService;
@@ -25,7 +24,21 @@ public class JwtProvider : IJwtProvider
         _secret = Encoding.UTF8.GetBytes(_jwtOptions.SecretKey);
     }
 
-    public (string AccessToken, DateTime ExpiresAt) GenerateAccessTokenForPermissionRequirement(
+    public Result<string> GetJtiClaim(string accessToken)
+    {
+        var claimsResult = ValidateToken(accessToken, false);
+        if(claimsResult.IsFailure)
+            return Result.Fail(claimsResult.Error);
+
+        var claims = claimsResult.Data;
+        var jti = claims?.FindFirst(JwtRegisteredClaimNames.Jti);
+        if (jti != null && !string.IsNullOrWhiteSpace(jti.Value))
+            return Result.Ok(jti.Value);
+
+        return Result.Fail(Error.Authentication("Access token jti Error"));
+    }
+
+    public (string AccessToken, DateTime ExpiresAt,Guid Jti) GenerateAccessTokenForPermissionRequirement(
        UserId userId,
        string login,
        string email,
@@ -34,11 +47,13 @@ public class JwtProvider : IJwtProvider
     {
         var now = DateTime.UtcNow;
 
+        var jti = Guid.NewGuid();
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, userId.Value.ToString()),
             new Claim(ClaimTypes.Name, login),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, jti.ToString()),
         };
         if (!string.IsNullOrWhiteSpace(phone))
         {
@@ -56,7 +71,7 @@ public class JwtProvider : IJwtProvider
             now,
             now.AddMinutes(_jwtOptions.AccessTokenLifetimeMinutes));
 
-        return accessToken;
+        return (accessToken.Token, accessToken.ExpiresAt, jti);
     }
 
     public (string RefreshToken, DateTime ExpiresAt) GenerateRefreshToken()
@@ -84,7 +99,8 @@ public class JwtProvider : IJwtProvider
             AccessToken: accessToken.AccessToken,
             AccessTokenExpiresAt: accessToken.ExpiresAt,
             RefreshToken: refreshToken.RefreshToken,
-            RefreshTokenExpiresAt: refreshToken.ExpiresAt);
+            RefreshTokenExpiresAt: refreshToken.ExpiresAt,
+            Jti: accessToken.Jti);
 
         return result;
     }

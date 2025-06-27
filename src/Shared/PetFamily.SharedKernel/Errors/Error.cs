@@ -129,5 +129,14 @@ public record Error
             ErrorType.Authentication
         );
     }
+
+    public static Error Authorization(string message)
+    {
+        return Error.Custom(
+            ErrorCodes.AUTHORIZATION_ERROR,
+            message,
+            ErrorType.Authentication
+        );
+    }
 }
 

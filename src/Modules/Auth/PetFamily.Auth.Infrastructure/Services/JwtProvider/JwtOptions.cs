@@ -2,6 +2,7 @@
 
 public class JwtOptions
 {
+    public const string SECTION_NAME = "JwtOptions";
     public string SecretKey { get; set; }
     public string Issuer { get; set; }
     public string Audience { get; set; }

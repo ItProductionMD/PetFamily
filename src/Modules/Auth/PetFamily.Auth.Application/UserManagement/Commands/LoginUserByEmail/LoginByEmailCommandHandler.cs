@@ -3,6 +3,7 @@ using PetFamily.Application.Abstractions.CQRS;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
+using PetFamily.Auth.Domain.Entities;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 
@@ -12,15 +13,19 @@ namespace PetFamily.Auth.Application.UserManagement.Commands.LoginUserByEmail;
 public class LoginByEmailCommandHandler(
     IUserWriteRepository userWriteRepository,
     IRoleReadRepository roleRepository,
+    IRefreshTokenWriteRepository refreshTokenWriteRepository,
     IPasswordHasher passwordHasher,
     IJwtProvider jwtProvider,
+    IAuthUnitOfWork authUnitOfWork,
     ILogger<LoginByEmailCommandHandler> logger) : ICommandHandler<TokenResult, LoginByEmailCommand>
 {
     private readonly IUserWriteRepository _userWriteRepository = userWriteRepository;
     private readonly IRoleReadRepository _roleRepository = roleRepository;
+    private readonly IRefreshTokenWriteRepository _refreshTokenWriteRepository = refreshTokenWriteRepository;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
     private readonly ILogger<LoginByEmailCommandHandler> _logger = logger;
+    private readonly IAuthUnitOfWork _authUnitOfWork = authUnitOfWork;
 
     public async Task<Result<TokenResult>> Handle(LoginByEmailCommand cmd, CancellationToken ct)
     {
@@ -41,6 +46,7 @@ public class LoginByEmailCommandHandler(
         if (user.IsBlocked)
         {
             _logger.LogWarning("User with email {Email} is blocked", cmd.Email);
+
             return Result.Fail(Error.Authentication("User is blocked"));
         }
 
@@ -78,13 +84,19 @@ public class LoginByEmailCommandHandler(
             permissionCodes
         );
 
-        user.LoginAttempts = 0;
+        user.SetSuccessfulLogin();
 
-        user.LastLoginDate = DateTime.UtcNow;
+        var refreshTokenSession = new RefreshTokenSession(
+            Guid.NewGuid(),
+            user.Id.Value,
+            tokens.RefreshToken,
+            tokens.RefreshTokenExpiresAt,
+            cmd.Fingerprint,
+            tokens.Jti);
 
-        await _userWriteRepository.SaveChangesAsync(ct);
+        await _refreshTokenWriteRepository.AddAsync(refreshTokenSession, ct);
 
-        // TODO: optionally save refreshToken to DB here
+        await _authUnitOfWork.SaveChangesAsync(ct);
 
         return Result.Ok(tokens);
     }

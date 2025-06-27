@@ -31,6 +31,8 @@ public static class PetFamilyAuthInjector
         services.InjectPetFamilyAuthApplication(configuration);
 
         services
+            .AddScoped<IRefreshTokenWriteRepository, RefreshTokenWriteRepository>()
+
             .AddScoped<IUserReadRepository, UserReadRepository>()
             .AddScoped<IUserWriteRepository, UserWriteRepository>()
 

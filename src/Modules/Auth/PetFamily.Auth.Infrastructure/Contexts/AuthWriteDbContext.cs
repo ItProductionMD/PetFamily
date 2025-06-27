@@ -18,7 +18,8 @@ public class AuthWriteDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }  
-    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<RefreshTokenSession> RefreshTokens { get; set; }
+
     public AuthWriteDbContext(string connectionString)
     {
         _connectionString = connectionString;

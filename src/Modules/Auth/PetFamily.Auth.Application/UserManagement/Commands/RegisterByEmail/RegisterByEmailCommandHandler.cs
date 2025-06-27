@@ -20,7 +20,7 @@ public class RegisterByEmailCommandHandler(
     IPasswordHasher passwordHasher,
     ILogger<RegisterByEmailCommandHandler> logger,
     IEmailConfirmationService emailConfirmationService,
-    IJwtProvider jwtProvider) : ICommandHandler<TokenResult, RegisterByEmailCommand>
+    IJwtProvider jwtProvider) : ICommandHandler<RegisterByEmailCommand>
 {
     private readonly IUserWriteRepository _userWriteRepository = userWriteRepository;
     private readonly IUserReadRepository _userReadRepository = userReadRepository;
@@ -31,7 +31,7 @@ public class RegisterByEmailCommandHandler(
     private readonly IEmailConfirmationService _emailConfirmationService = emailConfirmationService;
     private const string ROLE_CODE_TO_ASSIGN = RoleCodes.UNCONFIRMED_USER;
 
-    public async Task<Result<TokenResult>> Handle(RegisterByEmailCommand cmd, CancellationToken ct)
+    public async Task<UnitResult> Handle(RegisterByEmailCommand cmd, CancellationToken ct)
     {
         var validateCommandResult = RegisterByEmailCommandValidator.Validate(cmd);
         if (validateCommandResult.IsFailure)
@@ -43,7 +43,11 @@ public class RegisterByEmailCommandHandler(
         }
         var phone = Phone.CreateNotEmpty(cmd.phoneNumber, cmd.phoneRegionCode).Data!;
 
-        var checkUniqueFields = await _userReadRepository.CheckUniqueFields(cmd.Email, cmd.Login, phone, ct);
+        var checkUniqueFields = await _userReadRepository.CheckUniqueFields(
+            cmd.Email,
+            cmd.Login,
+            phone, 
+            ct);
         if (checkUniqueFields.IsFailure)
             return checkUniqueFields;
 
@@ -56,8 +60,6 @@ public class RegisterByEmailCommandHandler(
         var roleDto = getRoleDto.Data!;
 
         var roleId = RoleId.Create(roleDto.RoleId).Data!;
-
-        var permissionCodes = roleDto.Permissions.Select(p => p.PermissionCode).ToList();
 
         var socialNetworkList = cmd.SocialNetworksList
             .Select(dto => SocialNetworkInfo.Create(dto.Name, dto.Url).Data!).ToList();
@@ -73,13 +75,6 @@ public class RegisterByEmailCommandHandler(
             ProviderType.Local
         ).Data!;
 
-        var tokens = _jwtProvider.GenerateTokens(
-            user.Id,
-            user.Login,
-            user.Email,
-            user.Phone?.ToString() ?? string.Empty,
-            permissionCodes);
-
         await _userWriteRepository.AddAsync(user, ct);
 
         await _userWriteRepository.SaveChangesAsync(ct);
@@ -89,7 +84,7 @@ public class RegisterByEmailCommandHandler(
         _logger.LogInformation("User registered successfully. UserId: {UserId}, Email: {Email}",
             user.Id, user.Email);
 
-        return Result.Ok(tokens);
+        return UnitResult.Ok();
     }
 }
 

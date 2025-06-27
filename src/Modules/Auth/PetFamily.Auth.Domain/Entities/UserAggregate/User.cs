@@ -182,8 +182,15 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
         SocialNetworks = SocialNetworks;
     }
 
+    public void SetSuccessfulLogin()
+    {
+        LoginAttempts = 0;
+        LastLoginDate = DateTime.UtcNow;
+    }
 
 }
+
+
 public record Profile(
     string Login,
     Phone Phone,
