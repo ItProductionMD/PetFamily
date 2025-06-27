@@ -38,7 +38,7 @@ public class SoftDeleteVolunteerTest(
         foreach (var pet in softDeletedVolunteer.Pets)
         {
             Assert.True(pet.IsDeleted);
-            Assert.NotNull(pet.DeletedDateTime);
+            Assert.NotNull(pet.DeletedAt);
         }
     }
 }

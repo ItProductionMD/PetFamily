@@ -15,4 +15,6 @@ public static class UserTable
     public const string IsBlocked = "is_blocked";
     public const string IsTwoFactorEnabled = "is_two_factor_enabled";
     public const string BlockedAt = "blocked_at";
+    public const string DeletedAt = "deleted_at";
+    public const string IsDeleted = "is_deleted";
 }

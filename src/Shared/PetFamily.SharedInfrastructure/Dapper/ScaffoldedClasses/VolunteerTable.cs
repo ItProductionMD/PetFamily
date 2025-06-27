@@ -11,7 +11,7 @@ public static class VolunteerTable
     public const string Rating = "rating";
     public const string Requisites = "requisites";
     public const string SocialNetworks = "social_networks";
-    public const string DeletedDateTime = "deleted_date_time";
+    public const string DeletedDateTime = "deleted_at";
     public const string IsDeleted = "is_deleted";
     public const string FirstName = "first_name";
     public const string LastName = "last_name";

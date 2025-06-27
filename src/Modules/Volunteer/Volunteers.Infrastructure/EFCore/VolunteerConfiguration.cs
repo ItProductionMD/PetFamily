@@ -52,13 +52,13 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<VolunteerDomain>
             .Metadata.SetValueComparer(new ReadOnlyListComparer<RequisitesInfo>());
 
         //For soft deleting
-        builder.Property<bool>("_isDeleted")
-            .UsePropertyAccessMode(PropertyAccessMode.Field)
+        builder.Property(v => v.IsDeleted)
             .HasColumnName("is_deleted");
 
-        builder.Property<DateTime?>("_deletedDateTime")
-            .UsePropertyAccessMode(PropertyAccessMode.Field)
-            .HasColumnName("deleted_date_time");
+        builder.Property(v => v.DeletedAt)
+            .HasColumnName("deleted_at")
+            .IsRequired(false);
+        
 
         // Relationships
         builder.HasMany(v => v.Pets)

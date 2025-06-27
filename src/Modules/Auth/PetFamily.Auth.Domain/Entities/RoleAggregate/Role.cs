@@ -8,18 +8,20 @@ using PetFamily.SharedKernel.ValueObjects;
 namespace PetFamily.Auth.Domain.Entities.RoleAggregate;
 
 
-public class Role : Entity<RoleId>
+public class Role : IEntity<RoleId>
 {
+    public RoleId Id { get; private set; }
     [Unique]
     public string Code { get; private set; }
 
     private readonly List<RolePermission> _rolePermissions = [];
     public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions.ToList().AsReadOnly();
 
-    private Role(RoleId id) : base(id) { }
+    private Role(){ }//EFCore need this
 
-    private Role(RoleId id,string code, IEnumerable<RolePermission> permissions ) : base(id)
+    private Role(RoleId id,string code, IEnumerable<RolePermission> permissions )
     {
+        Id = id;
         Code = code;
         _rolePermissions = permissions.ToList();
     }

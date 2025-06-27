@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Auth.Application;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
+using PetFamily.Auth.Infrastructure.BackgroundServices;
 using PetFamily.Auth.Infrastructure.Contexts;
 using PetFamily.Auth.Infrastructure.Dapper;
 using PetFamily.Auth.Infrastructure.Repository;
@@ -57,6 +58,8 @@ public static class PetFamilyAuthInjector
             .AddSingleton<IAuthorizationHandler, AuthorizationHandlerByPermissions>()
 
             .AddHttpContextAccessor();
+
+        services.AddHostedService<AuthSoftDeletableCleanupService>();
 
         AuthDapperConverters.Register();
 

@@ -27,6 +27,13 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
                 value => RoleId.Create(value).Data!)
             .HasColumnName("role_id");
 
+        builder.Property(uR => uR.IsDeleted)
+            .HasColumnName("is_deleted");
+
+        builder.Property(uR => uR.DeletedAt)
+            .HasColumnName("deleted_at")
+            .IsRequired(false);
+
         builder.HasOne<User>()
             .WithMany(u => u.UserRoles)
             .HasForeignKey(ur => ur.UserId)
@@ -36,5 +43,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
             .WithMany()
             .HasForeignKey(ur => ur.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+
     }
 }

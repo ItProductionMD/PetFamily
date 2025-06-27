@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Volunteers.Infrastructure.Contexts;
@@ -12,9 +13,11 @@ using Volunteers.Infrastructure.Contexts;
 namespace Volunteers.Infrastructure.Migrations
 {
     [DbContext(typeof(VolunteerWriteDbContext))]
-    partial class VolunteerWriteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627132922_AddDeletedAt")]
+    partial class AddDeletedAt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

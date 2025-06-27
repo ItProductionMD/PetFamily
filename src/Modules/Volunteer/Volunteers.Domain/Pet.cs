@@ -11,8 +11,9 @@ using Image = PetFamily.SharedKernel.ValueObjects.Image;
 
 namespace Volunteers.Domain;
 
-public class Pet : Entity<Guid>, ISoftDeletable
+public class Pet : SoftDeletable, IEntity<Guid>
 {
+    public Guid Id { get; private set; }
     public string Name { get; private set; }
     public DateOnly? DateOfBirth { get; private set; }
     public DateTime DateTimeCreated { get; private set; }
@@ -30,12 +31,9 @@ public class Pet : Entity<Guid>, ISoftDeletable
     public Address Address { get; private set; }
     public HelpStatus HelpStatus { get; private set; }
     public IReadOnlyList<Image> Images => _images;
+
     private List<Image> _images = [];
-    private bool _isDeleted;
-    public bool IsDeleted => _isDeleted;
-    private DateTime? _deletedDateTime;
-    public DateTime? DeletedDateTime => _deletedDateTime;
-    private Pet(Guid id) : base(id) { }//Ef core needs this
+    private Pet() { }//Ef core needs this
 
     private Pet(
         Guid id,
@@ -53,8 +51,9 @@ public class Pet : Entity<Guid>, ISoftDeletable
         HelpStatus helpStatus,
         string? healthInfo,
         Address address,
-        PetSerialNumber serialNumber) : base(id)
+        PetSerialNumber serialNumber) 
     {
+        Id = id;
         DateTimeCreated = DateTime.UtcNow;
         Name = name;
         DateOfBirth = dateOfBirth;
@@ -135,17 +134,6 @@ public class Pet : Entity<Guid>, ISoftDeletable
 
     public void ChangePetStatus(HelpStatus helpStatus) => HelpStatus = helpStatus;
 
-    public void SoftDelete()
-    {
-        _isDeleted = true;
-        _deletedDateTime = DateTime.UtcNow;
-    }
-
-    public void Restore()
-    {
-        _isDeleted = false;
-        _deletedDateTime = null;
-    }
 
     public void AddImages(List<string> imageNames)
     {

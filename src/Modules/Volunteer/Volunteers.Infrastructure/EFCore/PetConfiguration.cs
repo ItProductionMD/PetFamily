@@ -91,13 +91,12 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
            .Metadata.SetValueComparer(new ReadOnlyListComparer<Image>());
 
         // For soft delete
-        builder.Property<bool>("_isDeleted")
-           .UsePropertyAccessMode(PropertyAccessMode.Field)
-           .HasColumnName("is_deleted");
+        builder.Property(p => p.IsDeleted)
+            .HasColumnName("is_deleted");
 
-        builder.Property<DateTime?>("_deletedDateTime")
-            .UsePropertyAccessMode(PropertyAccessMode.Field)
-            .HasColumnName("deleted_date_time");
+        builder.Property(p=>p.DeletedAt)
+            .IsRequired(false)
+            .HasColumnName("deleted_at");
 
         // Indexes
         builder.HasIndex(p => p.Name).IsUnique(false);

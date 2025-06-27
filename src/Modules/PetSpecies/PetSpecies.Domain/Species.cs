@@ -8,17 +8,19 @@ using static PetFamily.SharedKernel.Validations.ValidationPatterns;
 
 namespace PetSpecies.Domain;
 
-public class Species : Entity<Guid>
+public class Species : IEntity<Guid>
 {
+    public Guid Id { get; private set; }
     public string Name { get; private set; }
 
     private List<Breed> _breeds = [];
     public IReadOnlyList<Breed> Breeds => _breeds;
 
-    private Species(Guid id) : base(id) { }//Ef core needs this
+    private Species()  { }//Ef core needs this
 
-    private Species(Guid id, string name) : base(id)
+    private Species(Guid id, string name)
     {
+        Id = id;
         Name = name;
     }
 

@@ -20,7 +20,7 @@ public static class PetTable
     public const string HealthInfo = "health_info";
     public const string HelpStatus = "help_status";
     public const string Images = "images";
-    public const string DeletedDateTime = "deleted_date_time";
+    public const string DeletedAt = "deleted_at";
     public const string IsDeleted = "is_deleted";
     public const string VolunteerId = "volunteer_id";
     public const string AddressCity = "address_city";

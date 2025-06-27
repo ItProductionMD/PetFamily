@@ -12,8 +12,9 @@ using static PetFamily.SharedKernel.Validations.ValidationPatterns;
 
 namespace Volunteers.Domain;
 
-public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
+public class Volunteer : SoftDeletable, IEntity<Guid>, IHasUniqueFields
 {
+    public Guid Id { get;private set; }
     public FullName FullName { get; private set; }
     [Unique]
     public string Phone { get; private set; }
@@ -23,12 +24,8 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
     public IReadOnlyList<Pet> Pets => _pets;
     private List<Pet> _pets { get; set; } = [];
-    public bool IsDeleted => _isDeleted;
-    private bool _isDeleted;
-    public DateTime? DeletedDateTime => _deletedDateTime;
-    private DateTime? _deletedDateTime;
     public UserId UserId { get; private set; }
-    private Volunteer(Guid id) : base(id) { } //Ef core needs this
+    private Volunteer() { } //Ef core needs this
     public int PetsForAdoptCount => Pets
         .Where(p => p.HelpStatus == HelpStatus.ForAdoption && p.IsDeleted == false)
         .Count();
@@ -50,8 +47,9 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
         int experienceYears,
         string? description,
         string phone,
-        List<RequisitesInfo> requisites) : base(id)
+        List<RequisitesInfo> requisites)
     {
+        Id = id;
         UserId = userId;
         FullName = fullName;
         Phone = phone;
@@ -97,9 +95,7 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     {
         return UnitResult.FromValidationResults(
             () => ValidateRequiredObject(fullName, "Volunteer fullName"),
-            //() => ValidateRequiredObject(phone, "volunteer phone"),
             () => ValidateIntegerNumber(experienceYears, "volunteer experienece", 0, 100),
-            //() => ValidateRequiredField(email, "Volunteer email", MAX_LENGTH_SHORT_TEXT, EMAIL_PATTERN),
             () => ValidateNonRequiredField(description, "Volunteer description", MAX_LENGTH_LONG_TEXT));
     }
 
@@ -199,10 +195,10 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
     }
 
     //----------------------------------------Soft delete itself----------------------------------//
-    public void SoftDelete()
+    override public void SoftDelete()
     {
-        _isDeleted = true;
-        _deletedDateTime = DateTime.UtcNow;
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
 
         foreach (var pet in _pets)
             pet.SoftDelete();
@@ -210,10 +206,10 @@ public class Volunteer : Entity<Guid>, ISoftDeletable, IHasUniqueFields
 
 
     //--------------------------------------Restore itself----------------------------------------//
-    public void Restore()
+    override public void Restore()
     {
-        _isDeleted = false;
-        _deletedDateTime = null;
+        IsDeleted = false;
+        DeletedAt = null;
 
         foreach (var pet in _pets)
         {

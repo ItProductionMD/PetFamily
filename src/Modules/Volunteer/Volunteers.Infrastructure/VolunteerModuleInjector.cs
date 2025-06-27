@@ -31,7 +31,7 @@ public static class VolunteerModuleInjector
             .AddScoped<IVolunteerWriteRepository, VolunteerWriteRepository>()
             .AddScoped<VolunteerWriteDbContext>(_ => new VolunteerWriteDbContext(postgresConnection));
 
-        services.AddHostedService<DbCleanupService>();
+        services.AddHostedService<VolunteerSoftDeletableCleanupService>();
 
         services.AddScoped<IPetExistenceContract, PetExistenceContract>();
 
