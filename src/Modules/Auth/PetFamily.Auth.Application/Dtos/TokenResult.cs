@@ -4,5 +4,6 @@ public record TokenResult(
     string AccessToken,
     DateTime AccessTokenExpiresAt,
     string RefreshToken,
-    DateTime RefreshTokenExpiresAt);
+    DateTime RefreshTokenExpiresAt,
+    Guid Jti);
 

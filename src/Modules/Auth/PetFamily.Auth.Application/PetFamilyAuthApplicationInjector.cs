@@ -4,6 +4,7 @@ using PetFamily.Auth.Application.AdminOptions;
 using PetFamily.Auth.Application.DefaultSeeder;
 using PetFamily.Auth.Application.Email;
 using PetFamily.Auth.Application.IServices;
+using PetFamily.Auth.Application.Options;
 using PetFamily.SharedApplication.Extensions;
 using static Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions;
 
@@ -15,16 +16,13 @@ public static class PetFamilyAuthApplicationInjector
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var isAdminSectionExists = configuration
-            .GetSection(AdminIdentity.SectionName)
-            .Exists();
-
-        if (isAdminSectionExists == false)       
-            throw new InvalidOperationException(
-                $"Configuration section '{AdminIdentity.SectionName}' is missing. " +
-                "Please ensure it is defined in your configuration file.");
+        configuration.CheckSectionsExistence([
+            AdminIdentity.SECTION_NAME, 
+            RefreshTokenCookie.SECTION_NAME]);
         
-        services.Configure<AdminIdentity>(configuration.GetSection(AdminIdentity.SectionName));
+        services.Configure<AdminIdentity>(configuration.GetSection(AdminIdentity.SECTION_NAME));
+
+        services.Configure<RefreshTokenCookie>(configuration.GetSection(RefreshTokenCookie.SECTION_NAME));
 
         services.AddCommandsAndQueries<ClassForAssemblyReference>();
 
@@ -36,5 +34,7 @@ public static class PetFamilyAuthApplicationInjector
 
         return services;
     }
+
+   
 }
 internal class ClassForAssemblyReference { }

@@ -1,11 +1,14 @@
-﻿using PetFamily.Application.Abstractions.CQRS;
+﻿using Microsoft.Extensions.Logging;
+using PetFamily.Application.Abstractions.CQRS;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
+using PetFamily.Auth.Domain.Entities;
 using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.SharedKernel.Authorization;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects.Ids;
+using System.Reflection.Metadata.Ecma335;
 
 namespace PetFamily.Auth.Application.UserManagement.Commands.ConfirmEmail;
 
@@ -13,33 +16,36 @@ public class ConfirmEmailCommandHandler(
     IUserWriteRepository userWriteRepository,
     IEmailConfirmationService emailConfirmationService,
     IRoleReadRepository roleReadRepository,
-    IJwtProvider jwtProvider
-    ) : ICommandHandler<TokenResult, ConfirmEmailCommand>
+    IRefreshTokenWriteRepository refreshTokenWriteRepository,
+    ILogger<ConfirmEmailCommandHandler> logger,
+    IJwtProvider jwtProvider) : ICommandHandler<ConfirmEmailCommand>
 {
+    private readonly IRefreshTokenWriteRepository _refreshTokenWriteRepository = refreshTokenWriteRepository;
     private readonly IUserWriteRepository _userWriteRepository = userWriteRepository;
+    private readonly ILogger<ConfirmEmailCommandHandler> _logger = logger;
     private readonly IEmailConfirmationService _emailConfirmationService = emailConfirmationService;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
     private readonly IRoleReadRepository _roleReadRepository = roleReadRepository;
-    private const string ROLE_TO_ASSIGN = RoleCodes.VOLUNTEER;
+    private const string ROLE_TO_ASSIGN = RoleCodes.USER;
 
-    public async Task<Result<TokenResult>> Handle(ConfirmEmailCommand cmd, CancellationToken ct)
+    public async Task<UnitResult> Handle(ConfirmEmailCommand cmd, CancellationToken ct)
     {
         var confirmationTokenResult = _emailConfirmationService.GetUserIdFromConfirmationToken(
             cmd.EmailConfirmationToken);
         if (confirmationTokenResult.IsFailure)
-            return Result.Fail(confirmationTokenResult.Error);
+            return UnitResult.Fail(confirmationTokenResult.Error);
 
         var userId = UserId.Create(confirmationTokenResult.Data!).Data!;
 
         var getUser = await _userWriteRepository.GetByIdAsync(userId, ct);
         if (getUser.IsFailure)
-            return Result.Fail(getUser.Error);
+            return UnitResult.Fail(getUser.Error);
 
         var user = getUser.Data!;
 
         var getRole = await _roleReadRepository.GetByCodeAsync(ROLE_TO_ASSIGN, ct);
         if (getRole.IsFailure)
-            return Result.Fail(getRole.Error);
+            return UnitResult.Fail(getRole.Error);
 
         var roleDto = getRole.Data!;
 
@@ -49,16 +55,9 @@ public class ConfirmEmailCommandHandler(
 
         await _userWriteRepository.SaveChangesAsync(ct);
 
-        var permissionCodes = roleDto.Permissions.Select(p => p.PermissionCode).ToList();
+        _logger.LogInformation("Confirm email:{email} successful!", user.Email);
 
-        var tokens = _jwtProvider.GenerateTokens(
-            user.Id,
-            user.Login,
-            user.Email,
-            user.Phone?.ToString() ?? string.Empty,
-            permissionCodes);
-
-        return Result.Ok(tokens);
+        return UnitResult.Ok();
     }
 }
 

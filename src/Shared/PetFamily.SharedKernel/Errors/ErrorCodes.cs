@@ -20,5 +20,8 @@ public static class ErrorCodes
 
     //authentication errors
     public const string AUTHENTICATION_ERROR = "authentication.error";
+
+    public const string AUTHORIZATION_ERROR = "authorization.error";
+
 }
 

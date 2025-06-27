@@ -7,7 +7,7 @@ namespace PetFamily.Auth.Application.IServices;
 
 public interface IJwtProvider
 {
-    (string AccessToken, DateTime ExpiresAt) GenerateAccessTokenForPermissionRequirement(
+    (string AccessToken, DateTime ExpiresAt,Guid Jti) GenerateAccessTokenForPermissionRequirement(
        UserId userId,
        string login,
        string email,
@@ -27,6 +27,7 @@ public interface IJwtProvider
        DateTime issuedAt,
        DateTime expiresAt);
 
+    Result<string> GetJtiClaim(string accessToken);
 
     Result<ClaimsPrincipal> ValidateToken(string token, bool validateLifetime = true);
 }

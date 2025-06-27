@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PetFamily.Auth.Infrastructure.Contexts;
@@ -11,9 +12,11 @@ using PetFamily.Auth.Infrastructure.Contexts;
 namespace PetFamily.Auth.Infrastructure.Migrations
 {
     [DbContext(typeof(AuthWriteDbContext))]
-    partial class AuthWriteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250626210304_RefreshTokenAddJTI")]
+    partial class RefreshTokenAddJTI
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

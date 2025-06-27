@@ -9,5 +9,6 @@ public enum ErrorType
     InternalServerError,
     Cancellation,
     Forbidden,
-    Authentication
+    Authentication,
+    Authorization
 }
