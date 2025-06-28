@@ -71,6 +71,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("updated_at")
             .IsRequired(false);
 
+        builder.Property(u => u.IsDeleted)
+            .HasColumnName("is_deleted");
+        
         builder.Property(u => u.DeletedAt)
             .HasColumnName("deleted_at")
             .IsRequired(false);

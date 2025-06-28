@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Abstractions.CQRS;
 using Scrutor;
+
 namespace PetFamily.SharedApplication.Extensions;
 
 public static class ServicesExtensions

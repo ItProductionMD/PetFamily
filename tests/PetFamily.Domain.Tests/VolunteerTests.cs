@@ -257,7 +257,7 @@ public class VolunteerTests
 
         // ASSERT
         Assert.True(pet.IsDeleted);
-        Assert.NotNull(pet.DeletedDateTime);
+        Assert.NotNull(pet.DeletedAt);
         Assert.Equal(PetSerialNumber.Empty(), pet.SerialNumber);
         Assert.Equal(existingPetsCountAfterDelete, volunteer.ExistingPetsCount);
         Assert.Equal(petsCount, volunteer.Pets.Count);
@@ -316,7 +316,7 @@ public class VolunteerTests
         // ASSERT
         Assert.True(result.IsSuccess);
         Assert.False(pet.IsDeleted);
-        Assert.Null(pet.DeletedDateTime);
+        Assert.Null(pet.DeletedAt);
         Assert.Equal(petsCount, volunteer.Pets.Count);
         Assert.True(pet.SerialNumber.Value == volunteer.ExistingPetsCount);
     }

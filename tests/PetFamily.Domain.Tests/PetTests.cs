@@ -100,7 +100,7 @@ public class PetTests
         pet.SoftDelete();
         // ASSERT
         Assert.True(pet.IsDeleted);
-        Assert.NotNull(pet.DeletedDateTime);
+        Assert.NotNull(pet.DeletedAt);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class PetTests
         pet.Restore();
         // ASSERT
         Assert.False(pet.IsDeleted);
-        Assert.Null(pet.DeletedDateTime);
+        Assert.Null(pet.DeletedAt);
     }
 
     [Fact]

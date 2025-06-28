@@ -3,7 +3,6 @@ using PetFamily.Auth.Domain.Enums;
 using PetFamily.Auth.Domain.Options;
 using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.SharedKernel.Abstractions;
-using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Uniqness;
 using PetFamily.SharedKernel.ValueObjects;
@@ -14,8 +13,9 @@ using static PetFamily.Auth.Domain.Validations.Validations;
 
 namespace PetFamily.Auth.Domain.Entities.UserAggregate;
 
-public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
+public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
 {
+    public UserId Id { get; set; }
     [Unique]
     public string Login { get; set; }
     public string HashedPassword { get; set; }
@@ -32,7 +32,6 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
     public DateTime? LastLoginDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    public DateTime? DeletedAt { get; set; }
     public int LoginAttempts { get; set; } = 0;
     public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
 
@@ -41,7 +40,7 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
 
     private const int MAX_LOGIN_ATTEMPTS = 5;
 
-    private User() : base(UserId.NewGuid()) { }//EfCore need this
+    private User(){ }//EfCore need this
 
     private User(
         UserId id,
@@ -52,8 +51,9 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
         ProviderType providerType,
         List<UserRole> userRoles,
         List<SocialNetworkInfo> socialNetworks
-        ) : base(id)
+        )
     {
+        Id = id;
         Email = email;
         Phone = phone;
         Login = login;
@@ -104,11 +104,24 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
             () => ValidateEmail(email),
             () => ValidatePassword(password));
 
-    public void SoftDelete()
+    override public void SoftDelete()
     {
-        UserStatus = UserStatus.Disabled;
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
+        foreach(var userRole in _userRoles)
+        {
+            userRole.SoftDelete();
+        }
     }
-
+    override public void Restore()
+    {
+        IsDeleted = false;
+        DeletedAt = null;
+        foreach (var userRole in _userRoles)
+        {
+            userRole.Restore();
+        }
+    }
     public void HardDelete()
     {
         UserStatus = UserStatus.Deleted;
@@ -124,11 +137,6 @@ public class User : Entity<UserId>, ISoftDeletable, IHasUniqueFields
     public void EnableTwoFactor() => IsTwoFactorEnabled = true;
 
     public void SetPhoneNumber(Phone phone) => Phone = phone;
-
-    public void Restore()
-    {
-        throw new NotImplementedException();
-    }
 
     public void AddRole(RoleId roleId)
     {

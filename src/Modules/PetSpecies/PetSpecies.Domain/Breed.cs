@@ -7,15 +7,17 @@ using static PetFamily.SharedKernel.Validations.ValidationPatterns;
 
 namespace PetSpecies.Domain;
 
-public class Breed : Entity<Guid>
+public class Breed : IEntity<Guid>
 {
+    public Guid Id { get; private set; }
     public string Name { get; private set; }
     public string? Description { get; private set; }
 
-    private Breed(Guid id) : base(id) { }//Ef core needs this
+    private Breed() { }//Ef core needs this
 
-    private Breed(Guid id, string name, string? description) : base(id)
+    private Breed(Guid id, string name, string? description)
     {
+        Id = id;
         Name = name;
         Description = description;
     }

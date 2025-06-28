@@ -9,8 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace PetFamily.Auth.Domain.Entities;
-public class RefreshTokenSession : Entity<Guid> 
+public class RefreshTokenSession : IEntity<Guid> 
 {
+    public Guid Id { get; set; }
     public Guid UserId { get; set; } 
     public Guid Jti {  get; set; }
     public string FingerPrint {  get; set; }
@@ -18,7 +19,7 @@ public class RefreshTokenSession : Entity<Guid>
     public DateTime ExpiresAt { get; set; } 
     public DateTime CreatedAt { get; set; } 
     public DateTime? RevokedAt { get; set; } 
-    private RefreshTokenSession(Guid id) : base(id) { /* for EFCore */ }
+    private RefreshTokenSession()  { /* for EFCore */ }
 
     public RefreshTokenSession(
         Guid id,
@@ -26,8 +27,10 @@ public class RefreshTokenSession : Entity<Guid>
         string token,
         DateTime expiresAt,
         string fingerPrint,
-        Guid jti) : base (id)
+        Guid jti)
     {
+
+        Id = id;
         UserId = userId;
         Token = token;
         CreatedAt = DateTime.UtcNow;

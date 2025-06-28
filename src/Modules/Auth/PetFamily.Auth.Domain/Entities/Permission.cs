@@ -7,15 +7,17 @@ using PetFamily.SharedKernel.ValueObjects;
 
 namespace PetFamily.Auth.Domain.Entities;
 
-public class Permission : Entity<PermissionId>
+public class Permission : IEntity<PermissionId>
 {
+    public PermissionId Id { get; private set; }
     public string Code { get; set; }
     public bool IsEnabled { get; set; } = true;
 
-    private Permission(PermissionId id) : base(id) { }
+    private Permission() { }
 
-    private Permission(PermissionId id, string code) : base(id)
+    private Permission(PermissionId id, string code)
     {
+        Id = id;
         Code = code;
     }
 

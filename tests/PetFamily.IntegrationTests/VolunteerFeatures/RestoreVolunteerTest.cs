@@ -38,12 +38,12 @@ public class RestoreVolunteerTest(TestWebApplicationFactory factory)
 
         Assert.NotNull(restoredVolunteer);
         Assert.False(restoredVolunteer.IsDeleted);
-        Assert.Null(restoredVolunteer.DeletedDateTime);
+        Assert.Null(restoredVolunteer.DeletedAt);
 
         foreach (var pet in restoredVolunteer.Pets)
         {
             Assert.False(pet.IsDeleted);
-            Assert.Null(pet.DeletedDateTime);
+            Assert.Null(pet.DeletedAt);
         }
     }
 }
