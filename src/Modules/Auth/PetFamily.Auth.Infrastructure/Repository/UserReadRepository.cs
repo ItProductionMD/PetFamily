@@ -28,7 +28,7 @@ public class UserReadRepository(
     public async Task<UnitResult> CheckUniqueFields(
         string email,
         string login,
-        Phone phone, 
+        Phone phone,
         CancellationToken ct)
     {
         var sql = $@"
@@ -84,12 +84,12 @@ public class UserReadRepository(
         WHERE {UserTable.Id} = @Id         
         LIMIT 1;";
 
-        _logger.LogInformation("EXECURING QUERY:{sql} with params:{id}",sql,id);
+        _logger.LogInformation("EXECURING QUERY:{sql} with params:{id}", sql, id);
         await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
-        var user = await connection.QuerySingleOrDefaultAsync<UserDto>(sql, new { Id = id});
+        var user = await connection.QuerySingleOrDefaultAsync<UserDto>(sql, new { Id = id });
 
-        if(user == null)
+        if (user == null)
         {
             _logger.LogWarning("User with Id:{Id} not found!", id);
             return Result.Fail(Error.NotFound("User"));
@@ -97,29 +97,60 @@ public class UserReadRepository(
         return Result.Ok(user);
     }
 
-    public async Task<User?> GetByLoginAndPasswordAsync(
-        string login,
-        string hashedPassword,
-        CancellationToken ct = default)
+    public async Task<Result<UserAccountInfoDto>> GetUserAccountInfo(Guid userId, CancellationToken ct = default)
     {
-        try
+        var sql = $@"
+            SELECT 
+                u.{UserTable.Id} AS Id,
+                u.{UserTable.Login} AS Login,
+                u.{UserTable.Email} AS Email,
+                u.{UserTable.IsEmailConfirmed} AS IsEmailConfirmed,
+                CONCAT(COALESCE({UserTable.PhoneRegionCode}, ''),'-',COALESCE({UserTable.PhoneNumber}, '')) AS Phone,
+                u.{UserTable.IsBlocked} AS IsBlocked,
+                u.{UserTable.BlockedAt} AS BlockedAt,
+                u.{UserTable.CreatedAt} AS CreatedAt,
+                u.{UserTable.LastLoginDate} AS LastLoginDate,
+                u.{UserTable.UpdatedAt} AS UpdatedAt,
+                json_agg(DISTINCT r.{RoleTable.Code} ORDER BY r.{RoleTable.Code}) AS Roles,
+                json_agg(DISTINCT p.{PermissionsTable.Code} ORDER BY p.code) AS Permissions
+                FROM {UserTable.TableFullName} u
+            LEFT JOIN 
+                auth.user_role ur ON ur.user_id = u.{UserTable.Id}
+            LEFT JOIN 
+                {RoleTable.TableName} r ON r.{RoleTable.Id} = ur.role_id
+            LEFT JOIN 
+                auth.role_permissions rp ON rp.role_id = r.{RoleTable.Id}
+            LEFT JOIN 
+                {PermissionsTable.TableName} p ON p.{PermissionsTable.Id} = rp.permission_id
+            WHERE
+                u.{UserTable.Id} = @UserId
+            GROUP BY 
+                u.{UserTable.Id},
+                u.{UserTable.Login}, 
+                u.{UserTable.Email}, 
+                u.{UserTable.IsEmailConfirmed},
+                u.{UserTable.IsBlocked},
+                u.{UserTable.BlockedAt},
+                u.{UserTable.CreatedAt},
+                u.{UserTable.LastLoginDate},
+                u.{UserTable.UpdatedAt};";
+
+        await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+
+        _logger.LogInformation("EXECUTING QUERY: {query}", sql);
+
+        var userAccountInfo = await connection.QueryFirstOrDefaultAsync<UserAccountInfoDto>(
+            sql,
+            new {UserID = userId});
+
+        if (userAccountInfo == null)
         {
-            await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
-
-            var query = "SELECT * FROM users" +
-                " WHERE login = @Login " +
-                "AND hashed_password = @HashedPassword";
-
-            return await connection.QueryFirstOrDefaultAsync<User>(
-            query, new { Login = login, HashedPassword = hashedPassword });
+            _logger.LogWarning("User account with id:{userId} not found!", userId);
+            return Result.Fail(Error.NotFound("User"));
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex, "Error occurred while getting user by login and password, login:{login}", login);
+        _logger.LogInformation("Get UserAccountInfo for user with id:{userId} successful!", userId);
 
-            return null;
-        }
+        return Result.Ok(userAccountInfo);
     }
 
     private class DuplicateRaw
@@ -129,6 +160,4 @@ public class UserReadRepository(
         public string? PhoneRegionCode { get; set; }
         public string? PhoneNumber { get; set; }
     }
-
-    
 }
