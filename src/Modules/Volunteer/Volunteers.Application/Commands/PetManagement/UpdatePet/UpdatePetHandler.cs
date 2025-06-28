@@ -29,19 +29,11 @@ public class UpdatePetHandler(
 
             return validationResult;
         }
-
         var getVolunteer = await _writeRepository.GetByIdAsync(cmd.VolunteerId, cancelToken);
         if (getVolunteer.IsFailure)
             return UnitResult.Fail(getVolunteer.Error);
 
-        Volunteers.Domain.Volunteer volunteer = getVolunteer.Data!;
-
-        var pet = volunteer.Pets.FirstOrDefault(p => p.Id == cmd.PetId);
-        if (pet == null)
-        {
-            _logger.LogWarning("Pet with id:{Id} not found", cmd.PetId);
-            return UnitResult.Fail(Error.NotFound($"Pet with id:{cmd.PetId}"));
-        }
+        var volunteer = getVolunteer.Data!;
 
         var checkPetType = await _petTypeChecker.VerifySpeciesAndBreedExist(
             cmd.SpeciesId,
@@ -50,17 +42,24 @@ public class UpdatePetHandler(
         if (checkPetType.IsFailure)
             return checkPetType;
 
-        UpdatePetProcess(pet, cmd);
+        var updatePetResult = UpdatePetProcess(volunteer, cmd);
+        if (updatePetResult.IsFailure)
+        {
+
+            _logger.LogWarning("Update pet with id:{ id} error:{error}!", 
+                cmd.PetId, updatePetResult.ToErrorMessage());
+            return updatePetResult;
+        }
 
         var result = await _writeRepository.Save(volunteer, cancelToken);
         if (result.IsFailure)
             return result;
 
-        _logger.LogInformation("Update pet with id:{id} successful !", pet.Id);
+        _logger.LogInformation("Update pet with id:{id} successful !", cmd.PetId);
 
         return UnitResult.Ok();
     }
-    private void UpdatePetProcess(Pet pet, UpdatePetCommand cmd)
+    private UnitResult UpdatePetProcess(Volunteer volunteer, UpdatePetCommand cmd)
     {
         var petType = PetType.Create(
             BreedID.SetValue(cmd.BreedId),
@@ -80,20 +79,23 @@ public class UpdatePetHandler(
 
         var helpStatus = (HelpStatus)cmd.HelpStatus;
 
-        pet.Update(
-            name: cmd.PetName,
-            dateOfBirth: cmd.DateOfBirth,
-            description: cmd.Description,
-            isVaccinated: cmd.IsVaccinated,
-            isSterilized: cmd.IsSterilized,
-            weight: cmd.Weight,
-            height: cmd.Height,
-            color: cmd.Color,
-            petType: petType,
-            ownerPhone: phone,
-            requisites: requisites,
-            helpStatus: helpStatus,
-            healthInfo: cmd.HealthInfo,
-            address: address);
+        return volunteer.UpdatePet(
+            cmd.PetId,
+            new(
+                cmd.PetName,
+                cmd.DateOfBirth,
+                cmd.Description,
+                cmd.IsVaccinated,
+                cmd.IsSterilized,
+                cmd.Weight,
+                cmd.Height,
+                cmd.Color,
+                petType,
+                phone,
+                requisites,
+                helpStatus,
+                cmd.HealthInfo,
+                address)
+            );
     }
 }
