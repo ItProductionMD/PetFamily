@@ -378,4 +378,14 @@ public class Volunteer : SoftDeletable, IEntity<Guid>, IHasUniqueFields
         return UnitResult.Ok();
     }
 
+    public UnitResult UpdatePet(Guid petId, UpdatePetInfo updatePetInfo)
+    {
+        var pet = GetPet(petId);
+        if (pet == null)
+            return UnitResult.Fail(Error.NotFound($"Pet with id:{petId} in volunteer(id: {Id})"));
+
+        var updateResult = pet.Update(updatePetInfo);
+        return updateResult;
+    }
+
 }

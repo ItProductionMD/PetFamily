@@ -65,6 +65,16 @@ public abstract class Result
         if (Error.ValidationErrors.Count > 0)
             SetToFailure();
     }
+
+    public string ToErrorMessage() =>
+
+        string.IsNullOrWhiteSpace(ValidationMessagesToString()) == false
+                ? ValidationMessagesToString()
+                : string.IsNullOrWhiteSpace(Error.Message) == false
+                ? Error.Message
+                : "Empty error message!";
+    
+
 }
 
 

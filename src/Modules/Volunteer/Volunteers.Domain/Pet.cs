@@ -183,39 +183,25 @@ public class Pet : SoftDeletable, IEntity<Guid>
         return deletedImages;
     }
 
-    public UnitResult Update(
-        string name,
-        DateOnly? dateOfBirth,
-        string? description,
-        bool isVaccinated,
-        bool isSterilized,
-        double? weight,
-        double? height,
-        string? color,
-        PetType petType,
-        Phone? ownerPhone,
-        IReadOnlyList<RequisitesInfo> requisites,
-        HelpStatus helpStatus,
-        string? healthInfo,
-        Address? address)
+    public UnitResult Update(UpdatePetInfo info)
     {
-        var validatePetDomain = Validate(name, description, color, healthInfo);
+        var validatePetDomain = Validate(info.Name, info.Description, info.Color, info.HealthInfo);
         if (validatePetDomain.IsFailure)
             return validatePetDomain;
 
-        Name = name;
-        DateOfBirth = dateOfBirth;
-        Description = description;
-        IsVaccinated = isVaccinated;
-        IsSterilized = isSterilized;
-        Weight = weight;
-        Height = height;
-        Color = color;
-        PetType = petType;
-        OwnerPhone = ownerPhone ?? Phone.CreateEmpty();
-        Requisites = requisites;
-        HelpStatus = helpStatus;
-        Address = address ?? Address.CreateEmpty();
+        Name = info.Name;
+        DateOfBirth = info.DateOfBirth;
+        Description = info.Description;
+        IsVaccinated = info.IsVaccinated;
+        IsSterilized = info.IsSterilized;
+        Weight =info.Weight;
+        Height = info.Height;
+        Color = info.Color;
+        PetType = info.PetType;
+        OwnerPhone = info.OwnerPhone ?? Phone.CreateEmpty();
+        Requisites = info.Requisites;
+        HelpStatus = info.HelpStatus;
+        Address = info.Address ?? Address.CreateEmpty();
 
         return UnitResult.Ok();
     }
@@ -232,4 +218,21 @@ public class Pet : SoftDeletable, IEntity<Guid>
         return UnitResult.Ok();
     }
 }
+
+public record UpdatePetInfo(
+        string Name,
+        DateOnly? DateOfBirth,
+        string? Description,
+        bool IsVaccinated,
+        bool IsSterilized,
+        double? Weight,
+        double? Height,
+        string? Color,
+        PetType PetType,
+        Phone? OwnerPhone,
+        IReadOnlyList<RequisitesInfo> Requisites,
+        HelpStatus HelpStatus,
+        string? HealthInfo,
+        Address? Address);
+
 
