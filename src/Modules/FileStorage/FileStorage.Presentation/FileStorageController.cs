@@ -1,15 +1,13 @@
-﻿using FileStorage.Application.Validations;
+﻿using FileStorage.Application.IRepository;
+using FileStorage.Application.Validations;
+using FileStorage.Public.Contracts;
+using FileStorage.Public.Dtos;
+using FileStorage.SharedFramework.IFormFiles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Framework;
-using PetFamily.Framework.Extensions;
-using PetFamily.Framework.FormFiles;
-using PetFamily.Framework.Utilities;
-using PetFamily.SharedKernel.Results;
-using FileStorage.Application.IRepository;
-using FileStorage.Public.Dtos;
-using FileStorage.Public.Contracts;
 using Microsoft.Extensions.Options;
+using PetFamily.SharedKernel.Results;
+using PetFamily.SharedKernel.Utilities;
 
 
 namespace FileStorage.Presentation.Controllers;
@@ -34,21 +32,21 @@ public class FileStorageController(
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ActionResult<Envelope>> UploadFile(
+    public async Task<ActionResult> UploadFile(
         IFormFile file,
         CancellationToken cancellationToken = default)
     {
-        var validateFile = FormFileValidator.ValidateFile(file, _fileValidationOptions);
+        var validateFile = IFormFileValidator.ValidateFile(file, _fileValidationOptions);
         if (validateFile.IsFailure)
-            return validateFile.ToErrorActionResult();
+            return BadRequest(validateFile.Error);
 
         using var stream = file.OpenReadStream();
 
-        FileDto appFile = FormFileMapper.ToFileDto(file, TEST_BUCKET_NAME, stream);
+        UploadFileDto appFile = file.ToUploadFileDto(TEST_BUCKET_NAME, stream);
 
         await _fileRepository.UploadFileAsync(appFile, cancellationToken);
 
-        return Ok(Envelope.Success(appFile.Name));
+        return Ok(appFile.StoredName);
     }
 
     //-----------------------------------------UploadFiles-----------------------------------------//
@@ -59,23 +57,23 @@ public class FileStorageController(
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     [HttpPost("files")]
-    public async Task<ActionResult<Envelope>> UploadFiles(
+    public async Task<ActionResult> UploadFiles(
         [FromForm] List<IFormFile> files,
         CancellationToken cancelToken = default)
     {
-        var validate = FormFileValidator.ValidateFiles(files, _fileValidationOptions);
+        var validate = IFormFileValidator.ValidateFiles(files, _fileValidationOptions);
         if (validate.IsFailure)
-            return validate.ToErrorActionResult();
+            return BadRequest(validate.Error);
 
         await using var disposableStreams = new AsyncDisposableCollection();
 
-        var fileDtos = FormFileMapper.ToFileDtos(files, TEST_BUCKET_NAME, disposableStreams);
+        var fileDtos = files.ToUploadFileDtos(TEST_BUCKET_NAME, disposableStreams);
 
         var uploadResult = await _fileRepository.UploadFilesAsync(fileDtos, cancelToken);
         if (uploadResult.IsFailure)
-            return uploadResult.ToErrorActionResult();
+            return BadRequest(uploadResult.Error);
 
-        return Ok(Envelope.Success(uploadResult.Data));
+        return Ok(uploadResult.Data);
     }
 
     //-----------------------------------------GetFileUrl-----------------------------------------//
@@ -85,14 +83,14 @@ public class FileStorageController(
     /// <param name="fileName"></param>
     /// <returns></returns>
     [HttpGet("{fileName}/url")]
-    public async Task<ActionResult<Envelope>> GetFileUrl(
+    public async Task<ActionResult> GetFileUrl(
         [FromRoute] string fileName,
         CancellationToken cancelToken)
     {
         var result = await _fileRepository.GetFileUrlAsync(new(fileName, TEST_BUCKET_NAME), cancelToken);
         return result.IsFailure
-            ? NotFound(Envelope.Failure(result.Error))
-            : Ok(Envelope.Success(result.Data!));
+            ? NotFound(result.Error.Message)
+            : Ok(result.Data!);
     }
 
     //---------------------------------------DeleteFile-------------------------------------------//
@@ -102,7 +100,7 @@ public class FileStorageController(
     /// <param name="fileName"></param>
     /// <returns></returns>
     [HttpDelete("{fileName}")]
-    public async Task<ActionResult<Result<Envelope>>> SoftDeleteFile(
+    public async Task<ActionResult<Result>> SoftDeleteFile(
         [FromRoute] string fileName,
         CancellationToken cancelToken)
     {
@@ -110,7 +108,7 @@ public class FileStorageController(
 
         await _fileRepository.SoftDeleteFileAsync(new(fileName, TEST_BUCKET_NAME), cancelToken);
 
-        return Ok(Envelope.Success("File deleted successfully!"));
+        return Ok("File deleted successfully!");
     }
 
     /// <summary>
@@ -120,7 +118,7 @@ public class FileStorageController(
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     [HttpDelete("files")]
-    public async Task<ActionResult<Envelope>> DeleteFiles(
+    public async Task<ActionResult> DeleteFiles(
         [FromBody] List<string> fileNames,
         CancellationToken cancelToken)
     {
@@ -130,13 +128,13 @@ public class FileStorageController(
 
         var result = await _fileRepository.DeleteFileListAsync(files, cancelToken);
         if (result.IsFailure)
-            return result.ToErrorActionResult();
+            return BadRequest(result.Error);
 
-        return Result.Ok(result.Data).ToEnvelope();
+        return Ok(result.Data);
     }
 
     [HttpDelete("files/withQueue")]
-    public async Task<ActionResult<Envelope>> DeleteFilesWithQueue(
+    public async Task<ActionResult> DeleteFilesWithQueue(
         [FromBody] List<string> fileNames,
         CancellationToken cancelToken)
     {
@@ -146,7 +144,7 @@ public class FileStorageController(
 
         await _fileService.DeleteFilesUsingMessageQueue(files, cancelToken);
 
-        return Ok(Envelope.Success("File deleted successfully!"));
+        return Ok("File deleted successfully!");
     }
 
     //----------------------------------Restore files---------------------------------------------//
@@ -157,7 +155,7 @@ public class FileStorageController(
     /// <param name="cancelToken"></param>
     /// <returns></returns>
     [HttpPost("{fileName}/restore")]
-    public async Task<ActionResult<Result<Envelope>>> RestoreFile(
+    public async Task<ActionResult<Result>> RestoreFile(
         [FromRoute] string fileName,
         CancellationToken cancelToken)
     {
@@ -165,6 +163,6 @@ public class FileStorageController(
 
         await _fileRepository.RestoreFileAsync(new(fileName, TEST_BUCKET_NAME), cancelToken);
 
-        return Ok(Envelope.Success("File Restored successfully!"));
+        return Ok("File Restored successfully!");
     }
 }

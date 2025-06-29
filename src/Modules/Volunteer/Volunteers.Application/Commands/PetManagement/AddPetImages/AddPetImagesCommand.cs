@@ -7,7 +7,7 @@ public class AddPetImagesCommand : ICommand
 {
     public Guid VolunteerId { get; set; }
     public Guid PetId { get; set; }
-    public List<UploadFileDto> UploadFileCommands { get; set; } = [];
+    public List<UploadFileDto> UploadFileDtos { get; set; } = [];
 
     public AddPetImagesCommand(
         Guid volunteerId,
@@ -16,11 +16,11 @@ public class AddPetImagesCommand : ICommand
     {
         VolunteerId = volunteerId;
         PetId = petId;
-        UploadFileCommands = uploadFileCommands;
+        UploadFileDtos = uploadFileCommands;
     }
 
     public List<string> GetImageNames() =>
-        UploadFileCommands
+        UploadFileDtos
             .Select(c => c.StoredName)
             .ToList();
 }

@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\FileStorage\FileStorage.Public\FileStorage.Public.csproj" />
+    <ProjectReference Include="..\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
     <ProjectReference Include="..\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
   </ItemGroup>
 

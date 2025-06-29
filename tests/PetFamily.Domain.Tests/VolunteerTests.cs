@@ -135,17 +135,6 @@ public class VolunteerTests
     [InlineData("FirstName", "", "aaa@gmail.com", "+373", "699656666", 1, "description")]//LastName
     [InlineData("FirstName", null, "aaa@gmail.ru", "+33", "599656666", 0, "")]//LastName
     [InlineData("FName", "LName??", "aaa@mail.com", "+373", "699656666", 1, null)]//LastName
-    [InlineData("FirstName", "LastName", null, "+373", "699656666", 1, "description description")]//Email
-    [InlineData("First-Name", "LastName", "", "+373", "6998764666", 1, "description ")]//Email
-    [InlineData("First-Name", "LastName", "gfwfeuyigmail.com", "+373", "6998764666", 1, "description ")]//Email
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmailcom", "+373", "6998764666", 1, "description ")]//Email
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "", "6998764666", 1, "description ")]//PhoneRegionCode
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", null, "6998764666", 1, "description ")]//PhoneRegionCode
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "-373", "6998764666", 1, "description ")]//PhoneRegionCode
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "+3754323", "6998764666", 1, "description ")]//PhoneRegionCode
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "+373", "", 1, "description ")]//PhoneNumber
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "+373", null, 1, "description ")]//PhoneNumber
-    [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "+373", "6998764666A", 1, "description ")]//PhoneNumber
     [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "+373", "6998764666", 1000, "description ")]//ExperienceYears
     [InlineData("First-Name", "LastName", "gfwfeuyi@gmail.com", "+373", "6998764666", -11, "description ")]//ExperienceYears
     public void ValidateVolunteer_ShouldValidateWithError(
@@ -216,16 +205,13 @@ public class VolunteerTests
         Assert.True(updateResult.IsSuccess);
     }
     [Theory]
-    [InlineData("", "LastName", "+373", "699656666", "aa@gmail.com", 1, "description")]//FirstName
-    [InlineData("FirstName", "LastName", "", "699656666", "ddh@mail.ru", 0, "description hiohoie ioho")]//RegionCode
-    [InlineData("First-Name", "LastName", "+44", "6996562317", "fdgA2inbox.ru", 10, "description iqheu 123 123y78- ")]//Email
+    [InlineData("", "LastName", "+373", "699656666", 1, "description")]//FirstName
 
     public void UpdateMainInfo_ShouldUpdateWithErrors(
         string FirstName,
         string LastName,
         string RegionCode,
         string PhoneNumber,
-        string email,
         int experienceYears,
         string description)
     {

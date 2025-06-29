@@ -27,6 +27,7 @@ Log.Logger = new LoggerConfiguration()
         builder.Configuration.GetConnectionString("Seq")
         ?? throw new ArgumentNullException("Seq configuration wasn't found!"))
     .CreateLogger();
+
 var logger = Log.Logger;
 
 builder.WebHost.ConfigureKestrel(options =>
@@ -72,7 +73,7 @@ builder.Services.InjectVolunteerModule(builder.Configuration);
 
 builder.Services.InjectSpeciesModule(builder.Configuration);
 
-builder.Services.InjectPetFamilyAuth(builder.Configuration);
+builder.Services.InjectAuthModule(builder.Configuration);
 
 builder.Services.AddSwaggerGen();
 

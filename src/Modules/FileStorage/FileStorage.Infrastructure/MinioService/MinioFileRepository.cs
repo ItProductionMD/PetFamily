@@ -1,6 +1,8 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
+using FileStorage.Application.IRepository;
+using FileStorage.Public.Dtos;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Minio;
@@ -12,8 +14,6 @@ using PetFamily.SharedKernel.Results;
 using Polly;
 using LifecycleConfiguration = Minio.DataModel.ILM.LifecycleConfiguration;
 using LifecycleRule = Minio.DataModel.ILM.LifecycleRule;
-using FileStorage.Application.IRepository;
-using FileStorage.Public.Dtos;
 
 
 namespace FileStorage.Infrastructure.MinioService;
@@ -66,7 +66,7 @@ public class MinioFileRepository(
     }
 
     //------------------------------------------Upload File---------------------------------------//
-    public async Task UploadFileAsync(FileDto file, CancellationToken ct)
+    public async Task UploadFileAsync(UploadFileDto file, CancellationToken ct)
     {
         bool bucketExists = await _client.BucketExistsAsync(
             new BucketExistsArgs().WithBucket(file.Folder), ct);
@@ -76,7 +76,7 @@ public class MinioFileRepository(
         }
         var putObjectArgs = new PutObjectArgs()
             .WithBucket(file.Folder)
-            .WithObject(file.Name)
+            .WithObject(file.StoredName)
             .WithStreamData(file.Stream)
             .WithObjectSize(file.Size);
 
@@ -84,11 +84,11 @@ public class MinioFileRepository(
             putObjectArgs = putObjectArgs.WithContentType(file.MimeType);
 
         await _client.PutObjectAsync(putObjectArgs, ct);
-        _logger.LogInformation("Uploaded file {Name} to MinIO bucket {Folder}", file.Name, file.Folder);
+        _logger.LogInformation("Uploaded file {Name} to MinIO bucket {Folder}", file.StoredName, file.Folder);
     }
 
     //--------------------------------------Upload File With Retry--------------------------------//
-    public async Task UploadFileWithRetryAsync(FileDto file, CancellationToken ct)
+    public async Task UploadFileWithRetryAsync(UploadFileDto file, CancellationToken ct)
     {
         var retryPolicy = Policy.Handle<MinioException>().WaitAndRetryAsync(
             _minioOptions.FileRetryCount,
@@ -98,7 +98,7 @@ public class MinioFileRepository(
             {
                 _logger.LogWarning("Retry {retryCount}: Failed to upload file '{Name}' to bucket" +
                     " '{Folder}'. Waiting {timeSpan} before retrying.Exception:{exception}",
-                    retryCount, file.Name, file.Folder, timeSpan, exception);
+                    retryCount, file.OriginalName, file.Folder, timeSpan, exception);
             }));
         await retryPolicy.ExecuteAsync((Func<Task>)(async () =>
         {
@@ -108,7 +108,7 @@ public class MinioFileRepository(
 
     //------------------------------------------Upload File List-----------------------------------//
     public async Task<Result<List<FileUploadResponse>>> UploadFilesAsync(
-        List<FileDto> files,
+        List<UploadFileDto> files,
         CancellationToken ct)
     {
         var minioFilesHandler = new MinioFilesHandler(_logger, _minioOptions.CountForSemaphore, ct);
@@ -122,14 +122,14 @@ public class MinioFileRepository(
 
         foreach (var file in files)
         {
-            if (uploadResult.Data.Contains(file.Name))
+            if (uploadResult.Data.Contains(file.StoredName))
             {
-                FileUploadResponse uploadResponse = new(file.OriginalName, file.Name, true, string.Empty);
+                FileUploadResponse uploadResponse = new(file.OriginalName, file.StoredName, true, string.Empty);
                 response.Add(uploadResponse);
             }
             else
             {
-                FileUploadResponse uploadResponse = new(file.OriginalName, file.Name, false, string.Empty);
+                FileUploadResponse uploadResponse = new(file.OriginalName, file.StoredName, false, string.Empty);
                 response.Add(uploadResponse);
             }
         }

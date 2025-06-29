@@ -6,7 +6,7 @@ namespace FileStorage.Public.Contracts;
 public interface IFileService
 {
     Task<Result<List<FileUploadResponse>>> UploadFilesAsync(
-        List<FileDto> fileDtos,
+        List<UploadFileDto> fileDtos,
         CancellationToken ct = default);
 
     Task<Result<List<FileDeleteResponse>>> DeleFilesAsync(

@@ -24,42 +24,40 @@ public class AddPetImagesHandler(
     private readonly IUploadFileDtoValidator _fileValidator = fileValidator;
 
     public async Task<Result<List<FileUploadResponse>>> Handle(
-        AddPetImagesCommand command,
+        AddPetImagesCommand cmd,
         CancellationToken ct)
     {
         var validateFiles = _fileValidator.ValidateFiles(
-            command.UploadFileCommands,
+            cmd.UploadFileDtos,
             _fileValidatorOptions);
 
         if (validateFiles.IsFailure)
         {
             _logger.LogWarning("Error validate files for volunteer with id:{Id}! Errors:{errors}",
-                command.VolunteerId, validateFiles.ValidationMessagesToString());
+                cmd.VolunteerId, validateFiles.ValidationMessagesToString());
             return validateFiles;
         }
 
-        var getVolunteer = await _repository.GetByIdAsync(command.VolunteerId, ct);
+        var getVolunteer = await _repository.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return UnitResult.Fail(getVolunteer.Error);
 
         var volunteer = getVolunteer.Data!;
 
-        var pet = volunteer.Pets.FirstOrDefault(p => p.Id == command.PetId);
+        var pet = volunteer.Pets.FirstOrDefault(p => p.Id == cmd.PetId);
         if (pet == null)
         {
             _logger.LogError("Pet with Id:{pId} for volunteer with id:{vId} not found!",
-                command.PetId, command.VolunteerId);
+                cmd.PetId, cmd.VolunteerId);
             return UnitResult.Fail(Error.NotFound("Pet"));
         }
 
-        pet.AddImages(command.GetImageNames());
+        pet.AddImages(cmd.GetImageNames());
 
-        var fileDtos = command.UploadFileCommands
-            .Select(c => c.ToAppFileDto(Constants.BUCKET_FOR_PET_IMAGES))
-            .ToList();
+        var uploadFileDtos = cmd.UploadFileDtos;
 
         //save files to server - if at least one file is uploaded successfully, the result will be Ok. 
-        var filesUploadResult = await _fileService.UploadFilesAsync(fileDtos, ct);
+        var filesUploadResult = await _fileService.UploadFilesAsync(uploadFileDtos, ct);
         if (filesUploadResult.IsFailure)
             return filesUploadResult;
 
@@ -80,11 +78,15 @@ public class AddPetImagesHandler(
         var saveResult = await _repository.Save(volunteer, ct);
         if (saveResult.IsFailure)
         {
-            await _fileService.DeleteFilesUsingMessageQueue(fileDtos, ct);
+            var fileDtosToDelete = uploadFileDtos
+                .Select(f=>new FileDto(f.StoredName, f.Folder))
+                .ToList();
+
+            await _fileService.DeleteFilesUsingMessageQueue(fileDtosToDelete, ct);
 
             _logger.LogError("Update pet images for volunteer with id:{vId} for pet with id:{pId}" +
                 "error while save volunteer!",
-                command.VolunteerId, command.PetId);
+                cmd.VolunteerId, cmd.PetId);
 
             return UnitResult.Fail(Error.InternalServerError("Unexpected error while saving data!"));
         }

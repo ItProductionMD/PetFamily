@@ -7,10 +7,10 @@ public interface IFileRepository
 {
     public Task<Result<Uri>> GetFileUrlAsync(FileDto file, CancellationToken cancelToken);
 
-    public Task UploadFileAsync(FileDto file, CancellationToken cancelToken);
+    public Task UploadFileAsync(UploadFileDto file, CancellationToken cancelToken);
 
     public Task<Result<List<FileUploadResponse>>> UploadFilesAsync(
-        List<FileDto> fileDto,
+        List<UploadFileDto> fileDto,
         CancellationToken cancelToken);
 
     public Task DeleteFileAsync(FileDto file, CancellationToken cancelToken);
