@@ -1,17 +1,16 @@
 ﻿using FileStorage.Public.Contracts;
-using FileStorage.Public.Dtos;
 using Microsoft.AspNetCore.Http;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Validations;
 
-namespace PetFamily.Framework.FormFiles;
+namespace FileStorage.SharedFramework.IFormFiles;
 
-public static class FormFileValidator
+public class IFormFileValidator
 {
     public static UnitResult ValidateFiles(
-        List<IFormFile> files,
-        IFileValidatorOptions fileValidatorOptions)
+       List<IFormFile> files,
+       IFileValidatorOptions fileValidatorOptions)
     {
 
         if (files.Count > fileValidatorOptions.MaxFilesCount)
@@ -27,7 +26,7 @@ public static class FormFileValidator
 
                 break;
             }
-            var fileExtension = UploadFileDto.GetFullExtension(file.FileName);
+            var fileExtension = file.GetFullFileExtension();
             if (fileValidatorOptions.AllowedExtensions.Contains(fileExtension) == false)
                 errors.Add(Error.FileValidation(file.FileName, ValidationErrorCodes.FILE_INVALID_EXTENSION));
 
@@ -52,7 +51,7 @@ public static class FormFileValidator
 
         List<Error> errors = [];
 
-        var fileExtension = UploadFileDto.GetFullExtension(file.FileName);
+        var fileExtension = file.GetFullFileExtension();
         if (fileValidatorOptions.AllowedExtensions.Contains(fileExtension) == false)
             errors.Add(Error.FileValidation(file.FileName, ValidationErrorCodes.FILE_INVALID_EXTENSION));
 
@@ -67,5 +66,4 @@ public static class FormFileValidator
 
         return UnitResult.Ok();
     }
-
 }

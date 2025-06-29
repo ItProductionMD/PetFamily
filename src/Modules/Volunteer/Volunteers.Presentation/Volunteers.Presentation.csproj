@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\PetFamily.Framework\PetFamily.Framework.csproj" />
+    <ProjectReference Include="..\..\FileStorage\FileStorage.SharedFramework\FileStorage.SharedFramework.csproj" />
     <ProjectReference Include="..\Volunteers.Application\Volunteers.Application.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿namespace PetFamily.Framework.Utilities;
+﻿namespace PetFamily.SharedKernel.Utilities;
+
 
 public class AsyncDisposableCollection : IAsyncDisposable
 {
@@ -25,4 +26,5 @@ public class AsyncDisposableCollection : IAsyncDisposable
         _disposables.Add(disposable);
     }
 }
+
 

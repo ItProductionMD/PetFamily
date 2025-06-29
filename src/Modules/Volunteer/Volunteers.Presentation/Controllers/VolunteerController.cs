@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FileStorage.SharedFramework.IFormFiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
-using PetFamily.Framework.FormFiles;
-using PetFamily.Framework.Utilities;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
+using PetFamily.SharedKernel.Utilities;
 using Volunteers.Application;
 using Volunteers.Application.Commands.PetManagement.AddPet;
 using Volunteers.Application.Commands.PetManagement.AddPetImages;
@@ -19,7 +19,6 @@ using Volunteers.Application.Commands.PetManagement.DeletePetImages;
 using Volunteers.Application.Commands.PetManagement.RestorePet;
 using Volunteers.Application.Commands.PetManagement.UpdatePet;
 using Volunteers.Application.Commands.PetManagement.UpdatePetStatus;
-using Volunteers.Application.Commands.PetManagement.UpdateSocialNetworks;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 using Volunteers.Application.Commands.VolunteerManagement.DeleteVolunteer;
 using Volunteers.Application.Commands.VolunteerManagement.RestoreVolunteer;
@@ -327,15 +326,15 @@ public class VolunteerController(
         [FromForm] List<IFormFile> files,
         CancellationToken cancelToken)
     {
-        var validate = FormFileValidator.ValidateFiles(files, _fileValidatorOptions);
+        var validate = IFormFileValidator.ValidateFiles(files, _fileValidatorOptions);
         if (validate.IsFailure)
             return validate.ToErrorActionResult();
 
         await using var disposableStreams = new AsyncDisposableCollection();
 
-        var uploadfileCommands = FormFileMapper.ToUploadCommands(files, disposableStreams);
+        var uploadfileDtos = files.ToUploadFileDtos(Constants.BUCKET_FOR_PET_IMAGES, disposableStreams);
 
-        var command = new AddPetImagesCommand(volunteerId, petId, uploadfileCommands);
+        var command = new AddPetImagesCommand(volunteerId, petId, uploadfileDtos);
 
         var uploadPetImages = await handler.Handle(command, cancelToken);
 

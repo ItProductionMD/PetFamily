@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using PetFamily.Tools.DependencyProjectView.Extensions;
+using System.IO;
 using System.Xml.Linq;
 using static PetFamily.Tools.DependencyProjectView.Extensions.GraphGeneratorExtensions;
 
@@ -25,9 +26,41 @@ public partial class SolutionDependencyGraphGenerator
         {
             var projectName = Path.GetFileNameWithoutExtension(csprojPath);
 
-            var moduleName = projectName.ContainsKeyWord(projectsKeyWords)
-                ? projectName.Replace(projectName.Split('.').FirstOrDefault() ?? "", solutionName)
-                : projectName.Split('.').FirstOrDefault() ?? string.Empty;
+            var moduleName = string.Empty;
+            {
+                if (projectName.ContainsKeyWord(projectsKeyWords))
+                {
+                    var parts = projectName.Split('.');
+
+                    if(parts.Length == 2)
+                        moduleName = solutionName + "." + parts[1];
+
+                    else if(parts.Length == 3)
+                        moduleName = solutionName + "." + parts[2];
+
+                    else
+                    {
+                        Console.WriteLine($"parts length = {parts.Length}");
+                        throw new Exception($"Project Name:{projectName} has incorrect format for building moduleName");
+                    }
+                }
+                else
+                {
+                    var parts = projectName.Split('.');
+
+                    if (parts.Length == 2)
+                        moduleName = parts[0];
+
+                    else if (parts.Length == 3)
+                        moduleName = parts[1];
+                    else
+                    {
+                        Console.WriteLine($"parts length = {parts.Length}");
+                        throw new Exception($"Project Name:{projectName} has incorrect format for building moduleName");
+                    }
+                }
+
+            }
 
             if (projectName.ContainsKeyWord(["Host","Web"]))
                 moduleName = moduleName+"_Host";

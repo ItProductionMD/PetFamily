@@ -13,7 +13,7 @@ public class FileService(
     private readonly IFileScheduler _scheduler = scheduler;
 
     public async Task<Result<List<FileUploadResponse>>> UploadFilesAsync(
-        List<FileDto> fileDtos,
+        List<UploadFileDto> fileDtos,
         CancellationToken ct = default) =>
         await _repository.UploadFilesAsync(fileDtos, ct);
 

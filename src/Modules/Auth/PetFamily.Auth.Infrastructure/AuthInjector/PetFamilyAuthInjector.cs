@@ -21,7 +21,7 @@ namespace PetFamily.Auth.Infrastructure.AuthInjector;
 
 public static class PetFamilyAuthInjector
 {
-    public static IServiceCollection InjectPetFamilyAuth(
+    public static IServiceCollection InjectAuthModule(
         this IServiceCollection services,
         IConfiguration configuration)
     {

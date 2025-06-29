@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedInfrastructure\PetFamily.SharedInfrastructure.csproj" />
-    <ProjectReference Include="..\..\FileStorage\FileStorage.Public\FileStorage.Public.csproj" />
     <ProjectReference Include="..\PetSpecies.Application\PetSpecies.Application.csproj" />
     <ProjectReference Include="..\PetSpecies.Domain\PetSpecies.Domain.csproj" />
   </ItemGroup>

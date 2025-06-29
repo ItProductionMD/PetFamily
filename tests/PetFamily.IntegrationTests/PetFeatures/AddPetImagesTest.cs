@@ -83,7 +83,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
 
         var addedPet = addedVolunteer!.Pets[0];
 
-        var expectedStoredName = command.UploadFileCommands
+        var expectedStoredName = command.UploadFileDtos
             .FirstOrDefault(c => c.OriginalName == OK_FILE_NAME)!.StoredName;
 
         Assert.True(result.IsSuccess);
@@ -99,9 +99,12 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
         {
             uploadFileCommands.Add(new(
             name,
+            string.Concat(Guid.NewGuid(), ".png"),
+            ".png",
             "image/png",
             4000,
-            new MemoryStream(new byte[] { 0x89, 0x50 })));
+            new MemoryStream(new byte[] { 0x89, 0x50 }),
+            "FolderName"));
         }
         return new(
             volunteer.Id,
@@ -112,7 +115,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
     private static List<FileUploadResponse> CreateResponse(AddPetImagesCommand command)
     {
         var response = new List<FileUploadResponse>();
-        foreach (var file in command.UploadFileCommands)
+        foreach (var file in command.UploadFileDtos)
         {
             response.Add(new(
                 file.OriginalName,
@@ -132,7 +135,7 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
         _factory.FileServiceMock.Reset();
 
         _factory.FileServiceMock
-            .Setup(x => x.UploadFilesAsync(It.IsAny<List<FileDto>>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.UploadFilesAsync(It.IsAny<List<UploadFileDto>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => fileUploaderResult);
     }
 
