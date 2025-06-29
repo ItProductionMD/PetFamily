@@ -14,6 +14,7 @@ public static class DapperConfigurations
     {
         SqlMapper.AddTypeHandler(new Convertors.JsonbTypeHandler<List<BreedDto>>());
         SqlMapper.AddTypeHandler(new Convertors.JsonbTypeHandler<List<SpeciesDto>>());
+        SqlMapper.AddTypeHandler(new Convertors.JsonbTypeHandler<List<string>>());
 
         services.Configure<DapperOptions>(configuration.GetSection("DapperOptions"));
         return services;

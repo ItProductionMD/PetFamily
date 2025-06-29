@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="PermissionManagement\Commands\DeletePermission\" />
     <Folder Include="PermissionManagement\Commands\UpdatePermission\" />
-    <Folder Include="UserManagement\Queries\NewFolder\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,4 +17,8 @@ public static class UserTable
     public const string BlockedAt = "blocked_at";
     public const string DeletedAt = "deleted_at";
     public const string IsDeleted = "is_deleted";
+    public const string CreatedAt = "created_at";
+    public const string LastLoginDate = "last_login_date";
+    public const string UpdatedAt = "updated_at";
+
 }

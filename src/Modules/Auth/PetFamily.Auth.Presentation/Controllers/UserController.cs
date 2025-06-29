@@ -10,6 +10,7 @@ using PetFamily.Auth.Application.UserManagement.Commands.ConfirmEmail;
 using PetFamily.Auth.Application.UserManagement.Commands.LoginUserByEmail;
 using PetFamily.Auth.Application.UserManagement.Commands.RefreshToken;
 using PetFamily.Auth.Application.UserManagement.Commands.RegisterByEmail;
+using PetFamily.Auth.Application.UserManagement.Queries.GetUserAccountInfo;
 using PetFamily.Auth.Presentation.Cookies;
 using PetFamily.Auth.Presentation.Requests;
 using PetFamily.Framework;
@@ -133,5 +134,19 @@ public class UserController : Controller
             tokenCookieOptions);
 
         return Result.Ok(result.Data!.AccessToken).ToEnvelope();
+    }
+
+    [HttpGet("account_info/{id:Guid}")]
+    public async Task<ActionResult<Envelope>> GetUserAccountInfo(
+        [FromServices] GetUserAccountInfoHandler handler,
+        [FromRoute] Guid id,
+        CancellationToken ct)
+    {
+        var cmd = new GetUserAccountInfoCommand(id);
+
+        var result = await handler.Handle(cmd, ct);
+        return result.IsSuccess
+            ? result.ToEnvelope()
+            : result.ToErrorActionResult();
     }
 }

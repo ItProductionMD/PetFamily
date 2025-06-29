@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions.CQRS;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
@@ -20,7 +20,7 @@ public class LoginByEmailCommandHandler(
     ILogger<LoginByEmailCommandHandler> logger) : ICommandHandler<TokenResult, LoginByEmailCommand>
 {
     private readonly IUserWriteRepository _userWriteRepository = userWriteRepository;
-    private readonly IRoleReadRepository _roleRepository = roleRepository;
+    private readonly IRoleReadRepository _roleReadRepository = roleRepository;
     private readonly IRefreshTokenWriteRepository _refreshTokenWriteRepository = refreshTokenWriteRepository;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
@@ -69,7 +69,7 @@ public class LoginByEmailCommandHandler(
             }
             return Result.Fail(Error.Authentication("Password is wrong"));
         }
-        var roleDtos = await _roleRepository.GetRolesByUserId(user.Id, ct);
+        var roleDtos = await _roleReadRepository.GetRolesByUserId(user.Id, ct);
 
         var permissionCodes = roleDtos
             .SelectMany(role => role.Permissions)
