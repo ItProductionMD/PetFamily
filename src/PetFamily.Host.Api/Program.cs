@@ -99,8 +99,8 @@ if (app.Environment.IsDevelopment())
     var rolesSeeder = scope.ServiceProvider.GetRequiredService<RolesSeeder>();
     var adminSeeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
 
-    await rolesSeeder.SeedAsync();
-    await adminSeeder.SeedAsync();
+//    await rolesSeeder.SeedAsync();
+//  await adminSeeder.SeedAsync();
 }
 
 app.UseHttpsRedirection();

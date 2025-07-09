@@ -13,6 +13,7 @@ using Testcontainers.PostgreSql;
 using Volunteers.Infrastructure.Contexts;
 using PetFamily.SharedInfrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
+using PetFamily.Auth.Infrastructure.Contexts;
 
 namespace PetFamily.IntegrationTests;
 
@@ -42,6 +43,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (volunteerWriteDbContext != null)
                 services.Remove(volunteerWriteDbContext);
 
+            var authWriteDbContext = services.SingleOrDefault(s => s.ServiceType == typeof(AuthWriteDbContext));
+            if (authWriteDbContext != null)
+                services.Remove(authWriteDbContext);
+
             var iDbConnection = services.SingleOrDefault(s => s.ServiceType == typeof(IDbConnectionFactory));
             if (iDbConnection != null)
                 services.Remove(iDbConnection);
@@ -55,6 +60,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
 
             services.AddScoped<VolunteerWriteDbContext>(_ =>
                 new VolunteerWriteDbContext(_dbContainer.GetConnectionString()));
+
+            services.AddScoped<AuthWriteDbContext>(_ =>
+                new AuthWriteDbContext(_dbContainer.GetConnectionString()));
 
             services.AddSingleton<IDbConnectionFactory>(_ =>
                 new NpgSqlConnectionFactory(_dbContainer.GetConnectionString()));
@@ -70,7 +78,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         {
             DbAdapter = DbAdapter.Postgres,
 
-            SchemasToInclude = new[] { SchemaNames.SPECIES, SchemaNames.VOLUNTEER }
+            SchemasToInclude = new[] { SchemaNames.SPECIES, SchemaNames.VOLUNTEER , SchemaNames.AUTH }
 
         });
     }
@@ -88,9 +96,12 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         using var scope = Services.CreateScope();
         var speciesContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
         var volunteerContext = scope.ServiceProvider.GetRequiredService<VolunteerWriteDbContext>();
+        var authContext = scope.ServiceProvider.GetRequiredService<AuthWriteDbContext>();
 
+        await authContext.Database.MigrateAsync();
         await speciesContext.Database.MigrateAsync();
         await volunteerContext.Database.MigrateAsync();
+
 
         _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
         await InitializeRespawner();

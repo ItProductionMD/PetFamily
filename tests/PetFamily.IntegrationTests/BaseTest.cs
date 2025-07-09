@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.Auth.Infrastructure.Contexts;
 using PetSpecies.Infrastructure.Contexts;
 using Volunteers.Infrastructure.Contexts;
 
@@ -13,6 +14,7 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
     protected IServiceProvider _services => _scope!.ServiceProvider;
     protected VolunteerWriteDbContext _volunteerDbContext = null!;
     protected SpeciesWriteDbContext _speciesDbContext = null!;
+    protected AuthWriteDbContext _authDbContext = null!;
 
     public virtual Task InitializeAsync()
     {
@@ -20,6 +22,7 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
 
         _volunteerDbContext = _scope.ServiceProvider.GetService<VolunteerWriteDbContext>()!;
         _speciesDbContext = _scope.ServiceProvider.GetService<SpeciesWriteDbContext>()!;
+        _authDbContext = _scope.ServiceProvider.GetRequiredService<AuthWriteDbContext>()!;
 
         return Task.CompletedTask;
     }
@@ -28,8 +31,6 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
         await _factory.ResetCheckpoint();
         _scope?.Dispose();
     }
-
-    protected T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
 
     protected ICommandHandler<TResponse, T> GetCommandHandler<TResponse, T>() where T : ICommand =>
         _services.GetRequiredService<ICommandHandler<TResponse, T>>();
