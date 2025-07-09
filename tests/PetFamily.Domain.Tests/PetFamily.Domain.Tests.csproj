@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Modules\Auth\PetFamily.Auth.Domain\PetFamily.Auth.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Discussions\PetFamily.Disscussion.Domain\PetFamily.Discussion.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\VolunteerRequests\VolunteerRequests.Domain\VolunteerRequests.Domain.csproj" />
     <ProjectReference Include="..\..\src\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
     <ProjectReference Include="..\..\src\Modules\PetSpecies\PetSpecies.Domain\PetSpecies.Domain.csproj" />

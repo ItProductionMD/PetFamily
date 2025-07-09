@@ -88,6 +88,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VolunteerRequests", "Volunt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolunteerRequests.Domain", "src\Modules\VolunteerRequests\VolunteerRequests.Domain\VolunteerRequests.Domain.csproj", "{66015061-377E-481F-B80E-31FEDDEE94E5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Discussions", "Discussions", "{77CB0979-2D76-4ED8-83DA-E922C129E231}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Discussion.Domain", "src\Modules\Discussions\PetFamily.Disscussion.Domain\PetFamily.Discussion.Domain.csproj", "{AF4126CA-EFD0-4B2C-BF39-B892B8D707BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -218,6 +222,10 @@ Global
 		{66015061-377E-481F-B80E-31FEDDEE94E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66015061-377E-481F-B80E-31FEDDEE94E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66015061-377E-481F-B80E-31FEDDEE94E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF4126CA-EFD0-4B2C-BF39-B892B8D707BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF4126CA-EFD0-4B2C-BF39-B892B8D707BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF4126CA-EFD0-4B2C-BF39-B892B8D707BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF4126CA-EFD0-4B2C-BF39-B892B8D707BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -256,6 +264,8 @@ Global
 		{15921FAE-E490-43B8-9A6C-007CFEA286FE} = {136FEEDB-CDDB-48C6-8ACB-2E6AD24FE1E2}
 		{148BBF4A-1B4C-48A3-A10C-31099EE6FF17} = {53BA7B17-9DD4-43FD-BA83-5F459ED9BDE9}
 		{66015061-377E-481F-B80E-31FEDDEE94E5} = {148BBF4A-1B4C-48A3-A10C-31099EE6FF17}
+		{77CB0979-2D76-4ED8-83DA-E922C129E231} = {53BA7B17-9DD4-43FD-BA83-5F459ED9BDE9}
+		{AF4126CA-EFD0-4B2C-BF39-B892B8D707BE} = {77CB0979-2D76-4ED8-83DA-E922C129E231}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE566918-8763-4A9B-8563-593E205BA1B0}
