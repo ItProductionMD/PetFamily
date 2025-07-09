@@ -16,7 +16,7 @@ public static class TestDataFactory
 
         var volunteerId = VolunteerID.NewGuid();
 
-        var donateDetailsList = new List<RequisitesInfo>
+        var requisites = new List<RequisitesInfo>
         {
             RequisitesInfo.Create("Bank1", "Nr. 765753757835157").Data!,
             RequisitesInfo.Create("Bank2", "Nr. 765753758345157").Data!
@@ -35,7 +35,7 @@ public static class TestDataFactory
             0,
             null,
             phone,
-            donateDetailsList).Data!;
+            requisites).Data!;
 
         return volunteer!;
     }

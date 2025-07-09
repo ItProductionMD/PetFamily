@@ -39,27 +39,21 @@ public class CreateVolunteerHandlerTests
     }
 
     [Theory]
-    [InlineData("firstName", "firstName?!", "lastName", "rubon@gmail.com", "6767678876", "+373", 0)]
-    [InlineData("lastName", "firstName", "lastName?", "rubon@gmail.com", "6767678876", "+373", 0)]
-    [InlineData("email", "firstName", "lastName", "rubongmail.com", "6767678876", "+373", 0)]
-    [InlineData("phone Number", "firstName", "lastName", "rubon@gmail.com", "67676788A6", "+373", 0)]
-    [InlineData("phone regionCode", "firstName", "lastName", "rubon@gmail.com", "6767678876", "+37D3", 0)]
-    [InlineData("experienceYears", "firstName", "lastName", "rubon@gmail.com", "6767678876", "+373", 345)]
+    [InlineData("firstName", "firstName?!", "lastName", 0)]
+    [InlineData("lastName", "firstName", "lastName?", 0)]
+    [InlineData("experienceYears", "firstName", "lastName", 345)]
     public void ValidateCreateVolunteerCommand_WithValidationError_ShouldReturnFailure(
         string invalidFieldName,
         string firstName,
         string lastName,
-        string email,
-        string phoneNumber,
-        string phoneRegionCode,
-        int expirienceYears)
+        int experienceYears)
     {
         // ARRANGE
         var command = new CreateVolunteerCommand(
             firstName,
             lastName,        
             "Description",           
-            expirienceYears,
+            experienceYears,
             []);
 
         //ACT
@@ -71,19 +65,16 @@ public class CreateVolunteerHandlerTests
     }
 
     [Theory]
-    [InlineData("firstName", 1000, 5, 5)]
-    [InlineData("lastName", 5, 1000, 5)]
-    [InlineData("email", 5, 5, 1000)]
+    [InlineData("firstName", 1000, 5)]
+    [InlineData("lastName", 5, 1000)]
     public void ValidateCreateVolunteerCommand_WithValidationErrorTextLength_ShouldReturnFailure(
         string invalidFieldName,
         int firstNameSize,
-        int lastNameSize,
-        int emailSize)
+        int lastNameSize)
     {
         // ARRANGE
         var firstName = new string('a', firstNameSize);
         var lastName = new string('b', lastNameSize);
-        var email = new string('a', emailSize) + "@gmail.com";
 
         var command = new CreateVolunteerCommand(
             firstName,
@@ -148,6 +139,15 @@ public class CreateVolunteerHandlerTests
         _volunteerRepositoryMock
             .Setup(x => x.AddAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(addResult);
+
+        _userContextMock
+            .Setup(x => x.GetUserId())
+            .Returns(Result.Ok(Guid.NewGuid()));
+
+        _userContextMock
+            .Setup(x => x.Phone)
+            .Returns("+373-69999999");
+
 
         //ACT
         var result = await _handler.Handle(command, CancellationToken.None);
