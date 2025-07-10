@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Auth.Application.Dtos;
+﻿namespace PetFamily.Auth.Public.Dtos;
 
 public class UserDto
 {

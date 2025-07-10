@@ -5,6 +5,7 @@ using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities.UserAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.Auth.Public.Dtos;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
@@ -151,6 +152,11 @@ public class UserReadRepository(
         _logger.LogInformation("Get UserAccountInfo for user with id:{userId} successful!", userId);
 
         return Result.Ok(userAccountInfo);
+    }
+
+    Task<Result<UserDto>> IUserReadRepository.GetByIdAsync(Guid id, CancellationToken ct)
+    {
+        throw new NotImplementedException();
     }
 
     private class DuplicateRaw

@@ -2,6 +2,7 @@
 using PetFamily.Auth.Domain.Entities;
 using PetFamily.Auth.Domain.Entities.UserAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.Auth.Public.Dtos;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;

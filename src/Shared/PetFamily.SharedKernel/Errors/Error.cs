@@ -130,6 +130,15 @@ public record Error
         );
     }
 
+    public static Error Forbidden(string message)
+    {
+        return Error.Custom(
+            ErrorCodes.ACCESS_FORBIDDEN,
+            message,
+            ErrorType.Forbidden
+        );
+    }
+
     public static Error Authorization(string message)
     {
         return Error.Custom(

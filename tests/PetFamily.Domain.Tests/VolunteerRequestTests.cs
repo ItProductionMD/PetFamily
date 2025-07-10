@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using PetFamily.SharedKernel.ValueObjects;
-using VolunteerRequests.Domain.Enums;
-using VolunteerRequests.Domain.VolunteerRequestAggregate;
+using PetFamily.VolunteerRequests.Domain.Enums;
+using PetFamily.VolunteerRequests.Domain.Entities;
 using Xunit;
 
 namespace TestPetFamilyDomain;
@@ -20,7 +20,6 @@ public class VolunteerRequestTests
 
         // Act
         var result = VolunteerRequest.Create(
-            id,
             userId,
             "document.pdf",
             "Doe",
@@ -44,7 +43,6 @@ public class VolunteerRequestTests
     {
         // Act
         var result = VolunteerRequest.Create(
-            Guid.NewGuid(),
             Guid.NewGuid(),
             doc,
             last,
@@ -100,7 +98,6 @@ public class VolunteerRequestTests
     private static VolunteerRequest CreateValidRequest()
     {
         return VolunteerRequest.Create(
-            Guid.NewGuid(),
             Guid.NewGuid(),
             "doc.pdf",
             "Doe",
