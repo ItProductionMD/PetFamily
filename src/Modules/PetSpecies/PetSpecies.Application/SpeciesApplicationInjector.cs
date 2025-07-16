@@ -4,6 +4,7 @@ using PetSpecies.Application.Queries.GetSpeciesPagedList;
 using FluentValidation;
 using Scrutor;
 using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Extensions;
 
 
 namespace PetSpecies.Application;
@@ -14,21 +15,13 @@ public static class SpeciesApplicationInjector
         this IServiceCollection services,
         IConfiguration configuration) =>
 
-    services.AddCommandsAndQueries();
+    services.AddCommandsAndQueries<ClassForAssemblyReference>();
 
     //.AddValidatorsFromAssembly(typeof(SpeciesApplicationInjector).Assembly)
 
-    private static IServiceCollection AddCommandsAndQueries(this IServiceCollection services) =>
-
-        services.Scan(scan => scan.FromAssemblies(typeof(SpeciesApplicationInjector).Assembly)
-            .AddClasses(classes =>
-                classes
-                    .AssignableToAny(
-                        typeof(ICommandHandler<,>),
-                        typeof(ICommandHandler<>),
-                        typeof(IQueryHandler<,>),
-                        typeof(IQueryHandler<>)))
-                    .AsSelfWithInterfaces()
-                    .WithScopedLifetime());
-
+    internal class ClassForAssemblyReference
+    {
+        // This class is used to reference the assembly containing the validators.
+        // It ensures that the assembly is loaded and the validators are registered.
+    }
 }

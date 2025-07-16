@@ -26,7 +26,7 @@ public class VolunteerRequest : SoftDeletable, IEntity<Guid>
     public string Description { get; private set; }
     public int ExperienceYears { get; private set; }
 
-    public IEnumerable<RequisitesInfo> Requisites { get; private set; }
+    public IReadOnlyList<RequisitesInfo> Requisites { get; private set; }
 
     private VolunteerRequest() { }//EFCore need this
 
@@ -50,7 +50,7 @@ public class VolunteerRequest : SoftDeletable, IEntity<Guid>
         FirstName = firstName;
         Description = description;
         ExperienceYears = experienceYears;
-        Requisites = requisites;
+        Requisites = requisites.ToList();
     }
 
     public static Result<VolunteerRequest> Create(

@@ -70,17 +70,18 @@ public class TakeVolunteerRequestToReviewHandler(
         var discussionId = createDiscussion.Data!;
 
         volunteerRequest.TakeToReview(adminId, discussionId);
-
-        var saveResult = await _requestRepository.SaveAsync(ct);
-
-        if (saveResult.IsFailure)
+        try
         {
-            _logger.LogWarning("Failed to save volunteer request with ID {VolunteerRequestId}. Error: {Error}",
-                volunteerRequest.Id, saveResult.Error);
+            await _requestRepository.SaveAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save volunteer request with ID {VolunteerRequestId}. Error: {Message}",
+                volunteerRequest.Id, ex.Message);
 
             await _discussionRemover.RemoveDisscusion(discussionId);
 
-            return UnitResult.Fail(saveResult.Error);
+            return UnitResult.Fail(Error.InternalServerError("Failed to save volunteer request after taking it for review."));
         }
         _logger.LogInformation("Volunteer request with ID {VolunteerRequestId} has been taken for review by admin ID {AdminId}.",
             volunteerRequest.Id, adminId);

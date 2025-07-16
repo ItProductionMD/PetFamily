@@ -5,6 +5,7 @@ using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities.UserAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.Auth.Public.Contracts;
 using PetFamily.Auth.Public.Dtos;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
@@ -16,7 +17,7 @@ namespace PetFamily.Auth.Infrastructure.Repository;
 
 public class UserReadRepository(
     IDbConnectionFactory dbConnectionFactory,
-    ILogger<UserReadRepository> logger) : IUserReadRepository
+    ILogger<UserReadRepository> logger) : IUserReadRepository, IUserContract
 {
     private readonly IDbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
     private readonly ILogger<UserReadRepository> _logger = logger;

@@ -7,6 +7,6 @@ namespace Volunteers.Public.IContracts;
 public interface IVolunteerCreator
 {
 
-    Task<UnitResult> CreateVolunteer(CreateVolunteerDto createVolunteerDto, CancellationToken ct = default);
+    Task<Result<Guid>> CreateVolunteer(CreateVolunteerDto createVolunteerDto, CancellationToken ct = default);
 
 }

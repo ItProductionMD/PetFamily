@@ -40,8 +40,8 @@ public class SubmitVolunteerRequestHandler(
         }
         var userId = getUserId.Data!;
 
-        var request = await _requestReadRepository.GetByUserIdAsync(userId, ct);
-        if (request != null)
+        var isRequestExist = await _requestReadRepository.CheckIfRequestExistAsync(userId, ct);
+        if (isRequestExist)
         {
             _logger.LogWarning("Volunteer request already exists for user {UserId}", userId);
             return UnitResult.Fail(Error.ValueIsAlreadyExist("Volunteer request already exists"));

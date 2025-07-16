@@ -13,15 +13,16 @@ namespace PetFamily.VolunteerRequests.Application.Commands.ApproveVolunteerReque
 public class ApproveVolunteerRequestHandler(
     IVolunteerRequestWriteRepository requestWriteRepository,
     IUserContext userContext,
-    IUserFinder userFinder,
+    IUserContract userFinder,
     IVolunteerCreator volunteerCreator,
     ILogger<ApproveVolunteerRequestHandler> logger) : ICommandHandler<ApproveVolunteerRequestCommand>
 {
     private readonly IVolunteerRequestWriteRepository _requestWriteRepository = requestWriteRepository;
     private readonly IUserContext _userContext = userContext;
-    private readonly IUserFinder _userFinder = userFinder;
+    private readonly IUserContract _userFinder = userFinder;
     private readonly IVolunteerCreator _volunteerCreator = volunteerCreator;
     private readonly ILogger<ApproveVolunteerRequestHandler> _logger = logger;
+
     public async Task<UnitResult> Handle(ApproveVolunteerRequestCommand cmd, CancellationToken ct)
     {
         var getRequest = await _requestWriteRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
@@ -46,17 +47,12 @@ public class ApproveVolunteerRequestHandler(
                 cmd.VolunteerRequestId, approveResult.Error);
             return UnitResult.Fail(approveResult.Error);
         }
-        var saveResult = await _requestWriteRepository.SaveAsync(ct);
-        if (saveResult.IsFailure)
-        {
-            _logger.LogError("Failed to persist approved status for request ID {Id}: {Error}",
-                cmd.VolunteerRequestId, saveResult.Error);
-            return saveResult;
-        }
+
+        await _requestWriteRepository.SaveAsync(ct);
 
         try
         {
-            var getUser = await _userFinder.FindById(request.UserId, ct);
+            var getUser = await _userFinder.GetByIdAsync(request.UserId, ct);
             if (getUser.IsFailure)
                 throw new ApplicationException($"Failed to find user with ID {request.UserId}: {getUser.Error.Message}");
 
@@ -81,13 +77,8 @@ public class ApproveVolunteerRequestHandler(
             var cancelResult = request.CancelApproval(adminId);
             if (cancelResult.IsSuccess)
             {
-                var rollbackSaveResult = await _requestWriteRepository.SaveAsync(ct);
-                if (rollbackSaveResult.IsFailure)
-                {
-                    _logger.LogError("Failed to rollback approved status for request ID {Id}: {Error}",
-                        cmd.VolunteerRequestId, rollbackSaveResult.Error);
-                    return UnitResult.Fail(rollbackSaveResult.Error);
-                }
+                await _requestWriteRepository.SaveAsync(ct);
+
                 _logger.LogInformation("Approval for request ID {Id} was rolled back.", cmd.VolunteerRequestId);
             }
 

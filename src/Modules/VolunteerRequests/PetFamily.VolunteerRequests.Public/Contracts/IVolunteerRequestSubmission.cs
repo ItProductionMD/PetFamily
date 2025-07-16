@@ -5,5 +5,7 @@ namespace PetFamily.VolunteerRequests.Public.Contracts;
 
 public interface IVolunteerRequestSubmission
 {
-    Task<UnitResult> SubmitVolunteerRequestAsync(SubmitVolunteerRequestDto submitVolunteerRequestDto);
+    Task<UnitResult> SubmitVolunteerRequestAsync(
+        SubmitVolunteerRequestDto dto,
+        CancellationToken ct);
 }

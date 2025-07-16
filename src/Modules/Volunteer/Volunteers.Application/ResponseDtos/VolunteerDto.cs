@@ -1,4 +1,6 @@
-﻿namespace Volunteers.Application.ResponseDtos;
+﻿using PetFamily.SharedApplication.Dtos;
+
+namespace Volunteers.Application.ResponseDtos;
 
 public class VolunteerDto
 {

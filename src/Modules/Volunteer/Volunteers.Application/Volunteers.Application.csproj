@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\FileStorage\FileStorage.Public\FileStorage.Public.csproj" />
     <ProjectReference Include="..\..\PetSpecies\PetSpecies.Public\PetSpecies.Public.csproj" />
     <ProjectReference Include="..\Volunteers.Domain\Volunteers.Domain.csproj" />
+    <ProjectReference Include="..\Volunteers.Public\Volunteers.Public.csproj" />
   </ItemGroup>
 
 </Project>

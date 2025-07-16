@@ -64,13 +64,8 @@ public class UpdateVolunteerRequestHandler(
                 cmd.VolunteerRequestId, updateResult.Error);
             return UnitResult.Fail(updateResult.Error);
         }
-        var saveResult = await _requestRepository.SaveAsync(ct);
-        if (saveResult.IsFailure)
-        {
-            _logger.LogError("Failed to save updated request {RequestId}: {Error}", 
-                request.Id, saveResult.Error);
-            return saveResult;
-        }
+
+        await _requestRepository.SaveAsync(ct);
 
         _logger.LogInformation("Volunteer request {RequestId} successfully updated", request.Id);
 

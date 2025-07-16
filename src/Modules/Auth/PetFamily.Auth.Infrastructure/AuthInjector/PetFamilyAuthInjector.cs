@@ -12,6 +12,8 @@ using PetFamily.Auth.Infrastructure.Services.AuthorizationService;
 using PetFamily.Auth.Infrastructure.Services.EmailService;
 using PetFamily.Auth.Infrastructure.Services.JwtProvider;
 using PetFamily.Auth.Infrastructure.Services.PasswordHasher;
+using PetFamily.Auth.Public.Contracts;
+using PetFamily.SharedApplication.Extensions;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using static PetFamily.Auth.Infrastructure.AuthInjector.JwtAuthenticationInjector;
 using static PetFamily.Auth.Infrastructure.AuthInjector.PermissionsPolicesAuthorizationInjector;
@@ -21,13 +23,11 @@ namespace PetFamily.Auth.Infrastructure.AuthInjector;
 
 public static class PetFamilyAuthInjector
 {
-    public static IServiceCollection InjectAuthModule(
+    public static IServiceCollection InjectAuth(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var postgresConnection = configuration.GetConnectionString(ConnectionStringName.POSTGRESQL);
-        if (string.IsNullOrEmpty(postgresConnection))
-            throw new ApplicationException("PostgreSQL connection string wasn't found!");
+        var postgresConnection = configuration.TryGetConnectionString(ConnectionStringName.POSTGRESQL);
 
         services.InjectPetFamilyAuthApplication(configuration);
 
@@ -36,6 +36,7 @@ public static class PetFamilyAuthInjector
 
             .AddScoped<IUserReadRepository, UserReadRepository>()
             .AddScoped<IUserWriteRepository, UserWriteRepository>()
+            .AddScoped<IUserContract, UserReadRepository>()
 
             .AddScoped<IRoleReadRepository, RoleReadRepository>()
             .AddScoped<IRoleWriteRepository, RoleWriteRepository>()

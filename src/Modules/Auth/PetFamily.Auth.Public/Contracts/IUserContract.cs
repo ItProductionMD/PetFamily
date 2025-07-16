@@ -3,7 +3,7 @@ using PetFamily.SharedKernel.Results;
 
 namespace PetFamily.Auth.Public.Contracts;
 
-public interface IUserFinder
+public interface IUserContract
 {
-    Task<Result<UserDto>> FindById(Guid userId, CancellationToken ct = default);
+    Task<Result<UserDto>> GetByIdAsync(Guid userId, CancellationToken ct = default);
 }

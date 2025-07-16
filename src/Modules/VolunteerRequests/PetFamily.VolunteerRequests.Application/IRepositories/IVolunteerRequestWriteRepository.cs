@@ -6,6 +6,6 @@ namespace PetFamily.VolunteerRequests.Application.IRepositories;
 public interface IVolunteerRequestWriteRepository
 {
     Task<Result<VolunteerRequest>> GetByIdAsync(Guid volunteerRequestId, CancellationToken ct);
-    Task<UnitResult> AddAsync(VolunteerRequest volunteerRequest, CancellationToken ct);
-    Task<UnitResult> SaveAsync(CancellationToken ct);
+    Task AddAsync(VolunteerRequest volunteerRequest, CancellationToken ct);
+    Task SaveAsync(CancellationToken ct);
 }

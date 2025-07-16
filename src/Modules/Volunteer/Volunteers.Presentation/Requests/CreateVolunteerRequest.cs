@@ -1,4 +1,5 @@
-﻿using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
+﻿using PetFamily.SharedApplication.Dtos;
+using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 using Volunteers.Application.ResponseDtos;
 
 namespace Volunteers.Presentation.Requests;

@@ -53,9 +53,7 @@ public class SendRequestToRevisionHandler(
             return UnitResult.Fail(sendToRevisionResult.Error);
         }
 
-        var saveResult = await _requestRepository.SaveAsync(ct);
-        if (saveResult.IsFailure)
-            return saveResult;
+        await _requestRepository.SaveAsync(ct);
 
         // Try send message to discussion
         try

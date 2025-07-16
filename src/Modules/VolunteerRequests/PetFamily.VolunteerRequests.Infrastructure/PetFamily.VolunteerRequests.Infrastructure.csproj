@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Dapper\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\PetFamily.SharedInfrastructure\PetFamily.SharedInfrastructure.csproj" />
+    <ProjectReference Include="..\PetFamily.VolunteerRequests.Application\PetFamily.VolunteerRequests.Application.csproj" />
+    <ProjectReference Include="..\PetFamily.VolunteerRequests.Domain\PetFamily.VolunteerRequests.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

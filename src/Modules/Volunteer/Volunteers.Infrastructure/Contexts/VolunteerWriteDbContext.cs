@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.SharedInfrastructure.Shared.Logger;
 using PetFamily.SharedInfrastructure.Constants;
+using PetFamily.SharedInfrastructure.Shared.Logger;
 using VolunteerDomain = Volunteers.Domain.Volunteer;
-using PetFamily.SharedInfrastructure.Shared.EFCore;
 
 namespace Volunteers.Infrastructure.Contexts;
 
@@ -18,19 +17,18 @@ public class VolunteerWriteDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-
         optionsBuilder
             .UseNpgsql(_connectionString)
             .UseSnakeCaseNamingConvention()
             .UseLoggerFactory(MyLoggerFactory.LoggerFactoryInstance)
-        .EnableSensitiveDataLogging();
+            .EnableSensitiveDataLogging();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema(SchemaNames.VOLUNTEER);
-
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(VolunteerWriteDbContext).Assembly);
+        modelBuilder
+            .HasDefaultSchema(SchemaNames.VOLUNTEER)
+            .ApplyConfigurationsFromAssembly(typeof(VolunteerWriteDbContext).Assembly);
 
         base.OnModelCreating(modelBuilder);
     }

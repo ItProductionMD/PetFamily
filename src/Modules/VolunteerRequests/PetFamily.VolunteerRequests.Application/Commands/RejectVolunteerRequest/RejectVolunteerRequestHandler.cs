@@ -42,13 +42,7 @@ public class RejectVolunteerRequestHandler(
             return UnitResult.Fail(rejectResult.Error);
         }
 
-        var saveResult = await _requestRepository.SaveAsync(ct);
-        if (saveResult.IsFailure)
-        {
-            _logger.LogError("Failed to persist rejected status for request ID {Id}: {Error}",
-                cmd.VolunteerRequestId, saveResult.Error);
-            return saveResult;
-        }
+        await _requestRepository.SaveAsync(ct);
 
         _logger.LogInformation("Volunteer request with ID {Id} rejected by admin {AdminId}",
             cmd.VolunteerRequestId, adminId);

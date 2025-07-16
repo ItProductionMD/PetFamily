@@ -47,8 +47,8 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<VolunteerDomain>
             .IsRequired();
 
         builder.Property(v => v.Requisites)
-            .HasConversion(new ReadOnlyListConverter<RequisitesInfo>())
             .HasColumnType("jsonb")
+            .HasConversion(new ReadOnlyListConverter<RequisitesInfo>())
             .Metadata.SetValueComparer(new ReadOnlyListComparer<RequisitesInfo>());
 
         //For soft deleting

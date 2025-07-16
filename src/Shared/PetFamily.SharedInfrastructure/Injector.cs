@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Extensions;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedInfrastructure.HttpContext;
 using PetFamily.SharedInfrastructure.Shared.Constants;
@@ -14,10 +15,8 @@ public static class Injector
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var postgresConnection = configuration.GetConnectionString(ConnectionStringName.POSTGRESQL);
-        if (string.IsNullOrEmpty(postgresConnection))
-            throw new ApplicationException("PostgreSQL connection string wasn't found!");
-
+        var postgresConnection = configuration.TryGetConnectionString(ConnectionStringName.POSTGRESQL);
+        
         return services
             .ConfigDapper(configuration)
             .AddSingleton<IDbConnectionFactory>(_ => new NpgSqlConnectionFactory(postgresConnection))
