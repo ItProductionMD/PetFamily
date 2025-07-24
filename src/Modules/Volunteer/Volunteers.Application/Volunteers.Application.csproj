@@ -14,10 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\FileStorage\FileStorage.Public\FileStorage.Public.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
-    <ProjectReference Include="..\..\Auth\PetFamily.Auth.Domain\PetFamily.Auth.Domain.csproj" />
-    <ProjectReference Include="..\..\Auth\PetFamily.Auth.Public\PetFamily.Auth.Public.csproj" />
-    <ProjectReference Include="..\..\FileStorage\FileStorage.Public\FileStorage.Public.csproj" />
     <ProjectReference Include="..\..\PetSpecies\PetSpecies.Public\PetSpecies.Public.csproj" />
     <ProjectReference Include="..\Volunteers.Domain\Volunteers.Domain.csproj" />
     <ProjectReference Include="..\Volunteers.Public\Volunteers.Public.csproj" />

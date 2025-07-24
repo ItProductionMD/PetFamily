@@ -47,6 +47,7 @@ public class AddPermissionsCommandHandler(
         var permissions = permissionsToAdd.Select(newCode => Permission.Create(newCode).Data!);
 
         await _permissionWriteRepository.AddPermissions(permissions, ct);
+        await _permissionWriteRepository.SaveAsync(ct);
 
         var permissionDtos = permissions
             .Select(p => new PermissionDto(p.Id.Value, p.Code, p.IsEnabled))

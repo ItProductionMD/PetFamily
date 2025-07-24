@@ -432,7 +432,7 @@ public class MinioFileRepository(
 
         await _client.SetBucketLifecycleAsync(lifeCirclePolicyArgs, ct);
         _logger.LogWarning("Bucket with name'{Folder}' created, versioning is enabled, set" +
-            " rules: 'DeleteAfter1Day','DleteMarkers'", bucket);
+            " rules: 'DeleteAfter1Day','DeleteMarkers'", bucket);
     }
 }
 

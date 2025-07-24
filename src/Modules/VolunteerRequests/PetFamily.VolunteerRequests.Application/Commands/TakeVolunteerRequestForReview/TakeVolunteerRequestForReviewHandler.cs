@@ -9,15 +9,15 @@ using PetFamily.VolunteerRequests.Domain.Enums;
 
 namespace PetFamily.VolunteerRequests.Application.Commands.TakeVolunteerRequestForReview;
 
-public class TakeVolunteerRequestToReviewHandler(
+public class TakeVolunteerRequestForReviewHandler(
     IVolunteerRequestWriteRepository requestRepository,
     IDiscussionCreator discussionCreator,
     IDiscussionRemover discussionRemover,
     IUserContext userContext,
-    ILogger<TakeVolunteerRequestToReviewHandler> logger) : ICommandHandler<TakeVolunteerRequestForReviewCommand>
+    ILogger<TakeVolunteerRequestForReviewHandler> logger) : ICommandHandler<TakeVolunteerRequestForReviewCommand>
 {
     private readonly IVolunteerRequestWriteRepository _requestRepository = requestRepository;
-    private readonly ILogger<TakeVolunteerRequestToReviewHandler> _logger = logger;
+    private readonly ILogger<TakeVolunteerRequestForReviewHandler> _logger = logger;
     private readonly IUserContext _userContext = userContext;
     private readonly IDiscussionRemover _discussionRemover = discussionRemover;
     private readonly IDiscussionCreator _discussionCreator = discussionCreator;

@@ -123,7 +123,7 @@ public class UserReadRepository(
             LEFT JOIN 
                 auth.role_permissions rp ON rp.role_id = r.{RoleTable.Id}
             LEFT JOIN 
-                {PermissionsTable.TableName} p ON p.{PermissionsTable.Id} = rp.permission_id
+                {PermissionsTable.FullTableName} p ON p.{PermissionsTable.Id} = rp.permission_id
             WHERE
                 u.{UserTable.Id} = @UserId
             GROUP BY 

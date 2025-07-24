@@ -31,7 +31,7 @@ public class RoleReadRepository(
             p.{PermissionsTable.IsEnabled} AS IsEnable
         FROM {RoleTable.TableName} r
             JOIN auth.role_permissions rp ON r.{RoleTable.Id} = rp.{RoleTable.ConstraintName}
-            JOIN {PermissionsTable.TableName} p ON p.{PermissionsTable.Id} = rp.{PermissionsTable.ConstraintName}
+            JOIN {PermissionsTable.FullTableName} p ON p.{PermissionsTable.Id} = rp.{PermissionsTable.ConstraintName}
         WHERE r.{RoleTable.Code} = @RoleCode
         ORDER BY p.{PermissionsTable.Code};
     ";
@@ -75,7 +75,7 @@ public class RoleReadRepository(
                p.{PermissionsTable.IsEnabled} AS IsEnable
            FROM {RoleTable.TableName} r
                LEFT JOIN auth.role_permissions rp ON r.{RoleTable.Id} = rp.{RoleTable.ConstraintName}
-               LEFT JOIN {PermissionsTable.TableName} p ON p.{PermissionsTable.Id} = rp.{PermissionsTable.ConstraintName}
+               LEFT JOIN {PermissionsTable.FullTableName} p ON p.{PermissionsTable.Id} = rp.{PermissionsTable.ConstraintName}
                ORDER BY r.{RoleTable.Code}, p.{PermissionsTable.Code} ;";
 
         _logger.LogInformation("EXECUTING QUERY: {sql}", sql);
@@ -116,7 +116,7 @@ public class RoleReadRepository(
             ON r.{RoleTable.Id} = ur.{RoleTable.ConstraintName}
         LEFT JOIN auth.role_permissions rp 
             ON r.{RoleTable.Id} = rp.role_id
-        LEFT JOIN {PermissionsTable.TableName} p 
+        LEFT JOIN {PermissionsTable.FullTableName} p 
             ON p.{PermissionsTable.Id} = rp.permission_id
         WHERE ur.user_id = @UserId;";
 

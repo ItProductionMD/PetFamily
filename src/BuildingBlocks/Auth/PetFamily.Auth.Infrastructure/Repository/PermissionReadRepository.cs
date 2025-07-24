@@ -21,7 +21,7 @@ public class PermissionReadRepository(
             SELECT p.{PermissionsTable.Id} AS PermissionId,
                 p.{PermissionsTable.Code} AS PermissionCode,
                 p.{PermissionsTable.IsEnabled} As IsEnable
-            FROM {PermissionsTable.TableName} p
+            FROM {PermissionsTable.FullTableName} p
             ORDER BY p.{PermissionsTable.Code}" ;
 
         var permissions = await connection.QueryAsync<PermissionDto>(sql);

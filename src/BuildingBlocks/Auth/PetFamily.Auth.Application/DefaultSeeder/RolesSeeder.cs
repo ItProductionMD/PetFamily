@@ -47,15 +47,38 @@ public class RolesSeeder(
             .Select(p => Permission.Create(p).Data!)
             .ToList();
 
-        List<string> permissionCodesForUserRole = PermissionCodes.UserManagement
-            .GetPermissions();
+        List<string> permissionCodesForUserManagement = PermissionCodes.UserManagement
+            .GetAllPermissions();
 
-        List<string> permissionCodesForVolunteerRole = PermissionCodes.VolunteerManagement
-            .GetPermissions();
-        permissionCodesForVolunteerRole.AddRange(permissionCodesForUserRole);
+        List<string> permissionCodesForVolunteerManagement = PermissionCodes.VolunteerManagement
+            .GetAllPermissions();
 
+        List<string> permissionCodesForRoleManagement = PermissionCodes.RoleManagement
+            .GetAllPermissions();
+
+        List<string> permissionCodesForPermissionManagement = PermissionCodes.PermissionManagement
+            .GetAllPermissions();
+
+        List<string> permissionCodesForSpeciesManagement = PermissionCodes.SpeciesManagement
+            .GetAllPermissions();
+
+        List<string> permissionCodesForVolunteerRequestManagement = PermissionCodes.VolunteerRequestManagement
+            .GetAllPermissions();
+
+        var permissionsForVolunteer = permissionCodesForPermissionManagement
+            .Concat(permissionCodesForRoleManagement)
+            .Concat(permissionCodesForVolunteerManagement)
+            .Concat(permissionCodesForSpeciesManagement)
+            .Concat(permissionCodesForVolunteerRequestManagement)
+            .Concat([
+                PermissionCodes.UserManagement.UserDelete,
+                PermissionCodes.UserManagement.UserView
+                ]);
+
+        //permissionCodesForVolunteerManagement.AddRange(permissionCodesForUserManagement);
         List<string> permissionCodesForUnconfirmedUser = [
-            PermissionCodes.UserManagement.UserView];
+            PermissionCodes.UserManagement.UserView
+            ];
 
         await _authUnitOfWork.BeginTransactionAsync(default);
         try
@@ -69,12 +92,12 @@ public class RolesSeeder(
                 .ToList();
 
             var userPermissionIds = allPermissions
-                .Where(p => permissionCodesForUserRole.Any(pU => pU == p.Code))
+                .Where(p => permissionCodesForUserManagement.Any(pU => pU == p.Code))
                 .Select(p => p.Id)
                 .ToList();
 
             var volunteerPermissionIds = allPermissions
-                .Where(p => permissionCodesForVolunteerRole.Any(pV => pV == p.Code))
+                .Where(p => permissionCodesForVolunteerManagement.Any(pV => pV == p.Code))
                 .Select(p => p.Id)
                 .ToList();
 

@@ -4,12 +4,12 @@ public static class PermissionCodes
 {
     public static class UserManagement
     {
-        public const string UserView = "User.View";
-        public const string UserCreate = "User.Create";
+        public static readonly string UserView = "User.View";
+        public static readonly string UserCreate = "User.Create";
         public const string UserEdit = "User.Edit";
         public const string UserDelete = "User.Delete";
         public const string UserRestore = "User.Restore";
-        public static List<string> GetPermissions() =>
+        public static List<string> GetAllPermissions() =>
             [UserView, UserCreate, UserEdit, UserDelete, UserRestore];
     }
 
@@ -21,7 +21,7 @@ public static class PermissionCodes
         public const string VolunteerDelete = "Volunteer.Delete";
         public const string VolunteerRestore = "Volunteer.Restore";
 
-        public static List<string> GetPermissions() =>
+        public static List<string> GetAllPermissions() =>
             [VolunteerView, VolunteerCreate, VolunteerEdit, VolunteerDelete, VolunteerRestore];
     }
 
@@ -32,7 +32,7 @@ public static class PermissionCodes
         public const string RoleEdit = "Role.Edit";
         public const string RoleDelete = "Role.Delete";
         public const string RoleRestore = "Role.Restore";
-        public static List<string> GetPermissions() =>
+        public static List<string> GetAllPermissions() =>
             [RoleView, RoleCreate, RoleEdit, RoleDelete, RoleRestore];
     }
 
@@ -42,7 +42,7 @@ public static class PermissionCodes
         public const string PermissionCreate = "Permission.Create";
         public const string PermissionEdit = "Permission.Edit";
         public const string PermissionDelete = "Permission.Delete";
-        public static List<string> GetPermissions() => 
+        public static List<string> GetAllPermissions() =>
             [PermissionView, PermissionCreate, PermissionEdit, PermissionDelete];
     }
 
@@ -54,17 +54,41 @@ public static class PermissionCodes
         public const string SpeciesDelete = "Species.Delete";
         public const string SpeciesRestore = "Species.Restore";
 
-        public static List<string> GetPermissions() =>
+        public static List<string> GetAllPermissions() =>
             [SpeciesView, SpeciesCreate, SpeciesEdit, SpeciesDelete, SpeciesRestore];
+    }
+
+    public static class VolunteerRequestManagement
+    {
+        public const string VolunteerRequestView = "VolunteerRequest.View";
+        public const string VolunteerRequestCreate = "VolunteerRequest.Create";
+        public const string VolunteerRequestUpdate = "VolunteerRequest.Update";
+        public const string VolunteerRequestDelete = "VolunteerRequest.Delete";
+        public const string VolunteerRequestApprove = "VolunteerRequest.Approve";
+        public const string VolunteerRequestReject = "VolunteerRequest.Reject";
+        public const string VolunteerRequestTakeForReview = "VolunteerRequest.TakeForReview";
+        public const string VolunteerRequestSendToRevision = "VolunteerRequest.SendToRevision";
+
+        public static List<string> GetAllPermissions() =>
+            [
+            VolunteerRequestView,
+            VolunteerRequestCreate,
+            VolunteerRequestUpdate,
+            VolunteerRequestDelete,
+            VolunteerRequestApprove,
+            VolunteerRequestReject,
+            VolunteerRequestTakeForReview,
+            VolunteerRequestSendToRevision
+            ];
     }
 
     public static List<string> GetAllPermissionCodes()
     {
-        var userManagementPermissions = UserManagement.GetPermissions();
-        var volunteerManagementPermissions = VolunteerManagement.GetPermissions();
-        var roleManagementPermissions = RoleManagement.GetPermissions();
-        var permissionManagementPermissions = PermissionManagement.GetPermissions();
-        var speciesManagementPermissions = SpeciesManagement.GetPermissions();
+        var userManagementPermissions = UserManagement.GetAllPermissions();
+        var volunteerManagementPermissions = VolunteerManagement.GetAllPermissions();
+        var roleManagementPermissions = RoleManagement.GetAllPermissions();
+        var permissionManagementPermissions = PermissionManagement.GetAllPermissions();
+        var speciesManagementPermissions = SpeciesManagement.GetAllPermissions();
 
         List<string> list = [];
 
@@ -76,4 +100,54 @@ public static class PermissionCodes
 
         return list;
     }
+
+    public static List<string> GetPermissionsForAdmin() =>
+        [
+            UserManagement.UserDelete,
+            UserManagement.UserView,
+            UserManagement.UserRestore,
+            VolunteerManagement.VolunteerView,
+            VolunteerManagement.VolunteerCreate,
+            VolunteerManagement.VolunteerDelete,
+            VolunteerManagement.VolunteerRestore,
+            RoleManagement.RoleView,
+            RoleManagement.RoleCreate,
+            RoleManagement.RoleEdit,
+            RoleManagement.RoleDelete,
+            RoleManagement.RoleRestore,
+            PermissionManagement.PermissionView,
+            PermissionManagement.PermissionCreate,
+            PermissionManagement.PermissionEdit,
+            PermissionManagement.PermissionDelete,
+            SpeciesManagement.SpeciesView,
+            SpeciesManagement.SpeciesCreate,
+            SpeciesManagement.SpeciesEdit,
+            SpeciesManagement.SpeciesDelete,
+            SpeciesManagement.SpeciesRestore,
+            VolunteerRequestManagement.VolunteerRequestView,
+            VolunteerRequestManagement.VolunteerRequestDelete,
+            VolunteerRequestManagement.VolunteerRequestApprove,
+            VolunteerRequestManagement.VolunteerRequestReject,
+            VolunteerRequestManagement.VolunteerRequestTakeForReview,
+            VolunteerRequestManagement.VolunteerRequestSendToRevision
+        ];
+
+    public static List<string> GetPermissionsForUser() =>
+        [
+            UserManagement.UserView,
+            UserManagement.UserEdit,
+            VolunteerManagement.VolunteerView,
+            VolunteerRequestManagement.VolunteerRequestView,
+            VolunteerRequestManagement.VolunteerRequestCreate,
+            VolunteerRequestManagement.VolunteerRequestUpdate,
+            VolunteerRequestManagement.VolunteerRequestDelete
+        ];
+
+    public static List<string> GetPermissionsForVolunteer() =>
+        [
+            UserManagement.UserView,
+            UserManagement.UserEdit,
+            VolunteerManagement.VolunteerView,
+            VolunteerManagement.VolunteerEdit
+        ];
 }

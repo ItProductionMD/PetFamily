@@ -8,7 +8,7 @@ namespace PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 
 public static class PermissionsTable
 {
-    public const string TableName = "auth.permissions";
+    public const string FullTableName = "auth.permissions";
     public const string Id = "id";
     public const string Code = "code";
     public const string IsEnabled = "is_enabled";
