@@ -22,29 +22,15 @@ public class SubmitVolunteerRequestHandler(
 
     public async Task<UnitResult> Handle(SubmitVolunteerRequestCommand cmd, CancellationToken ct)
     {
-        var validationResult = SubmitVolunteerRequestValidator.Validate(cmd);
-        if (validationResult.IsFailure)
-        {
-            var errorMessage = validationResult.ToErrorMessage();
-            _logger.LogWarning("Create volunteer request failed! Error:{message}", errorMessage);
+        SubmitVolunteerRequestValidator.Validate(cmd);
 
-            return UnitResult.Fail(validationResult.Error);
-        }
-
-        var getUserId = _userContext.GetUserId();
-        if (getUserId.IsFailure)
-        {
-            _logger.LogWarning("UserId in userContext not found !Error:{error}",
-                getUserId.ToErrorMessage());
-            return UnitResult.Fail(getUserId.Error);
-        }
-        var userId = getUserId.Data!;
-
+        var userId = _userContext.GetUserId();
+        
         var isRequestExist = await _requestReadRepository.CheckIfRequestExistAsync(userId, ct);
         if (isRequestExist)
         {
             _logger.LogWarning("Volunteer request already exists for user {UserId}", userId);
-            return UnitResult.Fail(Error.ValueIsAlreadyExist("Volunteer request already exists"));
+            return UnitResult.Fail(Error.Conflict("Volunteer request already exists"));
         }
 
         var requisites = cmd.Requisites.Select(r => RequisitesInfo.Create(r.Name, r.Description).Data!);

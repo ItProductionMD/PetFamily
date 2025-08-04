@@ -14,6 +14,9 @@ using Volunteers.Infrastructure.Contexts;
 using PetFamily.SharedInfrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using PetFamily.Auth.Infrastructure.Contexts;
+using PetFamily.VolunteerRequests.Infrastructure.Contexts;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using PetFamily.SharedApplication.IUserContext;
 
 namespace PetFamily.IntegrationTests;
 
@@ -31,6 +34,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
     private NpgsqlConnection _dbConnection = null!;
     public Mock<IFileService> FileServiceMock = new Mock<IFileService>();
     public Mock<IUploadFileDtoValidator> FileValidator = new Mock<IUploadFileDtoValidator>();
+    public Guid UserContextId = Guid.NewGuid();
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -55,6 +59,22 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (iFileService != null)
                 services.Remove(iFileService);
 
+            var volunteerRequestDbContext = services.SingleOrDefault(s => s.ServiceType == typeof(VolunteerRequestDbContext));
+            if (volunteerRequestDbContext != null)
+                services.Remove(volunteerRequestDbContext);
+
+            var userContext = services.SingleOrDefault(s => s.ServiceType == typeof(IUserContext));
+            if (userContext != null)
+                services.Remove(userContext);
+
+            var userContextMock = new Mock<IUserContext>();
+            userContextMock.Setup(x => x.GetUserId())
+                           .Returns(UserContextId);
+
+            services.AddScoped<IUserContext>(_ =>
+                userContextMock.Object);
+
+
             services.AddScoped<SpeciesWriteDbContext>(_ =>
                 new SpeciesWriteDbContext(_dbContainer.GetConnectionString()));
 
@@ -68,6 +88,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
                 new NpgSqlConnectionFactory(_dbContainer.GetConnectionString()));
 
             services.AddScoped<IFileService>(_ => FileServiceMock.Object);
+
+            services.AddScoped<VolunteerRequestDbContext>(_ =>
+                new VolunteerRequestDbContext(_dbContainer.GetConnectionString()));
         });
     }
 
@@ -78,7 +101,13 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         {
             DbAdapter = DbAdapter.Postgres,
 
-            SchemasToInclude = new[] { SchemaNames.SPECIES, SchemaNames.VOLUNTEER , SchemaNames.AUTH }
+            SchemasToInclude = new[] 
+            {
+                SchemaNames.SPECIES,
+                SchemaNames.VOLUNTEER,
+                SchemaNames.AUTH,
+                SchemaNames.VOLUNTEER_REQUESTS 
+            }
 
         });
     }
@@ -97,11 +126,12 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         var speciesContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
         var volunteerContext = scope.ServiceProvider.GetRequiredService<VolunteerWriteDbContext>();
         var authContext = scope.ServiceProvider.GetRequiredService<AuthWriteDbContext>();
+        var volunteerRequestContext = scope.ServiceProvider.GetRequiredService<VolunteerRequestDbContext>();
 
         await authContext.Database.MigrateAsync();
         await speciesContext.Database.MigrateAsync();
         await volunteerContext.Database.MigrateAsync();
-
+        await volunteerRequestContext.Database.MigrateAsync();
 
         _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
         await InitializeRespawner();

@@ -1,6 +1,6 @@
 ﻿using PetFamily.SharedApplication.Dtos;
 
-namespace PetFamily.VolunteerRequest.Presentation.Requests;
+namespace PetFamily.VolunteerRequests.Presentation.Requests;
 
 public record UpdateVolunteerRequestDto(
     string LastName,

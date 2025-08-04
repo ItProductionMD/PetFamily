@@ -29,14 +29,8 @@ public class LoginByEmailCommandHandler(
 
     public async Task<Result<TokenResult>> Handle(LoginByEmailCommand cmd, CancellationToken ct)
     {
-        var validateCommandResult = LoginByEmailCommandValidator.Validate(cmd);
-        if (validateCommandResult.IsFailure)
-        {
-            _logger.LogWarning("VALIDATION FAILED for LoginByEmailCommand: {Errors}",
-            validateCommandResult.ValidationMessagesToString());
-
-            return validateCommandResult;
-        }
+        LoginByEmailCommandValidator.Validate(cmd);
+        
         var user = await _userWriteRepository.GetByEmailAsync(cmd.Email, ct);
         if (user == null)
         {

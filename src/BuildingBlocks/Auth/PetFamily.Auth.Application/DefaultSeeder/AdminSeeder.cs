@@ -53,16 +53,17 @@ public class AdminSeeder(
             return;
         }
 
-        var adminRole = await _roleReadRepository.GetByCodeAsync(RoleCodes.ADMIN, default);
-        if (adminRole.IsFailure)
+        var getAdminRole = await _roleReadRepository.GetByCodeAsync(RoleCodes.ADMIN, default);
+        if (getAdminRole.IsFailure)
         {
             _logger.LogCritical("ADMIN SEEDER: Admin role does not exist!");
             throw new InvalidOperationException("Admin role does not exist." +
                 " Please create it before seeding the admin user.");
         }
+        var guidRoleId = getAdminRole.Data!.RoleId;
+        var adminRoleId = RoleId.Create(guidRoleId).Data!;
+
         var hashedPassword = _passwordHasher.Hash(_admin.Password);
-        var roleGuidId = adminRole.Data!.RoleId;
-        var roleId = RoleId.Create(roleGuidId).Data!;
 
         var userResult = User.Create(
             UserId.NewGuid(),
@@ -71,7 +72,7 @@ public class AdminSeeder(
             Phone.CreateEmpty(),
             hashedPassword,
             [],
-            [roleId],
+            adminRoleId,
             ProviderType.Local);
 
         if (userResult.IsFailure)

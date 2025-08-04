@@ -142,7 +142,8 @@ public class Volunteer : SoftDeletable, IEntity<Guid>, IHasUniqueFields
         Phone ownerPhone,
         IReadOnlyList<RequisitesInfo> requisites,
         HelpStatus helpStatus,
-        string? healthInfo)
+        string? healthInfo,
+        Address address)
     {
         var serialNumberValue = ExistingPetsCount + 1;
         var serialNumber = PetSerialNumber.Create(serialNumberValue, this).Data!;
@@ -161,7 +162,7 @@ public class Volunteer : SoftDeletable, IEntity<Guid>, IHasUniqueFields
             requisites,
             helpStatus,
             healthInfo,
-            Address.CreateEmpty(),
+            address,
             serialNumber).Data!;
 
         _pets.Add(pet);

@@ -9,13 +9,19 @@ public record CreateVolunteerRequest(
     string LastName,
     string Description,
     int ExperienceYears,
+    string PhoneRegionCode,
+    string PhoneNumber,
     IEnumerable<RequisitesDto> Requisites)
 {
     public CreateVolunteerCommand ToCommand() =>
-        new(FirstName,
+        new(
+            Guid.NewGuid(),
+            FirstName,
             LastName,
             Description,    
             ExperienceYears,
+            PhoneRegionCode,
+            PhoneNumber,
             Requisites);
 }
 

@@ -33,7 +33,7 @@
     <ProjectReference Include="..\Modules\Discussions\PetFamily.Discussions.Infrastructure\PetFamily.Discussions.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\PetSpecies\PetSpecies.Infrastructure\PetSpecies.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\PetSpecies\PetSpecies.Presentation\PetSpecies.Presentation.csproj" />
-    <ProjectReference Include="..\Modules\VolunteerRequests\PetFamily.VolunteerRequest.Presentation\PetFamily.VolunteerRequest.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\VolunteerRequests\PetFamily.VolunteerRequest.Presentation\PetFamily.VolunteerRequests.Presentation.csproj" />
     <ProjectReference Include="..\Modules\VolunteerRequests\PetFamily.VolunteerRequests.Infrastructure\PetFamily.VolunteerRequests.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Volunteer\Volunteers.Infrastructure\Volunteers.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Volunteer\Volunteers.Presentation\Volunteers.Presentation.csproj" />

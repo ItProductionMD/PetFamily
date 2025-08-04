@@ -93,7 +93,8 @@ public class VolunteerTests
             Phone.CreateNotEmpty("67777745222", "+373").Data!,
             [],
             HelpStatus.ForHelp,
-            null);
+            null,
+            Address.CreateEmpty());
         //ASSERT
         Assert.NotNull(pet);
         Assert.Equal(petInitialCount + 1, volunteer.Pets.Count);

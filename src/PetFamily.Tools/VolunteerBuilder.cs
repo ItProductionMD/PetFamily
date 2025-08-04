@@ -123,7 +123,8 @@ public class VolunteerBuilder
            Phone.CreateEmpty(),
            [],
            randomHelpStatus,
-           "health info");
+           "health info",
+           randomAddress);
 
         for (int i = 0; i < 9; i++)
             pet.AddImages([$"{Guid.NewGuid().ToString()}" + ".jpg"]);

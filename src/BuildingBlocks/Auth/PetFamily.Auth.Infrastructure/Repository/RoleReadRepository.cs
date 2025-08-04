@@ -24,15 +24,17 @@ public class RoleReadRepository(
 
         var sql = $@"
         SELECT 
-            r.{RoleTable.Id} AS RoleId, 
-            r.{RoleTable.Code} AS RoleCode,   
+            r.{RolesTable.Id} AS RoleId, 
+            r.{RolesTable.Code} AS RoleCode,   
             p.{PermissionsTable.Id} AS PermissionId,
             p.{PermissionsTable.Code} AS PermissionCode,
             p.{PermissionsTable.IsEnabled} AS IsEnable
-        FROM {RoleTable.TableName} r
-            JOIN auth.role_permissions rp ON r.{RoleTable.Id} = rp.{RoleTable.ConstraintName}
-            JOIN {PermissionsTable.FullTableName} p ON p.{PermissionsTable.Id} = rp.{PermissionsTable.ConstraintName}
-        WHERE r.{RoleTable.Code} = @RoleCode
+        FROM {RolesTable.TableFullName} r
+            JOIN {RolePermissionsTable.TableFullName} rp 
+                ON r.{RolesTable.Id} = rp.{RolePermissionsTable.RoleId}
+            JOIN {PermissionsTable.TableFullName} p 
+                ON p.{PermissionsTable.Id} = rp.{RolePermissionsTable.PermissionId}
+        WHERE r.{RolesTable.Code} = @RoleCode
         ORDER BY p.{PermissionsTable.Code};
     ";
 
@@ -68,15 +70,17 @@ public class RoleReadRepository(
 
         var sql = $@"
            SELECT 
-               r.{RoleTable.Id} AS RoleId, 
-               r.{RoleTable.Code} AS RoleCode,   
+               r.{RolesTable.Id} AS RoleId, 
+               r.{RolesTable.Code} AS RoleCode,   
                p.{PermissionsTable.Id} AS PermissionId,
                p.{PermissionsTable.Code} AS PermissionCode,
                p.{PermissionsTable.IsEnabled} AS IsEnable
-           FROM {RoleTable.TableName} r
-               LEFT JOIN auth.role_permissions rp ON r.{RoleTable.Id} = rp.{RoleTable.ConstraintName}
-               LEFT JOIN {PermissionsTable.FullTableName} p ON p.{PermissionsTable.Id} = rp.{PermissionsTable.ConstraintName}
-               ORDER BY r.{RoleTable.Code}, p.{PermissionsTable.Code} ;";
+           FROM {RolesTable.TableFullName} r
+               LEFT JOIN {RolePermissionsTable.TableFullName} rp 
+                  ON r.{RolesTable.Id} = rp.{RolePermissionsTable.RoleId}
+               LEFT JOIN {PermissionsTable.TableFullName} p 
+                  ON p.{PermissionsTable.Id} = rp.{RolePermissionsTable.PermissionId}
+               ORDER BY r.{RolesTable.Code}, p.{PermissionsTable.Code} ;";
 
         _logger.LogInformation("EXECUTING QUERY: {sql}", sql);
 
@@ -106,19 +110,19 @@ public class RoleReadRepository(
 
         var sql = $@"
         SELECT 
-            r.{RoleTable.Id} AS RoleId, 
-            r.{RoleTable.Code} AS RoleCode,   
+            r.{RolesTable.Id} AS RoleId, 
+            r.{RolesTable.Code} AS RoleCode,   
             p.{PermissionsTable.Id} AS PermissionId,
             p.{PermissionsTable.Code} AS PermissionCode,
             p.{PermissionsTable.IsEnabled} AS IsEnable
-        FROM {RoleTable.TableName} r
-        JOIN auth.user_role ur 
-            ON r.{RoleTable.Id} = ur.{RoleTable.ConstraintName}
-        LEFT JOIN auth.role_permissions rp 
-            ON r.{RoleTable.Id} = rp.role_id
-        LEFT JOIN {PermissionsTable.FullTableName} p 
+        FROM {RolesTable.TableFullName} r
+        JOIN {UserRoleTable.TableFullName} ur 
+            ON r.{RolesTable.Id} = ur.{UserRoleTable.RoleId}
+        LEFT JOIN {RolePermissionsTable.TableFullName} rp 
+            ON r.{RolesTable.Id} = rp.role_id
+        LEFT JOIN {PermissionsTable.TableFullName} p 
             ON p.{PermissionsTable.Id} = rp.permission_id
-        WHERE ur.user_id = @UserId;";
+        WHERE ur.{UserRoleTable.UserId} = @UserId;";
 
         _logger.LogInformation("EXECUTING QUERY: {sql}", sql);
 
@@ -157,8 +161,10 @@ public class RoleReadRepository(
 
         var sql = $@"
         SELECT COUNT(*) 
-        FROM auth.roles 
-        WHERE id = ANY(@Ids);";
+        FROM {RolesTable.TableFullName} 
+        WHERE {RolesTable.Id} = ANY(@Ids);";
+
+        _logger.LogInformation("EXECUTONG QUERY:{sql}", sql);
 
         var count = await connection.ExecuteScalarAsync<int>(sql, new { Ids = ids });
 

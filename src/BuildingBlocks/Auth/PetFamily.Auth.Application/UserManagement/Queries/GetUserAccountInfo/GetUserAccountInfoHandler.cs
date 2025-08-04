@@ -22,6 +22,7 @@ public class GetUserAccountInfoHandler(
             _logger.LogWarning("User Id is empty!");
             return Result.Fail(validateCommandResult.Error);
         }
+
         return await _userReadRepository.GetUserAccountInfo(cmd.userId, ct);       
     }
 }

@@ -60,6 +60,8 @@ public static class PermissionCodes
 
     public static class VolunteerRequestManagement
     {
+        public const string VolunteerRequestsGetUnreviewed = "VolunteerRequests.GetUnreviewed";
+        public const string VolunteerRequestsGetOnReview = "VolunteerRequests.GetOnReview";
         public const string VolunteerRequestView = "VolunteerRequest.View";
         public const string VolunteerRequestCreate = "VolunteerRequest.Create";
         public const string VolunteerRequestUpdate = "VolunteerRequest.Update";
@@ -129,7 +131,9 @@ public static class PermissionCodes
             VolunteerRequestManagement.VolunteerRequestApprove,
             VolunteerRequestManagement.VolunteerRequestReject,
             VolunteerRequestManagement.VolunteerRequestTakeForReview,
-            VolunteerRequestManagement.VolunteerRequestSendToRevision
+            VolunteerRequestManagement.VolunteerRequestSendToRevision,
+            VolunteerRequestManagement.VolunteerRequestsGetUnreviewed,
+            VolunteerRequestManagement.VolunteerRequestsGetOnReview 
         ];
 
     public static List<string> GetPermissionsForUser() =>

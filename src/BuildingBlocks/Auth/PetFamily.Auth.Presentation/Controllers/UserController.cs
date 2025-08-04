@@ -60,13 +60,13 @@ public class UserController : Controller
 
     [HttpPatch("{id}/change_roles")]
     public async Task<ActionResult<Envelope>> ChangeRoles(
-        [FromServices] ChangeRolesCommandHandler handler,
-        [FromRoute] Guid id,
-        [FromBody] IEnumerable<Guid> roleIds,
+        [FromServices] ChangeRoleCommandHandler handler,
+        [FromRoute] Guid userId,
+        [FromBody] Guid roleId,
         CancellationToken ct)
     {
 
-        var cmd = new ChangeRolesCommand(id, roleIds);
+        var cmd = new ChangeRoleCommand(userId, roleId);
 
         var result = await handler.Handle(cmd, ct);
 

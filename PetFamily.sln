@@ -80,7 +80,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Discussions.Publi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.VolunteerRequests.Infrastructure", "src\Modules\VolunteerRequests\PetFamily.VolunteerRequests.Infrastructure\PetFamily.VolunteerRequests.Infrastructure.csproj", "{E2C962BC-02D2-4923-A1FB-5275AE7DF925}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.VolunteerRequest.Presentation", "src\Modules\VolunteerRequests\PetFamily.VolunteerRequest.Presentation\PetFamily.VolunteerRequest.Presentation.csproj", "{9E2346B0-9AD8-47C6-9D36-D160DDF63FC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.VolunteerRequests.Presentation", "src\Modules\VolunteerRequests\PetFamily.VolunteerRequest.Presentation\PetFamily.VolunteerRequests.Presentation.csproj", "{9E2346B0-9AD8-47C6-9D36-D160DDF63FC6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Discussions.Infrastructure", "src\Modules\Discussions\PetFamily.Discussions.Infrastructure\PetFamily.Discussions.Infrastructure.csproj", "{82A581AC-CC2B-48F8-BCC7-04452E67728C}"
 EndProject

@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClasses;
+using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using System.Text;
 using Volunteers.Application.Queries.GetPets.ForFilter;
 
@@ -12,18 +12,18 @@ public static class StringBuilderForSqlQueryExtensions
         PetsFilter filter)
     {
         if (filter.VolunteerId.HasValue)
-            countBuilder.Append($" LEFT JOIN {VolunteerTable.TableFullName} v " +
-                $"ON v.{VolunteerTable.Id} = p.{PetTable.VolunteerId}");
+            countBuilder.Append($" LEFT JOIN {VolunteersTable.TableFullName} v " +
+                $"ON v.{VolunteersTable.Id} = p.{PetsTable.VolunteerId}");
 
         if (filter.SpeciesIds != null && filter.SpeciesIds.Count > 0)
             countBuilder.Append($" LEFT JOIN {SpeciesTable.TableFullName} s " +
-                $"ON s.{SpeciesTable.Id} = p.{PetTable.PetTypeSpeciesId}");
+                $"ON s.{SpeciesTable.Id} = p.{PetsTable.PetTypeSpeciesId}");
 
         if (filter.BreedIds != null && filter.BreedIds.Count > 0)
-            countBuilder.Append($" LEFT JOIN {BreedTable.TableFullName} b " +
-                $"ON b.{BreedTable.Id} = p.{PetTable.PetTypeBreedId}");
+            countBuilder.Append($" LEFT JOIN {BreedsTable.TableFullName} b " +
+                $"ON b.{BreedsTable.Id} = p.{PetsTable.PetTypeBreedId}");
 
-        countBuilder.AppendLine($" WHERE p.{PetTable.IsDeleted} = FALSE ");
+        countBuilder.AppendLine($" WHERE p.{PetsTable.IsDeleted} = FALSE ");
 
         return countBuilder;
     }
@@ -35,7 +35,7 @@ public static class StringBuilderForSqlQueryExtensions
     {
         if (filter.VolunteerId.HasValue)
         {
-            sqlBuilder.AppendLine($" AND p.{PetTable.VolunteerId} = @VolunteerId");
+            sqlBuilder.AppendLine($" AND p.{PetsTable.VolunteerId} = @VolunteerId");
 
             if (parameters.ParameterNames.Contains("VolunteerId") == false)
                 parameters.Add("VolunteerId", filter.VolunteerId.Value);
@@ -43,19 +43,19 @@ public static class StringBuilderForSqlQueryExtensions
 
         if (filter.HelpStatuses != null && filter.HelpStatuses.Any())
         {
-            List<string> statusStrings = filter.HelpStatuses
+            string[] statusStrings = filter.HelpStatuses
                 .Select(s => s.ToString())
-                .ToList();
+                .ToArray();
 
-            sqlBuilder.AppendLine($" AND p.{PetTable.HelpStatus} = Any(@PetHelpStatuses)");
+            sqlBuilder.AppendLine($" AND p.{PetsTable.HelpStatus} = ANY(@PetHelpStatuses) ");
 
-            if (parameters.ParameterNames.Contains("PetHelpStatus") == false)
+            if (parameters.ParameterNames.Contains("PetHelpStatuses") == false)
                 parameters.Add("PetHelpStatuses", statusStrings);
         }
 
         if (!string.IsNullOrWhiteSpace(filter.PetName))
         {
-            sqlBuilder.AppendLine($" AND LOWER(p.{PetTable.Name}) LIKE LOWER(@PetName)");
+            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.Name}) LIKE LOWER(@PetName)");
 
             if (parameters.ParameterNames.Contains("PetName") == false)
                 parameters.Add("PetName", $"%{filter.PetName}%");
@@ -63,7 +63,7 @@ public static class StringBuilderForSqlQueryExtensions
 
         if (!string.IsNullOrWhiteSpace(filter.Color))
         {
-            sqlBuilder.AppendLine($" AND LOWER(p.{PetTable.Color}) LIKE LOWER(@Color)");
+            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.Color}) LIKE LOWER(@Color)");
 
             if (parameters.ParameterNames.Contains("Color") == false)
                 parameters.Add("Color", $"%{filter.Color}%");
@@ -71,7 +71,7 @@ public static class StringBuilderForSqlQueryExtensions
 
         if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            sqlBuilder.AppendLine($" AND LOWER(p.{PetTable.AddressCity}) LIKE LOWER(@City)");
+            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.AddressCity}) LIKE LOWER(@City)");
             parameters.Add("City", $"%{filter.City}%");
         }
 
@@ -82,14 +82,14 @@ public static class StringBuilderForSqlQueryExtensions
             string or = string.Empty;
             if (filter.SpeciesIds != null && filter.SpeciesIds.Any())
             {
-                sqlBuilder.AppendLine($"p.{PetTable.PetTypeSpeciesId} = ANY(@SpeciesIds)");
+                sqlBuilder.AppendLine($"p.{PetsTable.PetTypeSpeciesId} = ANY(@SpeciesIds)");
                 parameters.Add($"SpeciesIds", filter.SpeciesIds);
                 or = " OR ";
             }
 
             if (filter.BreedIds != null && filter.BreedIds.Any())
             {
-                sqlBuilder.AppendLine($" {or} p.{PetTable.PetTypeBreedId} = ANY(@BreedIds)");
+                sqlBuilder.AppendLine($" {or} p.{PetsTable.PetTypeBreedId} = ANY(@BreedIds)");
                 parameters.Add($"BreedIds", filter.BreedIds);
             }
             sqlBuilder.AppendLine(" )");
@@ -99,7 +99,7 @@ public static class StringBuilderForSqlQueryExtensions
         {
             var currentDate = DateTime.UtcNow;
             var maxDateOfBirthday = currentDate.AddMonths(-filter.MinAgeInMonth);
-            sqlBuilder.AppendLine($" AND p.{PetTable.DateOfBirth} <= @MaxDate");
+            sqlBuilder.AppendLine($" AND p.{PetsTable.DateOfBirth} <= @MaxDate");
 
             if (parameters.ParameterNames.Contains("MaxDate") == false)
                 parameters.Add("MaxDate", maxDateOfBirthday);
@@ -109,7 +109,7 @@ public static class StringBuilderForSqlQueryExtensions
         {
             var currentDate = DateTime.UtcNow;
             var minDateOfBirthday = currentDate.AddMonths(-filter.MaxAgeInMonth);
-            sqlBuilder.AppendLine($" AND p.{PetTable.DateOfBirth} >= @MinDate");
+            sqlBuilder.AppendLine($" AND p.{PetsTable.DateOfBirth} >= @MinDate");
 
             if (parameters.ParameterNames.Contains("MinDate") == false)
                 parameters.Add("MinDate", minDateOfBirthday);
@@ -133,7 +133,7 @@ public static class StringBuilderForSqlQueryExtensions
     {
         if (orderBies == null || orderBies.Count == 0)
         {
-            sql.AppendLine($" ORDER BY p.{PetTable.Id}");
+            sql.AppendLine($" ORDER BY p.{PetsTable.Id}");
             return sql;
         }
         var orderClauses = orderBies.Select(o =>
@@ -141,23 +141,23 @@ public static class StringBuilderForSqlQueryExtensions
             var direction = o.OrderDirection == OrderDirection.Desc ? "DESC" : "ASC";
             var column = o.OrderByProperty.ToLower() switch
             {
-                "name" => $"p.{PetTable.Name} {direction}",
+                "name" => $"p.{PetsTable.Name} {direction}",
 
-                "age" => $"p.{PetTable.DateOfBirth} {direction}",
+                "age" => $"p.{PetsTable.DateOfBirth} {direction}",
 
-                "volunteer" => $"v.{VolunteerTable.LastName} {direction}," +
-                               $"v.{VolunteerTable.FirstName} {direction}",
+                "volunteer" => $"v.{VolunteersTable.LastName} {direction}," +
+                               $"v.{VolunteersTable.FirstName} {direction}",
 
                 "species" => $"s.{SpeciesTable.Name} {direction}, " +
-                           $"b.{BreedTable.Name} {direction}",
+                           $"b.{BreedsTable.Name} {direction}",
 
-                "status" => $"p.{PetTable.HelpStatus} {direction}",
+                "status" => $"p.{PetsTable.HelpStatus} {direction}",
 
-                "address" => $"p.{PetTable.AddressCity} {direction}, " +
-                           $"p.{PetTable.AddressRegion} {direction}," +
-                           $"p.{PetTable.AddressStreet} {direction}",
+                "address" => $"p.{PetsTable.AddressCity} {direction}, " +
+                           $"p.{PetsTable.AddressRegion} {direction}," +
+                           $"p.{PetsTable.AddressStreet} {direction}",
 
-                _ => $"p.{PetTable.Id} {direction}"
+                _ => $"p.{PetsTable.Id} {direction}"
             };
             return $"{column}";
         });

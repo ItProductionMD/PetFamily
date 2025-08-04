@@ -1,6 +1,4 @@
-﻿
-
-using PetFamily.Application.Abstractions.CQRS;
+﻿using PetFamily.Application.Abstractions.CQRS;
 
 namespace PetFamily.Auth.Application.UserManagement.Queries.GetUserAccountInfo;
 

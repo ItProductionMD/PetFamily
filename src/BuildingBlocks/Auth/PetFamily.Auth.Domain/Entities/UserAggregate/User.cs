@@ -34,12 +34,8 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
     public DateTime? UpdatedAt { get; set; }
     public int LoginAttempts { get; set; } = 0;
     public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
-
-    private readonly List<UserRole> _userRoles = [];
-    public IReadOnlyCollection<UserRole> UserRoles => _userRoles.AsReadOnly();
-
+    public RoleId RoleId { get; set; }
     private const int MAX_LOGIN_ATTEMPTS = 5;
-
     private User(){ }//EfCore need this
 
     private User(
@@ -49,7 +45,7 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
         Phone phone,
         string hashedPassword,
         ProviderType providerType,
-        List<UserRole> userRoles,
+        RoleId roleId,
         List<SocialNetworkInfo> socialNetworks
         )
     {
@@ -59,7 +55,7 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
         Login = login;
         HashedPassword = hashedPassword;
         ProviderType = providerType;
-        _userRoles = userRoles;
+        RoleId = roleId;
         CreatedAt = DateTime.UtcNow;
         SocialNetworks = socialNetworks;
     }
@@ -71,13 +67,9 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
         Phone phone,
         string hashedPassword,
         List<SocialNetworkInfo> socialNetworks,
-        IEnumerable<RoleId> rolesIds,
+        RoleId roleId,
         ProviderType providerType)
     {
-        var userRoles = rolesIds
-            .Select(roleId => new UserRole(id, roleId))
-            .ToList();
-
         var validationResult = ValidateUser(email, login, hashedPassword, LoginOptions.Default);
 
         var user = new User(
@@ -87,7 +79,7 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
             phone,
             hashedPassword,
             providerType,
-            userRoles,
+            roleId,
             socialNetworks);
 
         return Result.Ok(user);
@@ -107,47 +99,30 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
     override public void SoftDelete()
     {
         IsDeleted = true;
-        DeletedAt = DateTime.UtcNow;
-        foreach(var userRole in _userRoles)
-        {
-            userRole.SoftDelete();
-        }
+        DeletedAt = DateTime.UtcNow;         
     }
+
     override public void Restore()
     {
         IsDeleted = false;
         DeletedAt = null;
-        foreach (var userRole in _userRoles)
-        {
-            userRole.Restore();
-        }
     }
+
     public void HardDelete()
     {
         UserStatus = UserStatus.Deleted;
     }
 
-    public void Update(string email, List<Role> roles, Phone? phone = null)
+    public void Update(string email, Phone? phone = null)
     {
+        //TODO check if Role is Volunteer - phone must be not null and should update volunteer data
         Email = email;
-        //update roles
         Phone = phone;
     }
 
     public void EnableTwoFactor() => IsTwoFactorEnabled = true;
 
     public void SetPhoneNumber(Phone phone) => Phone = phone;
-
-    public void AddRole(RoleId roleId)
-    {
-        if (!_userRoles.Any(r => r.RoleId == roleId))
-            _userRoles.Add(new UserRole(Id, roleId));
-    }
-
-    public void RemoveRoleId(RoleId roleId)
-    {
-        _userRoles.RemoveAll(r => r.RoleId == roleId);
-    }
 
     public void ConfirmEmail()
     {
@@ -158,12 +133,9 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
         throw new NotImplementedException();
     }
 
-    public void UpdateRoles(IEnumerable<RoleId> roleIds)
+    public void ChangeRole(RoleId roleId)
     {
-
-        _userRoles.Clear();
-        var userRoles = roleIds.Select(rId => new UserRole(Id, rId)).ToList();
-        _userRoles.AddRange(userRoles);
+        RoleId = roleId;
     }
 
     public void ErrorAttemptLogin()

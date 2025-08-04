@@ -189,6 +189,10 @@ namespace PetFamily.Auth.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("provider_type");
 
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("role_id");
+
                     b.Property<string>("SocialNetworks")
                         .IsRequired()
                         .HasColumnType("jsonb")
@@ -213,34 +217,10 @@ namespace PetFamily.Auth.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_users_login");
 
-                    b.ToTable("users", "auth");
-                });
-
-            modelBuilder.Entity("PetFamily.Auth.Domain.Entities.UserAggregate.UserRole", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_id");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.HasKey("UserId", "RoleId")
-                        .HasName("pk_user_role");
-
                     b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_user_role_role_id");
+                        .HasDatabaseName("ix_users_role_id");
 
-                    b.ToTable("user_role", "auth");
+                    b.ToTable("users", "auth");
                 });
 
             modelBuilder.Entity("PetFamily.Auth.Domain.Entities.RoleAggregate.RolePermission", b =>
@@ -262,6 +242,13 @@ namespace PetFamily.Auth.Infrastructure.Migrations
 
             modelBuilder.Entity("PetFamily.Auth.Domain.Entities.UserAggregate.User", b =>
                 {
+                    b.HasOne("PetFamily.Auth.Domain.Entities.RoleAggregate.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_users_roles_role_id");
+
                     b.OwnsOne("PetFamily.SharedKernel.ValueObjects.Phone", "Phone", b1 =>
                         {
                             b1.Property<Guid>("UserId")
@@ -297,31 +284,9 @@ namespace PetFamily.Auth.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PetFamily.Auth.Domain.Entities.UserAggregate.UserRole", b =>
-                {
-                    b.HasOne("PetFamily.Auth.Domain.Entities.RoleAggregate.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_role_roles_role_id");
-
-                    b.HasOne("PetFamily.Auth.Domain.Entities.UserAggregate.User", null)
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_role_users_user_id");
-                });
-
             modelBuilder.Entity("PetFamily.Auth.Domain.Entities.RoleAggregate.Role", b =>
                 {
                     b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("PetFamily.Auth.Domain.Entities.UserAggregate.User", b =>
-                {
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

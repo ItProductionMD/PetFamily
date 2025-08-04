@@ -85,7 +85,8 @@ public static class TestDataFactory
                 Phone.CreateNotEmpty("+373", "123456789").Data!,
                 [RequisitesInfo.Create("Bank1", "Nr. 765753757835157").Data!],
                 HelpStatus.ForHelp,
-                "");
+                "",
+                Address.CreateEmpty());
         }
     }
 

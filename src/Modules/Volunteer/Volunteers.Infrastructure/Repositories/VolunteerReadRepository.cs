@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using PetFamily.Application.Abstractions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
-using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using System.Text;
@@ -38,9 +37,9 @@ public class VolunteerReadRepository(
         SELECT 
             CASE WHEN EXISTS (
                 SELECT 1 
-                FROM {VolunteerTable.TableFullName}
-                WHERE {VolunteerTable.Phone} = @Phone
-                AND {VolunteerTable.Id} <> @Id) 
+                FROM {VolunteersTable.TableFullName}
+                WHERE {VolunteersTable.Phone} = @Phone
+                AND {VolunteersTable.Id} <> @Id) 
                 THEN 'Phone' ELSE NULL END AS PhoneTaken;";
 
         _logger.LogInformation("EXECUTING QUERY(CheckUniqueFields) SQL Query: {sql} with Parameters:" +
@@ -78,31 +77,31 @@ public class VolunteerReadRepository(
             -- Constructing a single table where volunteer data is combined with their pets.
             -- The PetDtos column is stored as JSONB, containing an array of pet objects.
             SELECT 
-                v.{VolunteerTable.Id} AS Id, 
-                v.{VolunteerTable.UserId} AS UserId,
-                v.{VolunteerTable.LastName} AS LastName, 
-                v.{VolunteerTable.FirstName} AS FirstName, 
-                v.{VolunteerTable.Phone} AS Phone,
-                v.{VolunteerTable.Rating} AS Rating,
-                v.{VolunteerTable.Requisites} AS RequisitesDtos,
+                v.{VolunteersTable.Id} AS Id, 
+                v.{VolunteersTable.UserId} AS UserId,
+                v.{VolunteersTable.LastName} AS LastName, 
+                v.{VolunteersTable.FirstName} AS FirstName, 
+                v.{VolunteersTable.Phone} AS Phone,
+                v.{VolunteersTable.Rating} AS Rating,
+                v.{VolunteersTable.Requisites} AS RequisitesDtos,
                 COALESCE(
                     jsonb_agg(
                         jsonb_build_object(
-                            'PetId', p.{PetTable.Id},           -- Pet ID
-                            'PetName', p.{PetTable.Name},       -- Pet name
-                            'MainPhoto', p.{PetTable.Images}->0->>'Name', -- Main photo (first image in the JSON array)
-                            'StatusForHelp', p.{PetTable.HelpStatus}, -- Help status
-                            'BreedName', b.{BreedTable.Name},   -- Breed name
+                            'PetId', p.{PetsTable.Id},           -- Pet ID
+                            'PetName', p.{PetsTable.Name},       -- Pet name
+                            'MainPhoto', p.{PetsTable.Images}->0->>'Name', -- Main photo (first image in the JSON array)
+                            'StatusForHelp', p.{PetsTable.HelpStatus}, -- Help status
+                            'BreedName', b.{BreedsTable.Name},   -- Breed name
                             'SpeciesName', s.{SpeciesTable.Name} -- Species name
                         )
-                    ) FILTER (WHERE p.{PetTable.Id} IS NOT NULL), '[]'::jsonb  -- If no pets exist, return an empty JSON array
+                    ) FILTER (WHERE p.{PetsTable.Id} IS NOT NULL), '[]'::jsonb  -- If no pets exist, return an empty JSON array
                 ) AS PetDtos
-            FROM {VolunteerTable.TableFullName} v
-            LEFT JOIN {PetTable.TableFullName} p ON p.{PetTable.VolunteerId} = v.{VolunteerTable.Id}
-            LEFT JOIN {SpeciesTable.TableFullName} s ON s.{SpeciesTable.Id} = p.{PetTable.PetTypeSpeciesId}
-            LEFT JOIN {BreedTable.TableFullName} b ON b.{BreedTable.Id} = p.{PetTable.PetTypeBreedId}
-            WHERE v.{VolunteerTable.Id} = @Id
-            GROUP BY v.{VolunteerTable.Id}  -- Group by volunteer to aggregate pets into a JSONB array
+            FROM {VolunteersTable.TableFullName} v
+            LEFT JOIN {PetsTable.TableFullName} p ON p.{PetsTable.VolunteerId} = v.{VolunteersTable.Id}
+            LEFT JOIN {SpeciesTable.TableFullName} s ON s.{SpeciesTable.Id} = p.{PetsTable.PetTypeSpeciesId}
+            LEFT JOIN {BreedsTable.TableFullName} b ON b.{BreedsTable.Id} = p.{PetsTable.PetTypeBreedId}
+            WHERE v.{VolunteersTable.Id} = @Id
+            GROUP BY v.{VolunteersTable.Id}  -- Group by volunteer to aggregate pets into a JSONB array
             LIMIT 1";
 
         _logger.LogInformation("Executing(GetByIdAsync for volunteerDTO) SQL Query: " +
@@ -144,8 +143,8 @@ public class VolunteerReadRepository(
         };
 
         var totalVolunteersCount = await dbConnection.ExecuteScalarAsync<int>(
-            $"SELECT COUNT(1) FROM {VolunteerTable.TableFullName}" +
-            $" WHERE {VolunteerTable.IsDeleted} = FALSE",
+            $"SELECT COUNT(1) FROM {VolunteersTable.TableFullName}" +
+            $" WHERE {VolunteersTable.IsDeleted} = FALSE",
             commandTimeout: _options.QueryTimeout);
 
         var totalPages = (int)Math.Ceiling((double)totalVolunteersCount / query.pageSize);
@@ -160,15 +159,15 @@ public class VolunteerReadRepository(
 
         var sql = $@"
             SELECT 
-            v.{VolunteerTable.Id} AS Id, 
-            v.{VolunteerTable.UserId} AS UserId,
-            CONCAT(v.{VolunteerTable.LastName}, ' ', v.{VolunteerTable.FirstName}) AS FullName, 
-            v.{VolunteerTable.Phone} AS Phone, 
-            v.{VolunteerTable.Rating} AS Rating,
-            v.{VolunteerTable.Requisites} AS RequisitesDtos
-            FROM {VolunteerTable.TableFullName} v
-            LEFT JOIN {UserTable.TableFullName} u ON u.{UserTable.Id} = v.{VolunteerTable.Id}
-            WHERE v.{VolunteerTable.IsDeleted} = FALSE
+            v.{VolunteersTable.Id} AS Id, 
+            v.{VolunteersTable.UserId} AS UserId,
+            CONCAT(v.{VolunteersTable.LastName}, ' ', v.{VolunteersTable.FirstName}) AS FullName, 
+            v.{VolunteersTable.Phone} AS Phone, 
+            v.{VolunteersTable.Rating} AS Rating,
+            v.{VolunteersTable.Requisites} AS RequisitesDtos
+            FROM {VolunteersTable.TableFullName} v
+            LEFT JOIN {UsersTable.TableFullName} u ON u.{UsersTable.Id} = v.{VolunteersTable.Id}
+            WHERE v.{VolunteersTable.IsDeleted} = FALSE
             ORDER BY {orderBy} {orderDirection}
             LIMIT @Limit OFFSET @Offset";
 
@@ -201,27 +200,27 @@ public class VolunteerReadRepository(
 
         var countBuilder = new StringBuilder($@"
             SELECT COUNT(*)
-            FROM {PetTable.TableFullName} p ");
+            FROM {PetsTable.TableFullName} p ");
 
         var sqlBuilder = new StringBuilder($@"
             SELECT 
-            p.{PetTable.Id} AS Id,
-            p.{PetTable.Name} AS PetName,
-            p.{PetTable.Color} AS Color,
-            p.{PetTable.Images}->0->>'Name' AS MainPhoto,
-            p.{PetTable.HelpStatus} AS StatusForHelp,
-            DATE_PART('year', AGE(p.{PetTable.DateOfBirth})) * 12 +
-            DATE_PART('month', AGE(p.{PetTable.DateOfBirth})) AS AgeInMonths,
-            CONCAT(p.{PetTable.AddressRegion}, ',',p.{PetTable.AddressCity}, ',',p.{PetTable.AddressStreet}) AS Address,
-            v.{VolunteerTable.Id} AS VolunteerId,
+            p.{PetsTable.Id} AS Id,
+            p.{PetsTable.Name} AS PetName,
+            p.{PetsTable.Color} AS Color,
+            p.{PetsTable.Images}->0->>'Name' AS MainPhoto,
+            p.{PetsTable.HelpStatus} AS StatusForHelp,
+            DATE_PART('year', AGE(p.{PetsTable.DateOfBirth})) * 12 +
+            DATE_PART('month', AGE(p.{PetsTable.DateOfBirth})) AS AgeInMonths,
+            CONCAT(p.{PetsTable.AddressRegion}, ',',p.{PetsTable.AddressCity}, ',',p.{PetsTable.AddressStreet}) AS Address,
+            v.{VolunteersTable.Id} AS VolunteerId,
             s.{SpeciesTable.Name} AS SpeciesName,
-            b.{BreedTable.Name} AS BreedName,
-            CONCAT(v.{VolunteerTable.LastName}, ' ', v.{VolunteerTable.FirstName}) AS VolunteerFullName  
-            FROM {PetTable.TableFullName} p
-            LEFT JOIN {VolunteerTable.TableFullName} v ON v.{VolunteerTable.Id} = p.{PetTable.VolunteerId}
-            LEFT JOIN {SpeciesTable.TableFullName} s ON s.{SpeciesTable.Id} = p.{PetTable.PetTypeSpeciesId}
-            LEFT JOIN {BreedTable.TableFullName} b ON b.{BreedTable.Id} = p.{PetTable.PetTypeBreedId}
-            WHERE p.{PetTable.IsDeleted} = FALSE");
+            b.{BreedsTable.Name} AS BreedName,
+            CONCAT(v.{VolunteersTable.LastName}, ' ', v.{VolunteersTable.FirstName}) AS VolunteerFullName  
+            FROM {PetsTable.TableFullName} p
+            LEFT JOIN {VolunteersTable.TableFullName} v ON v.{VolunteersTable.Id} = p.{PetsTable.VolunteerId}
+            LEFT JOIN {SpeciesTable.TableFullName} s ON s.{SpeciesTable.Id} = p.{PetsTable.PetTypeSpeciesId}
+            LEFT JOIN {BreedsTable.TableFullName} b ON b.{BreedsTable.Id} = p.{PetsTable.PetTypeBreedId}
+            WHERE p.{PetsTable.IsDeleted} = FALSE");
 
         if (filter != null)
         {

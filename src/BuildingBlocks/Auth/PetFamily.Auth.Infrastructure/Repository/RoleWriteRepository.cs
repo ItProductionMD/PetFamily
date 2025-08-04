@@ -36,7 +36,10 @@ public class RoleWriteRepository(
 
     public async Task<Result<Role>> GetByIdAsync(RoleId id, CancellationToken ct = default)
     {
-        var role = await _context.Roles.FirstOrDefaultAsync(p => p.Id == id);
+        var role = await _context.Roles
+            .Include(r => r.RolePermissions)
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
+
         if (role == null)
             return Result.Fail(Error.NotFound($"role with id: {id}"));
         

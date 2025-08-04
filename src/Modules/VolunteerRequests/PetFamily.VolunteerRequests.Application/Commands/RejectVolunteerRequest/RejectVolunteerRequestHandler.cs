@@ -26,13 +26,7 @@ public class RejectVolunteerRequestHandler(
         }
         var request = getRequest.Data!;
 
-        var getAdminIdResult = _userContext.GetUserId();
-        if (getAdminIdResult.IsFailure)
-        {
-            _logger.LogError("Failed to get user ID from context: {Error}", getAdminIdResult.Error);
-            return UnitResult.Fail(getAdminIdResult.Error);
-        }
-        var adminId = getAdminIdResult.Data!;
+        var adminId = _userContext.GetUserId();
 
         var rejectResult = request.Reject(adminId, cmd.Comment);
         if (rejectResult.IsFailure)

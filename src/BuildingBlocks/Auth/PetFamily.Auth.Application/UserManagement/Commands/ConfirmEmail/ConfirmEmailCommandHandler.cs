@@ -1,14 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions.CQRS;
-using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
-using PetFamily.Auth.Domain.Entities;
 using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.SharedKernel.Authorization;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects.Ids;
-using System.Reflection.Metadata.Ecma335;
 
 namespace PetFamily.Auth.Application.UserManagement.Commands.ConfirmEmail;
 
@@ -51,7 +48,7 @@ public class ConfirmEmailCommandHandler(
 
         user.ConfirmEmail();
 
-        user.UpdateRoles([RoleId.Create(roleDto.RoleId).Data!]);
+        user.ChangeRole(RoleId.Create(roleDto.RoleId).Data!);
 
         await _userWriteRepository.SaveChangesAsync(ct);
 

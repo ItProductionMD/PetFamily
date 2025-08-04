@@ -28,6 +28,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BuildingBlocks\FileStorage\FileStorage.Application\FileStorage.Application.csproj" />
     <ProjectReference Include="..\..\src\BuildingBlocks\FileStorage\FileStorage.Public\FileStorage.Public.csproj" />
+    <ProjectReference Include="..\..\src\Modules\VolunteerRequests\PetFamily.VolunteerRequests.Application\PetFamily.VolunteerRequests.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\VolunteerRequests\PetFamily.VolunteerRequests.Domain\PetFamily.VolunteerRequests.Domain.csproj" />
     <ProjectReference Include="..\..\src\PetFamily.Host.Api\PetFamily.Host.Api.csproj" />
     <ProjectReference Include="..\..\src\Modules\PetSpecies\PetSpecies.Application\PetSpecies.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\PetSpecies\PetSpecies.Domain\PetSpecies.Domain.csproj" />

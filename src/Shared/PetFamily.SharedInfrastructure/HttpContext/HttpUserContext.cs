@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using PetFamily.SharedApplication.Exceptions;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
@@ -12,7 +13,7 @@ public class HttpUserContext : IUserContext
 
     public HttpUserContext(IHttpContextAccessor accessor) => _accessor = accessor;
 
-    public Result<Guid> GetUserId()
+    public Result<Guid> TryGetUserId()
     {
         var parsedOk = Guid.TryParse(
             _accessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
@@ -26,6 +27,18 @@ public class HttpUserContext : IUserContext
 
     public bool HasPermission(string permission) =>
         _accessor.HttpContext!.User.HasClaim("permission", permission);
+
+    public Guid GetUserId()
+    {
+        var parsedOk = Guid.TryParse(
+            _accessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+            out var id);
+
+        if (parsedOk == false || id == Guid.Empty)
+            throw new UserNotAuthenticatedException();
+
+        return id;
+    }
 
     public string Phone =>
         _accessor.HttpContext!.User.FindFirst(ClaimTypes.MobilePhone)?.Value

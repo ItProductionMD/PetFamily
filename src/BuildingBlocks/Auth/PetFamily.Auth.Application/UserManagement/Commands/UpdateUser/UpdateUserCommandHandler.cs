@@ -26,13 +26,9 @@ public class UpdateUserCommandHandler(
     public async Task<UnitResult> Handle(UpdateUserProfileCommand cmd, CancellationToken ct)
     {
         //TODO Validate command
-        var getUserId = _userContext.GetUserId();
-        if (getUserId.IsFailure)
-            return UnitResult.Fail(getUserId.Error);
+        var userId = _userContext.GetUserId();
 
-        var userId = UserId.Create(getUserId.Data!).Data!;
-
-        var getUser = await _userWriteRepository.GetByIdAsync(userId, ct);
+        var getUser = await _userWriteRepository.GetByIdAsync(UserId.Create(userId).Data!, ct);
         if (getUser.IsFailure)
             return UnitResult.Fail(getUser.Error);
 

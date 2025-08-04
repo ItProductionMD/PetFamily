@@ -17,27 +17,30 @@ public class ScaffoldFromDb
     {
         using var connection = new NpgsqlConnection(_connectionString);
 
-        var query = @"
-            SELECT table_name, column_name 
-            FROM information_schema.columns 
-            WHERE table_schema = 'public'
-            ORDER BY table_name, ordinal_position";
+        var query = @" 
+            SELECT table_schema, table_name, column_name
+            FROM information_schema.columns
+            where table_schema != 'pg_catalog'
+            and table_schema != 'information_schema'
+            and table_schema != 'public' 
+            ORDER BY table_schema, table_name, ordinal_position;";
 
-        var columns = connection.Query<(string TableName, string ColumnName)>(query);
+        var columns = connection.Query<(string SchemaName, string TableName, string ColumnName)>(query);
         var tables = columns.GroupBy(c => c.TableName);
 
-        string outputPath = Path.Combine(infrastructurePath, "Dapper", "GeneratedTables");
+        string outputPath = Path.Combine(infrastructurePath, "Dapper", "ScafoldedClasses");
         if (Directory.Exists(outputPath) == false!)
         {
-            Console.WriteLine($"Directory :{outputPath} not exist!Make shure you set command from write directory! ");
+            Console.WriteLine($"Directory :{outputPath} not exist!Make sure you set command from write directory! ");
             return;
         }
 
         foreach (var table in tables)
         {
+            string schemaName = table.Select(c => c.SchemaName).FirstOrDefault()!;
             string className = ToPascalCase(table.Key);
-            string filePath = Path.Combine(outputPath, className + ".cs");
-
+            string filePath = Path.Combine(outputPath, className + "Table" + ".cs");
+           
             var newProperties = table.Select(c => (Name: ToPascalCase(c.ColumnName), Value: c.ColumnName)).ToList();
 
             if (File.Exists(filePath))
@@ -52,13 +55,13 @@ public class ScaffoldFromDb
                     if (added.Any()) Console.WriteLine(" + Added: " + string.Join(", ", added.Select(p => p.Name)));
                     if (removed.Any()) Console.WriteLine(" - Deleted: " + string.Join(", ", removed.Select(p => p.Name)));
 
-                    File.WriteAllText(filePath, GenerateClassContent(className, table.Key, newProperties));
+                    File.WriteAllText(filePath, GenerateClassContent(className,schemaName ,table.Key, newProperties));
                 }
             }
             else
             {
                 Console.WriteLine($"Created new class: {className}");
-                File.WriteAllText(filePath, GenerateClassContent(className, table.Key, newProperties));
+                File.WriteAllText(filePath, GenerateClassContent(className, schemaName ,table.Key, newProperties));
             }
         }
 
@@ -74,6 +77,31 @@ public class ScaffoldFromDb
         foreach (var prop in properties)
             sb.AppendLine($"    public const string {prop.Name} = \"{prop.Value}\";");
         sb.AppendLine("}");
+        return sb.ToString();
+    }
+
+    private string GenerateClassContent(
+        string className,
+        string schemaName,
+        string tableName,
+        List<(string Name, string Value)> properties)
+    {
+        var sb = new StringBuilder();
+        var tableFullName = $"{schemaName}.{tableName}";
+        sb.AppendLine("using PetFamily.SharedInfrastructure.Constants;");
+        sb.AppendLine();
+        sb.AppendLine("namespace PetFamily.SharedInfrastructure.Shared.Dapper.GeneratedClasses;");
+        sb.AppendLine();
+        sb.AppendLine($"public static class {className}");
+        sb.AppendLine("{");
+        sb.AppendLine($"    public const string TableName = \"{tableName}\";");
+        sb.AppendLine($"    public const string TableFullName = \"{tableFullName}\";");
+        foreach (var prop in properties)
+        {
+            sb.AppendLine($"    public const string {prop.Name} = \"{prop.Value}\";");
+        }
+        sb.AppendLine("}");
+
         return sb.ToString();
     }
 

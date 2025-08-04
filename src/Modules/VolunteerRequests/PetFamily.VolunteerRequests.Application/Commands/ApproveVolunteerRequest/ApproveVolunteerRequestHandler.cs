@@ -27,24 +27,18 @@ public class ApproveVolunteerRequestHandler(
     {
         var getRequest = await _requestWriteRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getRequest.IsFailure)
-        {
             return UnitResult.Fail(getRequest.Error);
-        }
+        
         var request = getRequest.Data!;
 
-        var getAdmin = _userContext.GetUserId();
-        if (getAdmin.IsFailure)
-        {
-            _logger.LogError("Failed to get user ID from context: {Error}", getAdmin.Error);
-            return UnitResult.Fail(getAdmin.Error);
-        }
-        var adminId = getAdmin.Data!;
+        var adminId = _userContext.GetUserId();
 
         var approveResult = request.Approve(adminId);
         if (approveResult.IsFailure)
         {
             _logger.LogWarning("Approve failed for request ID {Id}: {Error}",
                 cmd.VolunteerRequestId, approveResult.Error);
+
             return UnitResult.Fail(approveResult.Error);
         }
 
@@ -54,7 +48,8 @@ public class ApproveVolunteerRequestHandler(
         {
             var getUser = await _userFinder.GetByIdAsync(request.UserId, ct);
             if (getUser.IsFailure)
-                throw new ApplicationException($"Failed to find user with ID {request.UserId}: {getUser.Error.Message}");
+                throw new ApplicationException($"Failed to find user with ID {request.UserId}: " +
+                    $"{getUser.Error.Message}");
 
             var user = getUser.Data!;
 
@@ -69,6 +64,11 @@ public class ApproveVolunteerRequestHandler(
             var createVolunteerResult = await _volunteerCreator.CreateVolunteer(createVolunteerDto, ct);
             if (createVolunteerResult.IsFailure)
                 throw new ApplicationException($"Failed to create volunteer: {createVolunteerResult.Error.Message}");
+                         
+            _logger.LogInformation("Volunteer request with ID {Id} approved by admin {AdminId} successful!",
+            cmd.VolunteerRequestId, adminId);
+
+            return UnitResult.Ok();
         }
         catch (Exception ex)
         {
@@ -80,14 +80,13 @@ public class ApproveVolunteerRequestHandler(
                 await _requestWriteRepository.SaveAsync(ct);
 
                 _logger.LogInformation("Approval for request ID {Id} was rolled back.", cmd.VolunteerRequestId);
+                return UnitResult.Fail(Error.InternalServerError("Failed to create volunteer after approving request."));
             }
-
-            return UnitResult.Fail(Error.InternalServerError("Failed to create volunteer after approving request."));
-        }
-
-        _logger.LogInformation("Volunteer request with ID {Id} approved by admin {AdminId}",
-            cmd.VolunteerRequestId, adminId);
-
-        return UnitResult.Ok();
+            else
+            {
+                _logger.LogCritical("Error cancel approval for request with id:{Id}", cmd.VolunteerRequestId);
+                return UnitResult.Fail(Error.InternalServerError("Failed to cancel request approval"));
+            }
+        }     
     }
 }

@@ -42,6 +42,7 @@ public abstract class SoftDeletableCleanerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
+        await Task.Delay(3000000);
 
         _logger.LogInformation("{serviceName} started. DeleteAfterDays: {_deleteAfterDays}," +
             " TimeDelayInHours: {_timeDelayInHours}", ServiceName, _deleteAfterDays, timeDelayInHours);
@@ -68,6 +69,5 @@ public abstract class SoftDeletableCleanerService : BackgroundService
 
     public virtual async Task RunCleanupAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
     }
 }

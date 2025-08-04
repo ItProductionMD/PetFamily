@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.Auth.Domain.Entities.RoleAggregate;
 using PetFamily.Auth.Domain.Entities.UserAggregate;
+using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.SharedInfrastructure.Shared.EFCore;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;
@@ -86,14 +88,16 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
            .HasColumnName("blocked_at")
            .IsRequired(false);
 
-        builder
-            .Navigation(u => u.UserRoles)
-            .AutoInclude();
+        builder.Property(u => u.RoleId)
+            .HasConversion(id => id.Value, value => RoleId.Create(value).Data!)
+            .HasColumnName("role_id")
+            .IsRequired(true);
 
-        builder.HasMany(u => u.UserRoles)
-            .WithOne()
-            .HasForeignKey(uR=>uR.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder
+           .HasOne<Role>()
+           .WithMany()
+           .HasForeignKey(u => u.RoleId)
+           .OnDelete(DeleteBehavior.Restrict);
 
         builder.ApplyUniqueConstraints();
     }

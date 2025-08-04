@@ -21,14 +21,7 @@ public class SendRequestToRevisionHandler(
 
     public async Task<UnitResult> Handle(SendRequestToRevisionCommand cmd, CancellationToken ct)
     {
-        var validateResult = SendRequestToRevisionValidator.Validate(cmd);
-        if (validateResult.IsFailure)
-        {
-            _logger.LogWarning("Validate SendRequestToRevisionCommand error:{error}",
-                validateResult.ValidationMessagesToString());
-
-            return validateResult;
-        }
+        SendRequestToRevisionValidator.Validate(cmd);
 
         var getVolunteerRequest = await _requestRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getVolunteerRequest.IsFailure)
@@ -38,13 +31,7 @@ public class SendRequestToRevisionHandler(
         }
         var request = getVolunteerRequest.Data!;
 
-        var getAdminId = _userContext.GetUserId();
-        if (getAdminId.IsFailure)
-        {
-            _logger.LogError("Failed to get user id from context: {Error}", getAdminId.Error);
-            return UnitResult.Fail(getAdminId.Error);
-        }
-        var adminId = getAdminId.Data!;
+        var adminId = _userContext.GetUserId();
 
         var sendToRevisionResult = request.SendBackToRevision(adminId);
         if (sendToRevisionResult.IsFailure)

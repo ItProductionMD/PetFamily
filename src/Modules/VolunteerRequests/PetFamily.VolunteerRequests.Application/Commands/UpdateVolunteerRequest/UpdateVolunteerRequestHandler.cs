@@ -19,22 +19,10 @@ public class UpdateVolunteerRequestHandler(
 
     public async Task<UnitResult> Handle(UpdateVolunteerRequestCommand cmd, CancellationToken ct)
     {
-        var validationResult = UpdateVolunteerRequestValidator.Validate(cmd);
-        if (validationResult.IsFailure)
-        {
-            _logger.LogWarning("Validation failed for UpdateVolunteerRequestCommand: {Errors}",
-                validationResult.ValidationMessagesToString());
-            return validationResult;
-        }
-
-        var getUserId = _userContext.GetUserId();
-        if (getUserId.IsFailure)
-        {
-            _logger.LogError("Failed to get user ID from context: {Error}", getUserId.Error);
-            return UnitResult.Fail(getUserId.Error);
-        }
-        var userId = getUserId.Data!;
-
+        UpdateVolunteerRequestValidator.Validate(cmd);
+      
+        var userId = _userContext.GetUserId();
+       
         var getRequest = await _requestRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getRequest.IsFailure)
         {

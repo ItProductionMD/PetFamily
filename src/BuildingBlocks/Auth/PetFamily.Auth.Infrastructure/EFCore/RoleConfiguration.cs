@@ -27,10 +27,18 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .HasColumnName("code")
             .HasMaxLength(MAX_LENGTH_SHORT_TEXT);
 
-        builder.HasMany(r => r.RolePermissions)
+        builder
+            .HasMany<RolePermission>("_rolePermissions")
             .WithOne()
             .HasForeignKey(rp => rp.RoleId)
             .OnDelete(DeleteBehavior.Cascade);
+
+       // builder.Metadata
+       //    .FindNavigation(nameof(Role.RolePermissions))!
+       //    .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Navigation(r => r.RolePermissions)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
 

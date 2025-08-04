@@ -217,6 +217,11 @@ public class GetPetsQueryTest(
         await DbContextSeedExtensions.SeedRangeAsync(_speciesDbContext, species);
 
         var volunteers = VolunteerTestBuilder.Build(volunteersCount, petsInVolunteersCount, species);
+
+        var pet = volunteers.SelectMany(v => v.Pets).First();
+
+        pet.ChangePetStatus(HelpStatus.Helped);
+
         await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
 
         var petsFilter = new PetsFilter()

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions.CQRS;
-using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
 using PetFamily.Auth.Domain.Enums;
@@ -33,14 +32,8 @@ public class RegisterByEmailCommandHandler(
 
     public async Task<UnitResult> Handle(RegisterByEmailCommand cmd, CancellationToken ct)
     {
-        var validateCommandResult = RegisterByEmailCommandValidator.Validate(cmd);
-        if (validateCommandResult.IsFailure)
-        {
-            _logger.LogError("VALIDATION FAILED for RegisterByEmailCommand: {Errors}",
-                validateCommandResult.ValidationMessagesToString());
-
-            return validateCommandResult;
-        }
+        RegisterByEmailCommandValidator.Validate(cmd);
+        
         var phone = Phone.CreateNotEmpty(cmd.phoneNumber, cmd.phoneRegionCode).Data!;
 
         var checkUniqueFields = await _userReadRepository.CheckUniqueFields(
@@ -58,7 +51,6 @@ public class RegisterByEmailCommandHandler(
             return Result.Fail(getRoleDto.Error);
 
         var roleDto = getRoleDto.Data!;
-
         var roleId = RoleId.Create(roleDto.RoleId).Data!;
 
         var socialNetworkList = cmd.SocialNetworksList
@@ -71,7 +63,7 @@ public class RegisterByEmailCommandHandler(
             phone,
             hashedPassword,
             socialNetworkList,
-            [roleId],
+            roleId,
             ProviderType.Local
         ).Data!;
 

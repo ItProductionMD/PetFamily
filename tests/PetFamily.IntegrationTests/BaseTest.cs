@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Abstractions.CQRS;
 using PetFamily.Auth.Infrastructure.Contexts;
+using PetFamily.VolunteerRequests.Infrastructure.Contexts;
 using PetSpecies.Infrastructure.Contexts;
 using Volunteers.Infrastructure.Contexts;
 
@@ -13,6 +14,7 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
     protected IServiceScope? _scope { get; set; }
     protected IServiceProvider _services => _scope!.ServiceProvider;
     protected VolunteerWriteDbContext _volunteerDbContext = null!;
+    protected VolunteerRequestDbContext _volunteerRequestDbContext = null!;
     protected SpeciesWriteDbContext _speciesDbContext = null!;
     protected AuthWriteDbContext _authDbContext = null!;
 
@@ -23,6 +25,7 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
         _volunteerDbContext = _scope.ServiceProvider.GetService<VolunteerWriteDbContext>()!;
         _speciesDbContext = _scope.ServiceProvider.GetService<SpeciesWriteDbContext>()!;
         _authDbContext = _scope.ServiceProvider.GetRequiredService<AuthWriteDbContext>()!;
+        _volunteerRequestDbContext = _scope.ServiceProvider.GetRequiredService<VolunteerRequestDbContext>()!;
 
         return Task.CompletedTask;
     }

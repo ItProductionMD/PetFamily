@@ -24,14 +24,8 @@ public class TakeVolunteerRequestForReviewHandler(
 
     public async Task<UnitResult> Handle(TakeVolunteerRequestForReviewCommand cmd, CancellationToken ct)
     {
-        var validateCommand = TakeVolunteerRequestForReviewValidator.Validate(cmd);
-        if (validateCommand.IsFailure)
-        {
-            _logger.LogWarning("Validation failed for TakeVolunteerRequestForReviewCommand. Error: {Error}",
-                validateCommand.Error);
-            return UnitResult.Fail(validateCommand.Error);
-        }
-
+        TakeVolunteerRequestForReviewValidator.Validate(cmd);
+        
         var getVolunteerRequest = await _requestRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getVolunteerRequest.IsFailure)
         {
@@ -42,6 +36,7 @@ public class TakeVolunteerRequestForReviewHandler(
         }
 
         var volunteerRequest = getVolunteerRequest.Data!;
+
         if (volunteerRequest.RequestStatus != RequestStatus.Created)
         {
             _logger.LogWarning("Volunteer request with ID {VolunteerRequestId} is already taken for review.",
@@ -49,11 +44,8 @@ public class TakeVolunteerRequestForReviewHandler(
 
             return UnitResult.Fail(Error.InternalServerError("Volunteer request is already taken for review."));
         }
-        var getAdminId = _userContext.GetUserId();
-        if (getAdminId.IsFailure)
-            return UnitResult.Fail(getAdminId.Error);
-
-        var adminId = getAdminId.Data!;
+        
+        var adminId = _userContext.GetUserId();
 
         var createDiscussion = await _discussionCreator.CreateDiscussion(
             volunteerRequest.Id,

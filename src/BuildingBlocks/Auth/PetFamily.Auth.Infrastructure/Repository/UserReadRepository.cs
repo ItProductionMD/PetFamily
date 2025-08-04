@@ -35,14 +35,14 @@ public class UserReadRepository(
     {
         var sql = $@"
         SELECT 
-            {UserTable.Email} AS Email,
-            {UserTable.Login} AS Login,
-            {UserTable.PhoneRegionCode} AS PhoneRegionCode,
-            {UserTable.PhoneNumber} AS PhoneNumber
-        FROM {UserTable.TableFullName}
-        WHERE {UserTable.Email} = @Email
-            OR {UserTable.Login} = @Login
-            OR ({UserTable.PhoneRegionCode} = @RegionCode AND {UserTable.PhoneNumber} = @Number)
+            {UsersTable.Email} AS Email,
+            {UsersTable.Login} AS Login,
+            {UsersTable.PhoneRegionCode} AS PhoneRegionCode,
+            {UsersTable.PhoneNumber} AS PhoneNumber
+        FROM {UsersTable.TableFullName}
+        WHERE {UsersTable.Email} = @Email
+            OR {UsersTable.Login} = @Login
+            OR ({UsersTable.PhoneRegionCode} = @RegionCode AND {UsersTable.PhoneNumber} = @Number)
         LIMIT 4;";
 
         await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
@@ -78,12 +78,12 @@ public class UserReadRepository(
     {
         var sql = $@"
         SELECT 
-            {UserTable.Id} As Id,           
-            {UserTable.Email} AS Email,
-            {UserTable.Login} AS Login,
-        CONCAT({UserTable.PhoneRegionCode},'-',{UserTable.PhoneNumber}) AS Phone
-        FROM {UserTable.TableFullName}
-        WHERE {UserTable.Id} = @Id         
+            {UsersTable.Id} As Id,           
+            {UsersTable.Email} AS Email,
+            {UsersTable.Login} AS Login,
+        CONCAT({UsersTable.PhoneRegionCode},'-',{UsersTable.PhoneNumber}) AS Phone
+        FROM {UsersTable.TableFullName}
+        WHERE {UsersTable.Id} = @Id         
         LIMIT 1;";
 
         _logger.LogInformation("EXECURING QUERY:{sql} with params:{id}", sql, id);
@@ -103,39 +103,39 @@ public class UserReadRepository(
     {
         var sql = $@"
             SELECT 
-                u.{UserTable.Id} AS Id,
-                u.{UserTable.Login} AS Login,
-                u.{UserTable.Email} AS Email,
-                u.{UserTable.IsEmailConfirmed} AS IsEmailConfirmed,
-                CONCAT(COALESCE({UserTable.PhoneRegionCode}, ''),'-',COALESCE({UserTable.PhoneNumber}, '')) AS Phone,
-                u.{UserTable.IsBlocked} AS IsBlocked,
-                u.{UserTable.BlockedAt} AS BlockedAt,
-                u.{UserTable.CreatedAt} AS CreatedAt,
-                u.{UserTable.LastLoginDate} AS LastLoginDate,
-                u.{UserTable.UpdatedAt} AS UpdatedAt,
-                json_agg(DISTINCT r.{RoleTable.Code} ORDER BY r.{RoleTable.Code}) AS Roles,
+                u.{UsersTable.Id} AS Id,
+                u.{UsersTable.Login} AS Login,
+                u.{UsersTable.Email} AS Email,
+                u.{UsersTable.IsEmailConfirmed} AS IsEmailConfirmed,
+                CONCAT(COALESCE({UsersTable.PhoneRegionCode}, ''),'-',COALESCE({UsersTable.PhoneNumber}, '')) AS Phone,
+                u.{UsersTable.IsBlocked} AS IsBlocked,
+                u.{UsersTable.BlockedAt} AS BlockedAt,
+                u.{UsersTable.CreatedAt} AS CreatedAt,
+                u.{UsersTable.LastLoginDate} AS LastLoginDate,
+                u.{UsersTable.UpdatedAt} AS UpdatedAt,
+                json_agg(DISTINCT r.{RolesTable.Code} ORDER BY r.{RolesTable.Code}) AS Roles,
                 json_agg(DISTINCT p.{PermissionsTable.Code} ORDER BY p.code) AS Permissions
-                FROM {UserTable.TableFullName} u
+                FROM {UsersTable.TableFullName} u
             LEFT JOIN 
-                auth.user_role ur ON ur.user_id = u.{UserTable.Id}
+                auth.user_role ur ON ur.user_id = u.{UsersTable.Id}
             LEFT JOIN 
-                {RoleTable.TableName} r ON r.{RoleTable.Id} = ur.role_id
+                {RolesTable.TableName} r ON r.{RolesTable.Id} = ur.role_id
             LEFT JOIN 
-                auth.role_permissions rp ON rp.role_id = r.{RoleTable.Id}
+                auth.role_permissions rp ON rp.role_id = r.{RolesTable.Id}
             LEFT JOIN 
-                {PermissionsTable.FullTableName} p ON p.{PermissionsTable.Id} = rp.permission_id
+                {PermissionsTable.TableFullName} p ON p.{PermissionsTable.Id} = rp.permission_id
             WHERE
-                u.{UserTable.Id} = @UserId
+                u.{UsersTable.Id} = @UserId
             GROUP BY 
-                u.{UserTable.Id},
-                u.{UserTable.Login}, 
-                u.{UserTable.Email}, 
-                u.{UserTable.IsEmailConfirmed},
-                u.{UserTable.IsBlocked},
-                u.{UserTable.BlockedAt},
-                u.{UserTable.CreatedAt},
-                u.{UserTable.LastLoginDate},
-                u.{UserTable.UpdatedAt};";
+                u.{UsersTable.Id},
+                u.{UsersTable.Login}, 
+                u.{UsersTable.Email}, 
+                u.{UsersTable.IsEmailConfirmed},
+                u.{UsersTable.IsBlocked},
+                u.{UsersTable.BlockedAt},
+                u.{UsersTable.CreatedAt},
+                u.{UsersTable.LastLoginDate},
+                u.{UsersTable.UpdatedAt};";
 
         await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 

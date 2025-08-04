@@ -15,10 +15,13 @@ public class VolunteerCreator(
         CancellationToken ct = default)
     {
         var cmd = new CreateVolunteerCommand(
+            dto.UserId,
             dto.FirstName,
             dto.LastName,
             "",
             dto.ExperienceYears,
+            "+39",
+            "000000",
             dto.Requisites.Select(r=>new RequisitesDto(r.Name,r.Description)));
 
         var result = await handler.Handle(cmd, ct);

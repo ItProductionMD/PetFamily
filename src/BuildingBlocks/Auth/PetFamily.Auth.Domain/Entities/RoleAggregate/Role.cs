@@ -15,7 +15,7 @@ public class Role : IEntity<RoleId>
     public string Code { get; private set; }
 
     private readonly List<RolePermission> _rolePermissions = [];
-    public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions.ToList().AsReadOnly();
+    public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions.AsReadOnly();
 
     private Role(){ }//EFCore need this
 
@@ -68,7 +68,7 @@ public class Role : IEntity<RoleId>
    
     public void AddPermission(PermissionId permissionId)
     {
-        if (_rolePermissions.Any(rp => rp.PermissionId == permissionId))
+        if (_rolePermissions.Any(rp => rp.PermissionId.Value == permissionId.Value))
             return;
 
         var newRp = RolePermission.Create(Id, permissionId);

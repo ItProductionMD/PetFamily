@@ -14,7 +14,8 @@ public static class Scaffolder
     {
         string pathToInfrastructure = Path.Combine(
           Directory.GetParent(Directory.GetCurrentDirectory())!.FullName,
-          "PetFamily.Infrastructure"
+          "Shared",
+          "PetFamily.SharedInfrastructure"
         );
         if (!Path.Exists(pathToInfrastructure))
             throw new FileNotFoundException($"Assembly fail not found: {pathToInfrastructure}");

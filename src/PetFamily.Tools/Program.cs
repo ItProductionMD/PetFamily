@@ -1,5 +1,6 @@
 ﻿using PetFamily.Application.Abstractions.CQRS;
 using PetFamily.Tools;
+using PetFamily.Tools.DatabaseManagement;
 using PetFamily.Tools.DependencyProjectView;
 using PetFamily.Tools.Seeders;
 using PetFamily.Tools.UsingsEdit;
@@ -18,7 +19,8 @@ class Program
                 "\n\tclear --<tableName>," +
                 "\n\tusing --<operation> --usings:<old_using>%<new_using>" +
                 "\n\tusing --<operation> --usings:<static:old_using>|<static:new_using>"+
-                "\n\tdiagram ");
+                "\n\tdiagram" +
+                "\n\tdrop_and_reset_database");
 
             return;
         }
@@ -59,9 +61,14 @@ class Program
                 var graphGenerator = new SolutionDependencyGraphGenerator(
                     solutionPath,
                     ["Test","Tools"]);
-
                 graphGenerator.GenerateDependencyGraph();
+                break;
 
+            case "drop_and_reset_database":
+                var solutionPath1 = GetPathToSolution();
+                await DropAndResetDatabaseV2.RunAsync(solutionPath1);
+                //var resetter = new DatabaseResetter(solutionPath1);
+                //await resetter.RunAsync();
                 break;
 
             default:
