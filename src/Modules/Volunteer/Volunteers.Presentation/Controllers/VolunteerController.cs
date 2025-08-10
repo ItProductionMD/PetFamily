@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
+using PetFamily.SharedApplication.Dtos;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Utilities;

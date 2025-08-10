@@ -10,16 +10,21 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.8" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.14.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Modules\Auth\PetFamily.Auth.Application\PetFamily.Auth.Application.csproj" />
-    <ProjectReference Include="..\Modules\Auth\PetFamily.Auth.Domain\PetFamily.Auth.Domain.csproj" />
-    <ProjectReference Include="..\Modules\Auth\PetFamily.Auth.Infrastructure\PetFamily.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Auth\PetFamily.Auth.Application\PetFamily.Auth.Application.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Auth\PetFamily.Auth.Domain\PetFamily.Auth.Domain.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Auth\PetFamily.Auth.Infrastructure\PetFamily.Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
     <ProjectReference Include="..\Shared\PetFamily.SharedInfrastructure\PetFamily.SharedInfrastructure.csproj" />
     <ProjectReference Include="..\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />

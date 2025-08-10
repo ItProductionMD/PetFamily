@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using PetFamily.SharedKernel.ValueObjects;
-using VolunteerRequests.Domain.Enums;
-using VolunteerRequests.Domain.VolunteerRequestAggregate;
+using PetFamily.VolunteerRequests.Domain.Enums;
+using PetFamily.VolunteerRequests.Domain.Entities;
 using Xunit;
 
 namespace TestPetFamilyDomain;
@@ -20,7 +20,6 @@ public class VolunteerRequestTests
 
         // Act
         var result = VolunteerRequest.Create(
-            id,
             userId,
             "document.pdf",
             "Doe",
@@ -44,7 +43,6 @@ public class VolunteerRequestTests
     {
         // Act
         var result = VolunteerRequest.Create(
-            Guid.NewGuid(),
             Guid.NewGuid(),
             doc,
             last,
@@ -75,32 +73,32 @@ public class VolunteerRequestTests
     public void Approve_ShouldSetStatusToApproved()
     {
         var request = CreateValidRequest();
-        var adminId = Guid.NewGuid();
+        var takeToReviewResult = request.TakeToReview(AdminId, Guid.NewGuid());
 
-        request.Approve(adminId);
+        request.Approve(AdminId);
 
         request.RequestStatus.Should().Be(RequestStatus.Approved);
-        request.AdminId.Should().Be(adminId);
+        request.AdminId.Should().Be(AdminId);
     }
 
     [Fact]
     public void Reject_ShouldSetStatusToRejectedAndStoreComment()
     {
         var request = CreateValidRequest();
-        var adminId = Guid.NewGuid();
         var comment = "Not enough experience.";
 
-        request.Reject(adminId, comment);
+        request.TakeToReview(AdminId, Guid.NewGuid());
+
+        request.Reject(AdminId, comment);
 
         request.RequestStatus.Should().Be(RequestStatus.Rejected);
-        request.AdminId.Should().Be(adminId);
+        request.AdminId.Should().Be(AdminId);
         request.RejectedComment.Should().Be(comment);
     }
 
     private static VolunteerRequest CreateValidRequest()
     {
         return VolunteerRequest.Create(
-            Guid.NewGuid(),
             Guid.NewGuid(),
             "doc.pdf",
             "Doe",
@@ -109,6 +107,7 @@ public class VolunteerRequestTests
             3,
             new List<RequisitesInfo>()).Data!;
     }
+    private Guid AdminId = Guid.NewGuid();
 }
 
 

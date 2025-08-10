@@ -1,4 +1,6 @@
-﻿using Volunteers.Application.Commands.PetManagement.AddPet;
+﻿using PetFamily.VolunteerRequests.Application.Commands.SubmitVolunteerRequest;
+using PetFamily.VolunteerRequests.Domain.Entities;
+using Volunteers.Application.Commands.PetManagement.AddPet;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 using Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
 using Volunteers.Domain;
@@ -65,5 +67,16 @@ public static class AssertCustom
             Assert.Equal(commandRequisitesList[i].Name, pet.Requisites[i].Name);
             Assert.Equal(commandRequisitesList[i].Description, pet.Requisites[i].Description);
         }
+    }
+
+    public static void AreEqualData(
+        SubmitVolunteerRequestCommand cmd,
+        VolunteerRequest volunteerRequest)
+    {
+        Assert.Equal(cmd.FirstName, volunteerRequest.FirstName);
+        Assert.Equal(cmd.LastName, volunteerRequest.LastName);
+        Assert.Equal(cmd.Description, volunteerRequest.Description);
+        Assert.Equal(cmd.DocumentName, volunteerRequest.DocumentName);
+        Assert.Equal(cmd.ExperienceYears, volunteerRequest.ExperienceYears);
     }
 }

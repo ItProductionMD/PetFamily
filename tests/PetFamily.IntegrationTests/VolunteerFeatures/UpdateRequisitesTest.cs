@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.SharedApplication.Dtos;
 using Volunteers.Application.Commands.VolunteerManagement.UpdateRequisites;
 using Volunteers.Application.ResponseDtos;
 

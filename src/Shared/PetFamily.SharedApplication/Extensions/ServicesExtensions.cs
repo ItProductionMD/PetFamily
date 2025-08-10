@@ -22,6 +22,16 @@ public static class ServicesExtensions
         }
     }
 
+    public static string TryGetConnectionString(this IConfiguration configuration, string connectionString) 
+    {
+        var postgresConnection = configuration.GetConnectionString(connectionString);
+        if (string.IsNullOrEmpty(postgresConnection))
+            throw new ApplicationException("PostgreSQL connection string wasn't found!");
+
+        return postgresConnection;
+    }
+
+
     public static IServiceCollection AddCommandsAndQueries<TInjector>(this IServiceCollection services) =>
         services.Scan(scan => scan.FromAssemblies(typeof(TInjector).Assembly)
             .AddClasses(classes =>

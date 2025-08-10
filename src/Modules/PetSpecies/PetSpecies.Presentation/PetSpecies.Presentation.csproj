@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Auth\PetFamily.Auth.Public\PetFamily.Auth.Public.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.Framework\PetFamily.Framework.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
-    <ProjectReference Include="..\..\Auth\PetFamily.Auth.Public\PetFamily.Auth.Public.csproj" />
     <ProjectReference Include="..\PetSpecies.Application\PetSpecies.Application.csproj" />
   </ItemGroup>
 

@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Extensions;
+using Volunteers.Application.Contracts;
+using Volunteers.Public.IContracts;
 
 namespace Volunteers.Application;
 
@@ -11,25 +14,13 @@ public static class VolunteerApplicationInjector
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddScoped<IVolunteerCreator, VolunteerCreator>();
         services.AddValidatorsFromAssembly(typeof(VolunteerApplicationInjector).Assembly);
-        services.AddCommandsAndQueries();
+        services.AddCommandsAndQueries<ClassForAssemblyReference>();
         services.AddSingleton<PetImagesValidatorOptions>();
 
         return services;
     }
 
-
-
-    private static IServiceCollection AddCommandsAndQueries(this IServiceCollection services)
-    {
-        return services.Scan(scan => scan.FromAssemblies(typeof(VolunteerApplicationInjector).Assembly)
-                    .AddClasses(classes =>
-                        classes.AssignableToAny(
-                            typeof(ICommandHandler<,>),
-                            typeof(ICommandHandler<>),
-                            typeof(IQueryHandler<,>),
-                            typeof(IQueryHandler<>)))
-                    .AsSelfWithInterfaces()
-                    .WithScopedLifetime());
-    }
+    internal class ClassForAssemblyReference { }
 }

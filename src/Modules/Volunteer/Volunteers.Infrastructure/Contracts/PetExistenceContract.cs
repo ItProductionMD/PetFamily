@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using PetFamily.Application.Abstractions;
 using Volunteers.Public.IContracts;
-using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClasses;
+using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 
 namespace Volunteers.Infrastructure.Contracts
 {
@@ -15,8 +15,8 @@ namespace Volunteers.Infrastructure.Contracts
             await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
             const string sql = $@"
-                SELECT 1 FROM {PetTable.TableFullName}
-                WHERE {PetTable.PetTypeBreedId} = @BreedId 
+                SELECT 1 FROM {PetsTable.TableFullName}
+                WHERE {PetsTable.PetTypeBreedId} = @BreedId 
                 LIMIT 1;";
 
             var result = await dbConnection.QueryFirstOrDefaultAsync<int?>(new CommandDefinition(
@@ -33,8 +33,8 @@ namespace Volunteers.Infrastructure.Contracts
             await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
             const string sql = $@"
-                SELECT 1 FROM {PetTable.TableFullName} 
-                WHERE {PetTable.PetTypeSpeciesId} = @SpeciesId
+                SELECT 1 FROM {PetsTable.TableFullName} 
+                WHERE {PetsTable.PetTypeSpeciesId} = @SpeciesId
                 LIMIT 1;";
 
             var result = await dbConnection.QueryFirstOrDefaultAsync<int?>(new CommandDefinition(

@@ -1,0 +1,92 @@
+﻿using Microsoft.Extensions.Logging;
+using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.Auth.Public.Contracts;
+using PetFamily.SharedApplication.IUserContext;
+using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Results;
+using PetFamily.VolunteerRequests.Application.IRepositories;
+using Volunteers.Public.Dto;
+using Volunteers.Public.IContracts;
+
+namespace PetFamily.VolunteerRequests.Application.Commands.ApproveVolunteerRequest;
+
+public class ApproveVolunteerRequestHandler(
+    IVolunteerRequestWriteRepository requestWriteRepository,
+    IUserContext userContext,
+    IUserContract userFinder,
+    IVolunteerCreator volunteerCreator,
+    ILogger<ApproveVolunteerRequestHandler> logger) : ICommandHandler<ApproveVolunteerRequestCommand>
+{
+    private readonly IVolunteerRequestWriteRepository _requestWriteRepository = requestWriteRepository;
+    private readonly IUserContext _userContext = userContext;
+    private readonly IUserContract _userFinder = userFinder;
+    private readonly IVolunteerCreator _volunteerCreator = volunteerCreator;
+    private readonly ILogger<ApproveVolunteerRequestHandler> _logger = logger;
+
+    public async Task<UnitResult> Handle(ApproveVolunteerRequestCommand cmd, CancellationToken ct)
+    {
+        var getRequest = await _requestWriteRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
+        if (getRequest.IsFailure)
+            return UnitResult.Fail(getRequest.Error);
+        
+        var request = getRequest.Data!;
+
+        var adminId = _userContext.GetUserId();
+
+        var approveResult = request.Approve(adminId);
+        if (approveResult.IsFailure)
+        {
+            _logger.LogWarning("Approve failed for request ID {Id}: {Error}",
+                cmd.VolunteerRequestId, approveResult.Error);
+
+            return UnitResult.Fail(approveResult.Error);
+        }
+
+        await _requestWriteRepository.SaveAsync(ct);
+
+        try
+        {
+            var getUser = await _userFinder.GetByIdAsync(request.UserId, ct);
+            if (getUser.IsFailure)
+                throw new ApplicationException($"Failed to find user with ID {request.UserId}: " +
+                    $"{getUser.Error.Message}");
+
+            var user = getUser.Data!;
+
+            var createVolunteerDto = new CreateVolunteerDto(
+                request.UserId,
+                request.LastName,
+                request.FirstName,
+                user.Phone,
+                request.ExperienceYears,
+                request.Requisites);
+
+            var createVolunteerResult = await _volunteerCreator.CreateVolunteer(createVolunteerDto, ct);
+            if (createVolunteerResult.IsFailure)
+                throw new ApplicationException($"Failed to create volunteer: {createVolunteerResult.Error.Message}");
+                         
+            _logger.LogInformation("Volunteer request with ID {Id} approved by admin {AdminId} successful!",
+            cmd.VolunteerRequestId, adminId);
+
+            return UnitResult.Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while creating volunteer for request ID {Id}", cmd.VolunteerRequestId);
+
+            var cancelResult = request.CancelApproval(adminId);
+            if (cancelResult.IsSuccess)
+            {
+                await _requestWriteRepository.SaveAsync(ct);
+
+                _logger.LogInformation("Approval for request ID {Id} was rolled back.", cmd.VolunteerRequestId);
+                return UnitResult.Fail(Error.InternalServerError("Failed to create volunteer after approving request."));
+            }
+            else
+            {
+                _logger.LogCritical("Error cancel approval for request with id:{Id}", cmd.VolunteerRequestId);
+                return UnitResult.Fail(Error.InternalServerError("Failed to cancel request approval"));
+            }
+        }     
+    }
+}

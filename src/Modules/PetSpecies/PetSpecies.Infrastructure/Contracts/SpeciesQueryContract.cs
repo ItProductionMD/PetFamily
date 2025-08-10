@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
-using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClasses;
+using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetSpecies.Public.Dtos;
 using PetSpecies.Public.IContracts;
 using System.Collections.Generic;
@@ -27,13 +27,13 @@ public class SpeciesQueryContract(
                 (
                     jsonb_build_object
                     (
-                        'BreedId', b.{BreedTable.Id},'BreedName', b.{BreedTable.Name}
+                        'BreedId', b.{BreedsTable.Id},'BreedName', b.{BreedsTable.Name}
                     )
                 ) 
-                FILTER (WHERE b.{BreedTable.Id} IS NOT NULL), '[]'::jsonb
+                FILTER (WHERE b.{BreedsTable.Id} IS NOT NULL), '[]'::jsonb
             ) AS BreedDtos
             FROM {SpeciesTable.TableFullName} s
-            LEFT JOIN {BreedTable.TableFullName} b ON b.{BreedTable.SpeciesId} = s.{SpeciesTable.Id}
+            LEFT JOIN {BreedsTable.TableFullName} b ON b.{BreedsTable.SpeciesId} = s.{SpeciesTable.Id}
             GROUP BY s.{SpeciesTable.Id}, s.{SpeciesTable.Name}
             ORDER BY s.{SpeciesTable.Name}";
           

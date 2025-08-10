@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedInfrastructure\PetFamily.SharedInfrastructure.csproj" />
-    <ProjectReference Include="..\..\Auth\PetFamily.Auth.Domain\PetFamily.Auth.Domain.csproj" />
     <ProjectReference Include="..\Volunteers.Application\Volunteers.Application.csproj" />
     <ProjectReference Include="..\Volunteers.Domain\Volunteers.Domain.csproj" />
     <ProjectReference Include="..\Volunteers.Public\Volunteers.Public.csproj" />

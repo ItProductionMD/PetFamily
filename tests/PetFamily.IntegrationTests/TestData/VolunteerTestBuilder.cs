@@ -114,7 +114,8 @@ public class VolunteerTestBuilder
            Phone.CreateEmpty(),
            [],
            randomHelpStatus,
-           "health info");
+           "health info",
+           randomAddress);
 
         if (pet == null)
             throw new Exception($"Cant create and add pet to volunteer with builder!");
@@ -145,7 +146,8 @@ public class VolunteerTestBuilder
                     Phone.CreateEmpty(),
                     [],
                     GetRandomValue<HelpStatus>(),
-                    "health info");
+                    "health info",
+                    Address.CreateEmpty());
             }
         }
         return this;

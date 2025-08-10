@@ -3,8 +3,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Dtos;
+using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
-using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetSpecies.Application.IRepositories;
@@ -38,8 +38,8 @@ public class SpeciesReadRepository(
         using var dbConnection = _dbConnectionFactory.CreateConnection();
         var sql = $@"
             SELECT 1 
-            FROM {PetTable.TableFullName} 
-            WHERE {PetTable.PetTypeSpeciesId} = @SpeciesId
+            FROM {PetsTable.TableFullName} 
+            WHERE {PetsTable.PetTypeSpeciesId} = @SpeciesId
             LIMIT 1";
 
         _logger.LogInformation("EXECUTE(CheckForDeletingAsync) for species,check if exists at least" +
@@ -73,9 +73,9 @@ public class SpeciesReadRepository(
 
         var sql = $@"
             SELECT 1 
-            FROM {BreedTable.TableFullName} 
-            WHERE {BreedTable.SpeciesId} = @SpeciesId 
-            AND {BreedTable.Id} = @BreedId
+            FROM {BreedsTable.TableFullName} 
+            WHERE {BreedsTable.SpeciesId} = @SpeciesId 
+            AND {BreedsTable.Id} = @BreedId
             LIMIT 1";
 
         _logger.LogInformation("EXECUTE(CheckIfPetTypeExists) for speciesId:{speciesId} and breedId:{breedId}. SQL: {sql}",
@@ -108,8 +108,8 @@ public class SpeciesReadRepository(
 
         var sql = $@"
             SELECT 1 
-            FROM {PetTable.TableFullName} 
-            WHERE {PetTable.PetTypeBreedId} = @BreedId
+            FROM {PetsTable.TableFullName} 
+            WHERE {PetsTable.PetTypeBreedId} = @BreedId
             LIMIT 1";
 
         _logger.LogInformation("EXECUTE(CheckForDeleteBreedAsync),check if exists at least" +
@@ -141,10 +141,10 @@ public class SpeciesReadRepository(
         using var dbConnection = _dbConnectionFactory.CreateConnection();
 
         var sql = $@"
-                SELECT b.{BreedTable.Id} AS Id,
-                       b.{BreedTable.Name} AS Name,
-                       b.{BreedTable.Description} AS Description
-                FROM {BreedTable.TableFullName} b
+                SELECT b.{BreedsTable.Id} AS Id,
+                       b.{BreedsTable.Name} AS Name,
+                       b.{BreedsTable.Description} AS Description
+                FROM {BreedsTable.TableFullName} b
                 WHERE b.Id = @BreedId
                 LIMIT 1";
 
@@ -178,16 +178,16 @@ public class SpeciesReadRepository(
                    COALESCE(
                        JSON_AGG(
                            JSONB_BUILD_OBJECT(
-                               'Id', b.{BreedTable.Id}, 
-                               'Name', b.{BreedTable.Name},
-                               'Description', b.{BreedTable.Description})
+                               'Id', b.{BreedsTable.Id}, 
+                               'Name', b.{BreedsTable.Name},
+                               'Description', b.{BreedsTable.Description})
                            ORDER BY b.name
-                        ) FILTER (WHERE b.{BreedTable.Id} IS NOT NULL),
+                        ) FILTER (WHERE b.{BreedsTable.Id} IS NOT NULL),
                         '[]'
                     ) AS Breeds
             FROM {SpeciesTable.TableFullName} s
             WHERE s.{SpeciesTable.Id} = @SpeciesId
-            LEFT JOIN {BreedTable.TableFullName} b ON s.{SpeciesTable.Id} = b.{BreedTable.SpeciesId}
+            LEFT JOIN {BreedsTable.TableFullName} b ON s.{SpeciesTable.Id} = b.{BreedsTable.SpeciesId}
             GROUP BY s.{SpeciesTable.Id}, s.{SpeciesTable.Name} 
             ORDER BY s.{SpeciesTable.Name}
             LIMIT 1";
@@ -237,13 +237,13 @@ public class SpeciesReadRepository(
                 (
                     jsonb_build_object
                     (
-                        'BreedId', b.{BreedTable.Id},'BreedName', b.{BreedTable.Name}
+                        'BreedId', b.{BreedsTable.Id},'BreedName', b.{BreedsTable.Name}
                     )
                 ) 
-                FILTER (WHERE b.{BreedTable.Id} IS NOT NULL), '[]'::jsonb
+                FILTER (WHERE b.{BreedsTable.Id} IS NOT NULL), '[]'::jsonb
             ) AS BreedDtos
             FROM {SpeciesTable.TableFullName} s
-            LEFT JOIN {BreedTable.TableFullName} b ON b.{BreedTable.SpeciesId} = s.{SpeciesTable.Id}
+            LEFT JOIN {BreedsTable.TableFullName} b ON b.{BreedsTable.SpeciesId} = s.{SpeciesTable.Id}
             GROUP BY s.{SpeciesTable.Id}, s.{SpeciesTable.Name}
             ORDER BY s.{orderBy} {orderDirection}
             LIMIT {limit} OFFSET {offset}";

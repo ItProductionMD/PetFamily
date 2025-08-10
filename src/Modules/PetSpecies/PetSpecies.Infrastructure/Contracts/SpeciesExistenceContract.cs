@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
-using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClasses;
+using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetSpecies.Public.IContracts;
@@ -24,9 +24,9 @@ public class SpeciesExistenceContract(
 
         var sql = $@"
             SELECT 1 
-            FROM {BreedTable.TableFullName} 
-            WHERE {BreedTable.SpeciesId} = @SpeciesId 
-            AND {BreedTable.Id} = @BreedId
+            FROM {BreedsTable.TableFullName} 
+            WHERE {BreedsTable.SpeciesId} = @SpeciesId 
+            AND {BreedsTable.Id} = @BreedId
             LIMIT 1";
 
         _logger.LogInformation("EXECUTE(CheckIfPetTypeExists) for speciesId:{speciesId} and breedId:" +
