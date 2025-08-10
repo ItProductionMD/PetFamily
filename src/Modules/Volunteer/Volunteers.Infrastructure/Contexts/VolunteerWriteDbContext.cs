@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetFamily.SharedInfrastructure.Constants;
 using PetFamily.SharedInfrastructure.Shared.Logger;
-using VolunteerDomain = Volunteers.Domain.Volunteer;
+using Volunteers.Domain;
 
 namespace Volunteers.Infrastructure.Contexts;
 
 public class VolunteerWriteDbContext : DbContext
 {
     private readonly string _connectionString;
-    public DbSet<VolunteerDomain> Volunteers { get; set; }
+    public DbSet<Volunteer> Volunteers { get; set; }
 
     public VolunteerWriteDbContext(string connectionString)
     {

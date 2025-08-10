@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;

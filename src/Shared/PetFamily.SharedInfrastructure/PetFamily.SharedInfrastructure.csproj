@@ -33,4 +33,8 @@
 		<ProjectReference Include="..\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Dapper\ScaffoldedClassesPreview\" />
+	</ItemGroup>
+
 </Project>

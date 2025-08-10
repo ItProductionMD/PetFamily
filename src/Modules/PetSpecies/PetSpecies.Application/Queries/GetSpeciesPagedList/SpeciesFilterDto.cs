@@ -1,5 +1,5 @@
-﻿using PetFamily.Application.Dtos;
-using PetFamily.Application.Enums;
+﻿using PetFamily.SharedApplication.Dtos;
+using PetFamily.SharedApplication.Enums;
 
 namespace PetSpecies.Application.Queries.GetSpeciesPagedList;
 

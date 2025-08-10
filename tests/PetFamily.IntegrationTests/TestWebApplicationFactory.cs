@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Npgsql;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
 using PetSpecies.Infrastructure.Contexts;
 using Respawn;

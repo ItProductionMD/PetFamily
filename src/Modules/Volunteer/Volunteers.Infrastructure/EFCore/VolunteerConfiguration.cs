@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.SharedInfrastructure.Shared.EFCore;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;
+using Volunteers.Domain;
 using static PetFamily.SharedInfrastructure.Shared.EFCore.Convertors;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
-using VolunteerDomain = Volunteers.Domain.Volunteer;
 
 namespace Volunteers.Infrastructure.EFCore;
 
-public class VolunteerConfiguration : IEntityTypeConfiguration<VolunteerDomain>
+public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
 {
-    public void Configure(EntityTypeBuilder<VolunteerDomain> builder)
+    public void Configure(EntityTypeBuilder<Volunteer> builder)
     {
         builder.ToTable("volunteers");
 

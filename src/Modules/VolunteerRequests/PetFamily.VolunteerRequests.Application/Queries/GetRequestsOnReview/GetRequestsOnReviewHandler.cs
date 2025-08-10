@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedApplication.IUserContext;
-using PetFamily.SharedApplication.PagedResult;
+using PetFamily.SharedApplication.PaginationUtils.PagedResult;
 using PetFamily.SharedKernel.Results;
 using PetFamily.VolunteerRequests.Application.Dtos;
 using PetFamily.VolunteerRequests.Application.IRepositories;

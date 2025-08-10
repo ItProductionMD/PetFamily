@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Infrastructure.Contexts;
 using PetFamily.VolunteerRequests.Infrastructure.Contexts;
 using PetSpecies.Infrastructure.Contexts;

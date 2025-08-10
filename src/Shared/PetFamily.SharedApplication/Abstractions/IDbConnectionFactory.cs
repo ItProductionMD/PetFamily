@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 
-namespace PetFamily.Application.Abstractions;
+namespace PetFamily.SharedApplication.Abstractions;
 
 
 public interface IDbConnectionFactory

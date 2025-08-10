@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Public.Contracts;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;

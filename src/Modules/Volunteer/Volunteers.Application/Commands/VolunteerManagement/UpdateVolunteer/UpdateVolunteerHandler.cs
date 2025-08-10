@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions.CQRS;
-using PetFamily.Application.Validations;
+using PetFamily.SharedApplication.Abstractions.CQRS;
+using PetFamily.SharedApplication.Validations;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using Volunteers.Application.IRepositories;

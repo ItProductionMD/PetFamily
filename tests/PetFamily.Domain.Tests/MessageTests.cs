@@ -1,4 +1,4 @@
-﻿using PetFamily.Discussion.Domain.Entities;
+﻿using PetFamily.Discussions.Domain.Entities;
 using Xunit;
 using System;
 
@@ -11,10 +11,11 @@ public class MessageTests
     {
         // Arrange
         var authorId = Guid.NewGuid();
+        var discussionId = Guid.NewGuid(); // Assuming discussionId is needed
         var text = "Hello world!";
 
         // Act
-        var result = Message.Create(authorId, text);
+        var result = Message.Create(authorId, discussionId, text);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -29,10 +30,11 @@ public class MessageTests
     {
         // Arrange
         var authorId = Guid.NewGuid();
+        var discussionId = Guid.NewGuid(); // Assuming discussionId is needed
         string text = null!;
 
         // Act
-        var result = Message.Create(authorId, text);
+        var result = Message.Create(authorId, discussionId, text);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -43,10 +45,11 @@ public class MessageTests
     {
         // Arrange
         var authorId = Guid.NewGuid();
+        var discussionId = Guid.NewGuid(); // Assuming discussionId is needed
         var text = "";
 
         // Act
-        var result = Message.Create(authorId, text);
+        var result = Message.Create(authorId, discussionId, text);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -57,10 +60,11 @@ public class MessageTests
     {
         // Arrange
         var authorId = Guid.NewGuid();
+        var discussionId = Guid.NewGuid(); // Assuming discussionId is needed
         var longText = new string('a', 10001); // assuming MAX_LENGTH_LONG_TEXT = 10000
 
         // Act
-        var result = Message.Create(authorId, longText);
+        var result = Message.Create(authorId, discussionId, longText);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -71,7 +75,8 @@ public class MessageTests
     {
         // Arrange
         var authorId = Guid.NewGuid();
-        var message = Message.Create(authorId, "Initial").Data!;
+        var discussionId = Guid.NewGuid(); // Assuming discussionId is needed
+        var message = Message.Create(authorId, discussionId, "Initial").Data!;
 
         // Act
         var result = message.Edit("Updated text");
@@ -88,7 +93,8 @@ public class MessageTests
     {
         // Arrange
         var authorId = Guid.NewGuid();
-        var message = Message.Create(authorId, "Initial valid").Data!;
+        var discussionId = Guid.NewGuid(); // Assuming discussionId is needed
+        var message = Message.Create(authorId, discussionId,  "Initial valid").Data!;
 
         // Act
         var result = message.Edit(""); // invalid empty text

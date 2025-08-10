@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using PetSpecies.Application.Commands.AddSpecies;
@@ -7,7 +7,7 @@ using PetSpecies.Application.IRepositories;
 using PetSpecies.Domain;
 
 
-namespace PetFamily.Application.Commands.PetTypeManagement.AddPetType;
+namespace PetFamily.SharedApplication.Commands.PetTypeManagement.AddPetType;
 
 public class AddPetTypeHandler(
     ISpeciesWriteRepository repository,

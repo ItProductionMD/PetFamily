@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using System.Data;
 
 namespace PetFamily.SharedInfrastructure.Shared;

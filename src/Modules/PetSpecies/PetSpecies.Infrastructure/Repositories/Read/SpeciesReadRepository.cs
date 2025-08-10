@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.Dtos;
+using PetFamily.SharedApplication.Abstractions;
+using PetFamily.SharedApplication.Dtos;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
 using PetFamily.SharedKernel.Errors;

@@ -12,9 +12,10 @@ public static class DapperConfigurations
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        SqlMapper.AddTypeHandler(new Convertors.JsonbTypeHandler<List<BreedDto>>());
-        SqlMapper.AddTypeHandler(new Convertors.JsonbTypeHandler<List<SpeciesDto>>());
-        SqlMapper.AddTypeHandler(new Convertors.JsonbTypeHandler<List<string>>());
+        SqlMapper.AddTypeHandler(new DapperMappers.JsonbTypeMapper<List<BreedDto>>());
+        SqlMapper.AddTypeHandler(new DapperMappers.JsonbTypeMapper<List<SpeciesDto>>());
+        SqlMapper.AddTypeHandler(new DapperMappers.JsonbTypeMapper<List<string>>());
+        SqlMapper.AddTypeHandler(new DapperMappers.JsonbTypeMapper<List<Guid>>());
 
 
         services.Configure<DapperOptions>(configuration.GetSection("DapperOptions"));

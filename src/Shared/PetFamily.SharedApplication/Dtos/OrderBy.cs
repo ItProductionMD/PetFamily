@@ -1,6 +1,6 @@
-﻿using PetFamily.Application.Enums;
+﻿using PetFamily.SharedApplication.Enums;
 
-namespace PetFamily.Application.Dtos;
+namespace PetFamily.SharedApplication.Dtos;
 public class OrderBy<T>(T orderByProperty, OrderDirection orderDirection)
 {
     public T Property = orderByProperty;

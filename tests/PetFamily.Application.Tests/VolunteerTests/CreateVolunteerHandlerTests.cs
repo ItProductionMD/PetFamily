@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Application.Validations;
+using PetFamily.SharedApplication.Validations;
 using PetFamily.SharedApplication.Exceptions;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
@@ -9,7 +9,7 @@ using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 using Volunteers.Application.IRepositories;
 using Volunteers.Domain;
 
-namespace PetFamily.Application.Tests.VolunteerTests;
+namespace PetFamily.SharedApplication.Tests.VolunteerTests;
 
 public class CreateVolunteerHandlerTests
 {
@@ -18,7 +18,7 @@ public class CreateVolunteerHandlerTests
     private readonly Mock<ILogger<CreateVolunteerHandler>> _loggerMock;
     private readonly CreateVolunteerHandler _handler;
     private readonly CreateVolunteerFluentValidator _validator;
-    private readonly Mock<IUserContext> _userContextMock;
+    private readonly Mock<IUserContext.IUserContext> _userContextMock;
 
     public CreateVolunteerHandlerTests()
     {
@@ -26,7 +26,7 @@ public class CreateVolunteerHandlerTests
         _loggerMock = new Mock<ILogger<CreateVolunteerHandler>>();
         _validator = new CreateVolunteerFluentValidator();
         _volunteerReadRepositoryMock = new Mock<IVolunteerReadRepository>();
-        _userContextMock = new Mock<IUserContext>();
+        _userContextMock = new Mock<IUserContext.IUserContext>();
         _handler = new CreateVolunteerHandler(
             _volunteerRepositoryMock.Object,
             _volunteerReadRepositoryMock.Object,

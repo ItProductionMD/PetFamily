@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PetFamily.SharedApplication.Dtos;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
 using Volunteers.Application.ResponseDtos;
-using static PetFamily.SharedInfrastructure.Shared.Dapper.Convertors;
+using static PetFamily.SharedInfrastructure.Shared.Dapper.DapperMappers;
 
 namespace Volunteers.Infrastructure.Dapper;
 
@@ -12,8 +12,8 @@ public static class VolunteerDapperConvertor
 {
     public static void Register()
     {
-        SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<SocialNetworksDto>>());
-        SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<RequisitesDto>>());
-        SqlMapper.AddTypeHandler(new JsonbTypeHandler<List<PetMainInfoDto>>());
+        SqlMapper.AddTypeHandler(new JsonbTypeMapper<List<SocialNetworksDto>>());
+        SqlMapper.AddTypeHandler(new JsonbTypeMapper<List<RequisitesDto>>());
+        SqlMapper.AddTypeHandler(new JsonbTypeMapper<List<PetMainInfoDto>>());
     }
 }

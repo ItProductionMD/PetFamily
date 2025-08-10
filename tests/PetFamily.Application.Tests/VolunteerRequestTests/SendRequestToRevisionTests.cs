@@ -11,12 +11,12 @@ using PetFamily.VolunteerRequests.Application.IRepositories;
 using PetFamily.VolunteerRequests.Domain.Entities;
 using PetFamily.VolunteerRequests.Domain.Enums;
 
-namespace PetFamily.Application.Tests.VolunteerRequestTests;
+namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 
 public class SendRequestToRevisionTests
 {
     private readonly Mock<IVolunteerRequestWriteRepository> _repo = new();
-    private readonly Mock<IUserContext> _userContext = new();
+    private readonly Mock<IUserContext.IUserContext> _userContext = new();
     private readonly Mock<IDiscussionMessageSender> _messageSender = new();
     private readonly Mock<ILogger<SendRequestToRevisionHandler>> _logger = new();
 

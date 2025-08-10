@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Abstractions.CQRS;
+﻿using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities.RoleAggregate;
 using PetFamily.Auth.Domain.ValueObjects;

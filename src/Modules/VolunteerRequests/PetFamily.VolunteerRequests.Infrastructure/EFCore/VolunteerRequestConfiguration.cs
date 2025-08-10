@@ -66,6 +66,10 @@ public class VolunteerRequestConfiguration : IEntityTypeConfiguration<VolunteerR
             .HasColumnName("rejected_comment")
             .HasMaxLength(MAX_LENGTH_LONG_TEXT);
 
+
+        builder.Property(v => v.UpdatedAt)
+            .HasColumnName("updated_at");
+
         builder.Property(v => v.Requisites)
             .HasColumnName("requisites")
             .HasColumnType("jsonb")

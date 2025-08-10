@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Abstractions.CQRS;
+﻿using PetFamily.SharedApplication.Abstractions.CQRS;
 
 namespace PetFamily.Auth.Application.UserManagement.Commands.ChangeRoles;
 
