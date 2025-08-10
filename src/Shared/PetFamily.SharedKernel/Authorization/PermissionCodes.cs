@@ -58,6 +58,25 @@ public static class PermissionCodes
             [SpeciesView, SpeciesCreate, SpeciesEdit, SpeciesDelete, SpeciesRestore];
     }
 
+    public static class DiscussionManagement
+    {
+        public const string DiscussionView = "Discussion.View";
+        public const string DiscussionCreate = "Discussion.Create";
+        public const string DiscussionEdit = "Discussion.Edit";
+        public const string DiscussionDelete = "Discussion.Delete";
+        public const string DiscussionRestore = "Discussion.Restore";
+        public const string DiscussionClose = "Discussion.Close";
+        public const string DiscussionMessageCreate = "DiscussionMessage.Create";
+        public const string DiscussionMessageDelete = "DiscussionMessage.Delete";
+        public const string DiscussionMessageView = "DiscussionMessage.View";
+        public const string DiscussionMessageEdit = "DiscussionMessage.Edit";
+
+        public static List<string> GetAllPermissions() =>
+            [DiscussionView, DiscussionCreate, DiscussionEdit, DiscussionDelete, DiscussionRestore,
+             DiscussionClose,DiscussionMessageCreate,DiscussionMessageCreate,DiscussionMessageDelete,
+             DiscussionMessageView, DiscussionMessageEdit];
+    }
+
     public static class VolunteerRequestManagement
     {
         public const string VolunteerRequestsGetUnreviewed = "VolunteerRequests.GetUnreviewed";
@@ -91,6 +110,7 @@ public static class PermissionCodes
         var roleManagementPermissions = RoleManagement.GetAllPermissions();
         var permissionManagementPermissions = PermissionManagement.GetAllPermissions();
         var speciesManagementPermissions = SpeciesManagement.GetAllPermissions();
+        var discussionManagementPermissions = DiscussionManagement.GetAllPermissions();
 
         List<string> list = [];
 
@@ -99,6 +119,7 @@ public static class PermissionCodes
         list.AddRange(roleManagementPermissions);
         list.AddRange(permissionManagementPermissions);
         list.AddRange(speciesManagementPermissions);
+        list.AddRange(discussionManagementPermissions);
 
         return list;
     }
@@ -133,7 +154,17 @@ public static class PermissionCodes
             VolunteerRequestManagement.VolunteerRequestTakeForReview,
             VolunteerRequestManagement.VolunteerRequestSendToRevision,
             VolunteerRequestManagement.VolunteerRequestsGetUnreviewed,
-            VolunteerRequestManagement.VolunteerRequestsGetOnReview 
+            VolunteerRequestManagement.VolunteerRequestsGetOnReview,
+            DiscussionManagement.DiscussionView,
+            DiscussionManagement.DiscussionCreate,
+            DiscussionManagement.DiscussionEdit,
+            DiscussionManagement.DiscussionDelete,
+            DiscussionManagement.DiscussionRestore,
+            DiscussionManagement.DiscussionClose,
+            DiscussionManagement.DiscussionMessageCreate,
+            DiscussionManagement.DiscussionMessageDelete,
+            DiscussionManagement.DiscussionMessageView,
+            DiscussionManagement.DiscussionMessageEdit
         ];
 
     public static List<string> GetPermissionsForUser() =>
@@ -144,8 +175,14 @@ public static class PermissionCodes
             VolunteerRequestManagement.VolunteerRequestView,
             VolunteerRequestManagement.VolunteerRequestCreate,
             VolunteerRequestManagement.VolunteerRequestUpdate,
-            VolunteerRequestManagement.VolunteerRequestDelete
+            VolunteerRequestManagement.VolunteerRequestDelete,
+            DiscussionManagement.DiscussionMessageCreate,
+            DiscussionManagement.DiscussionMessageDelete,
+            DiscussionManagement.DiscussionMessageView,
+            DiscussionManagement.DiscussionMessageEdit
         ];
+
+    public static List<string> GetPermissionsForUnconfirmedUser() => [UserManagement.UserView,];
 
     public static List<string> GetPermissionsForVolunteer() =>
         [
