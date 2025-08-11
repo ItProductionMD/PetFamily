@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PetFamily.Discussion.Presentation.Requests;
+using PetFamily.Discussions.Presentation.Requests;
 using PetFamily.Discussions.Application.Commands.CloseDiscussion;
 using PetFamily.Discussions.Application.Commands.CreateDiscussion;
 using PetFamily.Discussions.Application.Commands.DeleteDiscussionMessage;
@@ -10,7 +10,7 @@ using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
 using PetFamily.SharedApplication.IUserContext;
 
-namespace PetFamily.Discussion.Presentation.Controllers;
+namespace PetFamily.Discussions.Presentation.Controllers;
 
 [ApiController]
 [Route("api/discussions")]

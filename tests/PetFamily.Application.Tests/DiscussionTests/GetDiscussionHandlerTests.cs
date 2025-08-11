@@ -23,12 +23,13 @@ public class GetDiscussionHandlerTests
         new(_discussionRepo.Object, _logger.Object, _participantContract.Object);
 
     private static DiscussionDto CreateDiscussionDto(Guid discussionId, List<Guid> participantIds)
-        => new(
-            Id: discussionId,
-            IsClosed: false,
-            participantIds,
-            Messages: []
-            );
+        => new()
+        {
+            Id = discussionId,
+            IsClosed = false,
+            ParticipantIds = participantIds,
+            Messages = []
+        };
 
     [Fact]
     public async Task Handle_Should_ReturnOk_When_UserIsParticipant()

@@ -5,12 +5,15 @@ using PetFamily.VolunteerRequests.Domain.Entities;
 
 namespace PetFamily.VolunteerRequests.Infrastructure.Contexts;
 
-public class VolunteerRequestDbContext : DbContext
+public class VolunteerRequestWriteDbContext : DbContext
 {
     private readonly string _connectionString;
     public DbSet<VolunteerRequest> VolunteerRequests { get; set; }
-    public VolunteerRequestDbContext(string connectionString)
+    public VolunteerRequestWriteDbContext(string connectionString)
     {
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ArgumentException("Connection string cannot be null or empty.", nameof(connectionString));
+
         _connectionString = connectionString;
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -26,7 +29,7 @@ public class VolunteerRequestDbContext : DbContext
     {
         modelBuilder
             .HasDefaultSchema(SchemaNames.VOLUNTEER_REQUESTS)
-            .ApplyConfigurationsFromAssembly(typeof(VolunteerRequestDbContext).Assembly);
+            .ApplyConfigurationsFromAssembly(typeof(VolunteerRequestWriteDbContext).Assembly);
 
         base.OnModelCreating(modelBuilder);
     }

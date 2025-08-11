@@ -108,7 +108,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Discussions.Domai
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Discussions.Application", "src\Modules\Discussions\PetFamily.Discussions.Application\PetFamily.Discussions.Application.csproj", "{96C3E24E-2DA9-4D16-8B72-2422FC02F677}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Discussion.Presentation", "src\Modules\Discussions\PetFamily.Discussion.Presentation\PetFamily.Discussion.Presentation.csproj", "{A1B719CF-6553-4301-AF14-956BCC334670}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Discussions.Presentation", "src\Modules\Discussions\PetFamily.Discussion.Presentation\PetFamily.Discussions.Presentation.csproj", "{A1B719CF-6553-4301-AF14-956BCC334670}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

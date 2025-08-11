@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
+using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedApplication.Exceptions;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
@@ -24,6 +26,9 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
             1,
             [new("victoriabank", "iban12345")]);
 
+        _factory.UserContextMock.Setup(x => x.GetUserId())
+            .Returns(Guid.NewGuid());
+
         //ACT
         var handleResult = await _sut.Handle(command, CancellationToken.None);
         //ASSERT
@@ -39,6 +44,8 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
     [Fact]
     public async Task Should_fail_if_request_already_exists()
     {
+        var userId = Guid.NewGuid();
+
         // ARRANGE
         var command = new SubmitVolunteerRequestCommand(
             "file.doc",
@@ -49,7 +56,7 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
             [new("victoriabank", "iban12345")]);
 
         var existingRequest = VolunteerRequest.Create(
-            _factory.UserContextId,
+            userId,
             command.DocumentName,
             command.LastName,
             command.FirstName,
@@ -61,6 +68,8 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
         await _volunteerRequestDbContext.VolunteerRequests.AddAsync(existingRequest);
         await _volunteerRequestDbContext.SaveChangesAsync();
 
+        _factory.UserContextMock.Setup(x => x.GetUserId())
+            .Returns(userId);
         // ACT
         var result = await _sut.Handle(command, CancellationToken.None);
 

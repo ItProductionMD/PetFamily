@@ -1,6 +1,6 @@
 ﻿using PetFamily.Discussions.Application.Commands.CreateDiscussion;
 
-namespace PetFamily.Discussion.Presentation.Requests;
+namespace PetFamily.Discussions.Presentation.Requests;
 
 public class CreateDiscussionRequest
 {

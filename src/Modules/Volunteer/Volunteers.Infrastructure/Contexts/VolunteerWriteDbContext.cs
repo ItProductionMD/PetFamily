@@ -12,6 +12,9 @@ public class VolunteerWriteDbContext : DbContext
 
     public VolunteerWriteDbContext(string connectionString)
     {
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ArgumentException("Connection string cannot be null or empty.", nameof(connectionString));
+
         _connectionString = connectionString;
     }
 

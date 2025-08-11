@@ -27,8 +27,8 @@ public class DiscussionReadRepository(
     {
         const string sqlDiscussion = $@"
         SELECT
-            d.{DiscussionsTable.Id},
-            d.{DiscussionsTable.IsClosed},
+            d.{DiscussionsTable.Id} AS Id,
+            d.{DiscussionsTable.IsClosed} AS IsClosed,
             d.{DiscussionsTable.ParticipantIds} AS ParticipantIds
         FROM {DiscussionsTable.TableFullName} d
         WHERE d.{DiscussionsTable.Id} = @DiscussionId;";
@@ -74,7 +74,7 @@ public class DiscussionReadRepository(
         var (totalCount, messages) = await connection
             .GetPagedQuery<DiscussionMessageDto, DiscussionReadRepository>(pagedQueryCmd, _logger);
 
-        discussion = discussion with { Messages = messages.ToList() };
+        discussion.Messages = messages.ToList();
 
         _logger.LogInformation("Discussion with id:{DiscussionId} found with {MessageCount} messages " +
             "(Total messages: {TotalCount})",

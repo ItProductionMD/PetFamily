@@ -28,7 +28,7 @@ public static class VolunteerRequestInjector
             .AddScoped<IVolunteerRequestWriteRepository, VolunteerRequestWriteRepository>()
             .AddScoped<IVolunteerRequestReadRepository, VolunteerRequestReadRepository>()
             .InjectVolunteerRequestApplication(configuration)
-            .AddScoped<VolunteerRequestDbContext>(_ => new VolunteerRequestDbContext(postgresConnection))
+            .AddScoped<VolunteerRequestWriteDbContext>(_ => new VolunteerRequestWriteDbContext(postgresConnection))
             .AddHostedService<RejectedStatusProcessor>();
 
         return services;

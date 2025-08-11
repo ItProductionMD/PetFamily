@@ -10,10 +10,10 @@ namespace PetFamily.VolunteerRequests.Infrastructure.Repositories.Write;
 
 public class VolunteerRequestWriteRepository(
     ILogger<VolunteerRequestWriteRepository> logger,
-    VolunteerRequestDbContext volunteerRequestDbContext) : IVolunteerRequestWriteRepository
+    VolunteerRequestWriteDbContext volunteerRequestDbContext) : IVolunteerRequestWriteRepository
 {
     private readonly ILogger<VolunteerRequestWriteRepository> _logger = logger;
-    private readonly VolunteerRequestDbContext _dbContext = volunteerRequestDbContext;
+    private readonly VolunteerRequestWriteDbContext _dbContext = volunteerRequestDbContext;
 
     public async Task AddAsync(VolunteerRequest volunteerRequest, CancellationToken ct)
     {

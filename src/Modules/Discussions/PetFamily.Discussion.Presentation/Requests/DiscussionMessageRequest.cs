@@ -1,7 +1,7 @@
 ﻿using PetFamily.Discussions.Application.Commands.LeaveMessage;
 using PetFamily.Discussions.Application.Commands.UpdateMessage;
 
-namespace PetFamily.Discussion.Presentation.Requests;
+namespace PetFamily.Discussions.Presentation.Requests;
 
 public class DiscussionMessageRequest
 {

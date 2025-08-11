@@ -8,6 +8,7 @@ using PetFamily.Discussions.Public.Contracts;
 using PetFamily.SharedApplication.Extensions;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using PetFamily.Discussions.Infrastructure.Contexts;
+using PetFamily.Discussions.Infrastructure.Dapper;
 
 namespace PetFamily.Discussions.Infrastructure;
 
@@ -29,6 +30,8 @@ public static class DiscussionInjector
             .AddScoped<IDiscussionRemover, DiscussionRemover>()
             .AddScoped<IDiscussionCreator, DisscussionCreator>()
             .AddScoped<DiscussionWriteDbContext>(_ => new DiscussionWriteDbContext(postgresConnection));
+
+        DiscussionMapperConvertors.Register();
 
         return services;
     }
