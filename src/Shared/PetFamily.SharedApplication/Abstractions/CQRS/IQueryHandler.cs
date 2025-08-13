@@ -1,6 +1,6 @@
 ﻿using PetFamily.SharedKernel.Results;
 
-namespace PetFamily.Application.Abstractions.CQRS;
+namespace PetFamily.SharedApplication.Abstractions.CQRS;
 
 public interface IQueryHandler<TResponse, in TQuery> where TQuery : IQuery
 {

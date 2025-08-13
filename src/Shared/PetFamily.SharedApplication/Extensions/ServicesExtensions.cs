@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using Scrutor;
 
 namespace PetFamily.SharedApplication.Extensions;

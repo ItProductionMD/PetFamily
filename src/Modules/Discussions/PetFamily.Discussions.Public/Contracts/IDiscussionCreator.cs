@@ -7,6 +7,7 @@ public interface IDiscussionCreator
 {
     Task<Result<Guid>> CreateDiscussion(
         Guid volunteerRequestId,
-        IEnumerable<Guid> participantIds,
+        Guid adminId,
+        Guid userId,
         CancellationToken ct);
 }

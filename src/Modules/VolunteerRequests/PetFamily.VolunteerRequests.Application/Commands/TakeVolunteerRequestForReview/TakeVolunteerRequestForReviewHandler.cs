@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Discussions.Public.Contracts;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
@@ -49,7 +49,8 @@ public class TakeVolunteerRequestForReviewHandler(
 
         var createDiscussion = await _discussionCreator.CreateDiscussion(
             volunteerRequest.Id,
-            [volunteerRequest.UserId, adminId],
+            adminId,
+            volunteerRequest.UserId,
             ct);
 
         if (createDiscussion.IsFailure)

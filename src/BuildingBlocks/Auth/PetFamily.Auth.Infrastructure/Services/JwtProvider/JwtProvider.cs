@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IServices;
-using PetFamily.Auth.Infrastructure.Services.AuthorizationService;
+using PetFamily.Framework.SharedAuthorization;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects.Ids;

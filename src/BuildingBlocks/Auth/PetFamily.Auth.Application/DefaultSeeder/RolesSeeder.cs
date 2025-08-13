@@ -29,15 +29,15 @@ public class RolesSeeder(
     public async Task SeedAsync()
     {
 
-        var result = await _roleReadRepository.GetRoles(default);
-        if (result.Count > 0)
+        var existingRoles = await _roleReadRepository.GetRoles(default);
+        if (existingRoles.Count > 0)
         {
             _logger.LogInformation("ROLE SEEDER: Roles already exist. Skipping seeding.");
             return;
         }
 
-        var permissionResult = await _permissionReadRepository.GetPermissionsAsync(default);
-        if (permissionResult.Count > 0)
+        var existingPermissions = await _permissionReadRepository.GetPermissionsAsync(default);
+        if (existingPermissions.Count > 0)
         {
             _logger.LogInformation("ROLE SEEDER: Permissions already exist. Skipping seeding.");
             return;
@@ -47,38 +47,10 @@ public class RolesSeeder(
             .Select(p => Permission.Create(p).Data!)
             .ToList();
 
-        List<string> permissionCodesForUserManagement = PermissionCodes.UserManagement
-            .GetAllPermissions();
-
-        List<string> permissionCodesForVolunteerManagement = PermissionCodes.VolunteerManagement
-            .GetAllPermissions();
-
-        List<string> permissionCodesForRoleManagement = PermissionCodes.RoleManagement
-            .GetAllPermissions();
-
-        List<string> permissionCodesForPermissionManagement = PermissionCodes.PermissionManagement
-            .GetAllPermissions();
-
-        List<string> permissionCodesForSpeciesManagement = PermissionCodes.SpeciesManagement
-            .GetAllPermissions();
-
-        List<string> permissionCodesForVolunteerRequestManagement = PermissionCodes.VolunteerRequestManagement
-            .GetAllPermissions();
-
-        var permissionsForVolunteer = permissionCodesForPermissionManagement
-            .Concat(permissionCodesForRoleManagement)
-            .Concat(permissionCodesForVolunteerManagement)
-            .Concat(permissionCodesForSpeciesManagement)
-            .Concat(permissionCodesForVolunteerRequestManagement)
-            .Concat([
-                PermissionCodes.UserManagement.UserDelete,
-                PermissionCodes.UserManagement.UserView
-                ]);
-
-        //permissionCodesForVolunteerManagement.AddRange(permissionCodesForUserManagement);
-        List<string> permissionCodesForUnconfirmedUser = [
-            PermissionCodes.UserManagement.UserView
-            ];
+        var permissionCodesForAdminRole = PermissionCodes.GetPermissionsForAdmin();
+        var permissionCodesForUserRole = PermissionCodes.GetPermissionsForUser();
+        var permissionCodesForVolunteerRole = PermissionCodes.GetPermissionsForVolunteer();
+        var permissionCodesForUnconfirmedUser = PermissionCodes.GetPermissionsForUnconfirmedUser();
 
         await _authUnitOfWork.BeginTransactionAsync(default);
         try
@@ -87,22 +59,27 @@ public class RolesSeeder(
 
             await _authUnitOfWork.SaveChangesAsync(default);
 
-            var authPermissionsIds = allPermissions
+            var allPermissionsIds = allPermissions
                 .Select(p => p.Id)
                 .ToList();
 
-            var userPermissionIds = allPermissions
-                .Where(p => permissionCodesForUserManagement.Any(pU => pU == p.Code))
+            var permissionsIdsForAdminRole = allPermissions
+                .Where(p => permissionCodesForAdminRole.Any(pC => pC == p.Code))
                 .Select(p => p.Id)
                 .ToList();
 
-            var volunteerPermissionIds = allPermissions
-                .Where(p => permissionCodesForVolunteerManagement.Any(pV => pV == p.Code))
+            var permissionIdsForUserRole = allPermissions
+                .Where(p => permissionCodesForUserRole.Any(pV => pV == p.Code))
                 .Select(p => p.Id)
                 .ToList();
 
-            var unconfirmedUserPermissionIds = allPermissions
+            var permissionIdsForUnconfirmedUserRole = allPermissions
                 .Where(p => permissionCodesForUnconfirmedUser.Any(pU => pU == p.Code))
+                .Select(p => p.Id)
+                .ToList();
+
+            var permissionIdsForVolunteerRole = allPermissions
+                .Where(p => permissionCodesForVolunteerRole.Any(pC => pC == p.Code))
                 .Select(p => p.Id)
                 .ToList();
 
@@ -135,10 +112,10 @@ public class RolesSeeder(
 
             await _authUnitOfWork.SaveChangesAsync(default);
 
-            _adminRole.Update(authPermissionsIds);
-            _userRole.Update(userPermissionIds);
-            _unconfirmedUserRole.UpdatePermissions(unconfirmedUserPermissionIds);
-            _volunteerRole.UpdatePermissions(volunteerPermissionIds);
+            _adminRole.UpdatePermissions(permissionsIdsForAdminRole);
+            _userRole.UpdatePermissions(permissionIdsForUserRole);
+            _unconfirmedUserRole.UpdatePermissions(permissionIdsForUserRole);
+            _volunteerRole.UpdatePermissions(permissionIdsForVolunteerRole);
 
             await _authUnitOfWork.SaveChangesAsync(default);
 

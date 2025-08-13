@@ -8,7 +8,6 @@ using PetFamily.Auth.Infrastructure.BackgroundServices;
 using PetFamily.Auth.Infrastructure.Contexts;
 using PetFamily.Auth.Infrastructure.Dapper;
 using PetFamily.Auth.Infrastructure.Repository;
-using PetFamily.Auth.Infrastructure.Services.AuthorizationService;
 using PetFamily.Auth.Infrastructure.Services.EmailService;
 using PetFamily.Auth.Infrastructure.Services.JwtProvider;
 using PetFamily.Auth.Infrastructure.Services.PasswordHasher;
@@ -16,7 +15,6 @@ using PetFamily.Auth.Public.Contracts;
 using PetFamily.SharedApplication.Extensions;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using static PetFamily.Auth.Infrastructure.AuthInjector.JwtAuthenticationInjector;
-using static PetFamily.Auth.Infrastructure.AuthInjector.PermissionsPolicesAuthorizationInjector;
 
 
 namespace PetFamily.Auth.Infrastructure.AuthInjector;
@@ -52,13 +50,7 @@ public static class PetFamilyAuthInjector
             .AddScoped(_ => new AuthWriteDbContext(postgresConnection))
             .Configure<JwtOptions>(configuration.GetSection("JwtOptions"))
 
-            .AddJwtAuthentication(configuration)
-
-            .AddPermissionPoliciesAuthorization()
-
-            .AddSingleton<IAuthorizationHandler, AuthorizationHandlerByPermissions>()
-
-            .AddHttpContextAccessor();
+            .AddJwtAuthentication(configuration);
 
         services.AddHostedService<AuthSoftDeletableCleanupService>();
 

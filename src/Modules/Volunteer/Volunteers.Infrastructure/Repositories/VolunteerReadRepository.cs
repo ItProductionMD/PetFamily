@@ -1,7 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
+using PetFamily.SharedInfrastructure.Dapper.Extensions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
 using PetFamily.SharedKernel.Errors;
@@ -14,7 +15,7 @@ using Volunteers.Application.Queries.GetVolunteers;
 using Volunteers.Application.ResponseDtos;
 using Volunteers.Infrastructure.Extensions;
 
-using static PetFamily.SharedInfrastructure.Shared.Extensions.DynamicParametersExtensions;
+using static PetFamily.SharedInfrastructure.Dapper.Extensions.DynamicParametersExtensions;
 
 
 namespace Volunteers.Infrastructure.Repositories;

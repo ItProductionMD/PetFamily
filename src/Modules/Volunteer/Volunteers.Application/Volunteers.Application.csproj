@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Auth\PetFamily.Auth.Public\PetFamily.Auth.Public.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\FileStorage\FileStorage.Public\FileStorage.Public.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
     <ProjectReference Include="..\..\PetSpecies\PetSpecies.Public\PetSpecies.Public.csproj" />

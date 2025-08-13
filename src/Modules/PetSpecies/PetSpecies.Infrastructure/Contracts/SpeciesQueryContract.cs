@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetSpecies.Public.Dtos;
 using PetSpecies.Public.IContracts;

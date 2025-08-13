@@ -1,5 +1,5 @@
-﻿using PetFamily.Application.Abstractions.CQRS;
-using PetFamily.Application.Dtos;
+﻿using PetFamily.SharedApplication.Abstractions.CQRS;
+using PetFamily.SharedApplication.Dtos;
 
 namespace PetSpecies.Application.Queries.GetSpeciesPagedList;
 

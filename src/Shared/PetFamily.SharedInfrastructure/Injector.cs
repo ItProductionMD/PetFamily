@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedApplication.Extensions;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedInfrastructure.HttpContext;
@@ -20,7 +20,7 @@ public static class Injector
         return services
             .ConfigDapper(configuration)
             .AddSingleton<IDbConnectionFactory>(_ => new NpgSqlConnectionFactory(postgresConnection))
-            .AddScoped<IUserContext, HttpUserContext>();
+            .AddScoped<IUserContext, HTTPUserContext>();
 
         //.AddScoped<IUnitOfWork, UnitOfWork>();
 

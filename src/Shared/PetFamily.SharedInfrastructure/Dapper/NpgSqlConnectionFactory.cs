@@ -1,5 +1,5 @@
 ﻿using Npgsql;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using System.Data;
 using System.Data.Common;
 

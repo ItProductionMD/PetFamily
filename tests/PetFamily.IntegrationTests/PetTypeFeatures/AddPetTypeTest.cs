@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetSpecies.Application.Commands.AddSpecies;
 using PetSpecies.Domain;
 

@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Abstractions.CQRS;
+﻿using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedApplication.Dtos;
 using Volunteers.Application.ResponseDtos;
 

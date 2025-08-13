@@ -1,7 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
+using PetFamily.Auth.Public.Contracts;
 using PetFamily.SharedApplication.Extensions;
 using Volunteers.Application.Contracts;
 using Volunteers.Public.IContracts;
@@ -15,6 +16,7 @@ public static class VolunteerApplicationInjector
         IConfiguration configuration)
     {
         services.AddScoped<IVolunteerCreator, VolunteerCreator>();
+        services.AddScoped<IParticipantContract, ParticipantContract>();
         services.AddValidatorsFromAssembly(typeof(VolunteerApplicationInjector).Assembly);
         services.AddCommandsAndQueries<ClassForAssemblyReference>();
         services.AddSingleton<PetImagesValidatorOptions>();

@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PetSpecies.Application.Queries.GetSpeciesPagedList;
 using FluentValidation;
 using Scrutor;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedApplication.Extensions;
 
 

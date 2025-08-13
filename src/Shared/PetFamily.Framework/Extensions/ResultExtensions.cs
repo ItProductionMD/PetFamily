@@ -7,6 +7,21 @@ namespace PetFamily.Framework.Extensions
 {
     public static class ResultExtensions
     {
+
+        public static ActionResult ToActionResult<T>(this Result<T> result)
+        {
+            return result.IsFailure
+            ? result.ToErrorActionResult()
+            : new OkObjectResult(result.ToEnvelope());
+        }
+
+        public static ActionResult ToActionResult(this UnitResult result)
+        {
+            return result.IsFailure
+            ? result.ToErrorActionResult()
+            : new OkObjectResult(result.ToEnvelope());
+        }
+
         public static ActionResult ToErrorActionResult(this UnitResult result)
         {
             if (result.Error is null)

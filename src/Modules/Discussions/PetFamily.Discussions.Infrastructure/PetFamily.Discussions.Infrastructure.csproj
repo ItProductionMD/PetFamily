@@ -7,11 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\PetFamily.SharedInfrastructure\PetFamily.SharedInfrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
+    <ProjectReference Include="..\PetFamily.Discussions.Application\PetFamily.Discussions.Application.csproj" />
     <ProjectReference Include="..\PetFamily.Discussions.Public\PetFamily.Discussions.Public.csproj" />
+    <ProjectReference Include="..\PetFamily.Disscussions.Domain\PetFamily.Discussions.Domain.csproj" />
   </ItemGroup>
 
 </Project>

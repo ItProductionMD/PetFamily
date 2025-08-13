@@ -9,11 +9,11 @@ using PetFamily.VolunteerRequests.Application.IRepositories;
 using PetFamily.VolunteerRequests.Domain.Entities;
 using Xunit.Sdk;
 
-namespace PetFamily.Application.Tests.VolunteerRequestTests;
+namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 
 public class SubmitVolunteerRequestTests
 {
-    private readonly Mock<IUserContext> _userContext = new();
+    private readonly Mock<IUserContext.IUserContext> _userContext = new();
     private readonly Mock<IVolunteerRequestWriteRepository> _writeRepo = new();
     private readonly Mock<IVolunteerRequestReadRepository> _readRepo = new();
     private readonly Mock<ILogger<SubmitVolunteerRequestHandler>> _logger = new();

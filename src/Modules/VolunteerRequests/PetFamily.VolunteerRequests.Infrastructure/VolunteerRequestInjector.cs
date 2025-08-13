@@ -22,13 +22,13 @@ public static class VolunteerRequestInjector
     {
         var postgresConnection = configuration.TryGetConnectionString(ConnectionStringName.POSTGRESQL);
 
-        SqlMapper.AddTypeHandler(new Convertors.JsonbTypeHandler<List<VolunteerRequestDto>>());
+        SqlMapper.AddTypeHandler(new DapperMappers.JsonbTypeMapper<List<VolunteerRequestDto>>());
 
         services
             .AddScoped<IVolunteerRequestWriteRepository, VolunteerRequestWriteRepository>()
             .AddScoped<IVolunteerRequestReadRepository, VolunteerRequestReadRepository>()
             .InjectVolunteerRequestApplication(configuration)
-            .AddScoped<VolunteerRequestDbContext>(_ => new VolunteerRequestDbContext(postgresConnection))
+            .AddScoped<VolunteerRequestWriteDbContext>(_ => new VolunteerRequestWriteDbContext(postgresConnection))
             .AddHostedService<RejectedStatusProcessor>();
 
         return services;

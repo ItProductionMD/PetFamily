@@ -1,8 +1,10 @@
 ﻿using FileStorage.Public.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using PetFamily.IntegrationTests.Fixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using Volunteers.Application.Commands.PetManagement.DeletePetImages;

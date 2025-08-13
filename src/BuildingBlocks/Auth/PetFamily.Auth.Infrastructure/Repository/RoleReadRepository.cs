@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.ValueObjects;
@@ -116,13 +116,13 @@ public class RoleReadRepository(
             p.{PermissionsTable.Code} AS PermissionCode,
             p.{PermissionsTable.IsEnabled} AS IsEnable
         FROM {RolesTable.TableFullName} r
-        JOIN {UserRoleTable.TableFullName} ur 
-            ON r.{RolesTable.Id} = ur.{UserRoleTable.RoleId}
+        JOIN {UsersTable.TableFullName} u
+            ON r.{RolesTable.Id} = u.{UsersTable.RoleId}
         LEFT JOIN {RolePermissionsTable.TableFullName} rp 
             ON r.{RolesTable.Id} = rp.role_id
         LEFT JOIN {PermissionsTable.TableFullName} p 
             ON p.{PermissionsTable.Id} = rp.permission_id
-        WHERE ur.{UserRoleTable.UserId} = @UserId;";
+        WHERE u.{UsersTable.Id} = @UserId;";
 
         _logger.LogInformation("EXECUTING QUERY: {sql}", sql);
 

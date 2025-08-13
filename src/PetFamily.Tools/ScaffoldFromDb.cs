@@ -28,7 +28,7 @@ public class ScaffoldFromDb
         var columns = connection.Query<(string SchemaName, string TableName, string ColumnName)>(query);
         var tables = columns.GroupBy(c => c.TableName);
 
-        string outputPath = Path.Combine(infrastructurePath, "Dapper", "ScafoldedClasses");
+        string outputPath = Path.Combine(infrastructurePath, "Dapper", "ScaffoldedClassesPreview");
         if (Directory.Exists(outputPath) == false!)
         {
             Console.WriteLine($"Directory :{outputPath} not exist!Make sure you set command from write directory! ");
@@ -90,9 +90,9 @@ public class ScaffoldFromDb
         var tableFullName = $"{schemaName}.{tableName}";
         sb.AppendLine("using PetFamily.SharedInfrastructure.Constants;");
         sb.AppendLine();
-        sb.AppendLine("namespace PetFamily.SharedInfrastructure.Shared.Dapper.GeneratedClasses;");
+        sb.AppendLine("namespace PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClassesPreview;");
         sb.AppendLine();
-        sb.AppendLine($"public static class {className}");
+        sb.AppendLine($"public static class {className}Table");
         sb.AppendLine("{");
         sb.AppendLine($"    public const string TableName = \"{tableName}\";");
         sb.AppendLine($"    public const string TableFullName = \"{tableFullName}\";");

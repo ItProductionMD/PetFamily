@@ -1,5 +1,7 @@
-﻿using PetFamily.IntegrationTests.Seeds;
+﻿using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using Volunteers.Application.Queries.GetVolunteers;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;

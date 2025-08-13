@@ -10,7 +10,7 @@ using Volunteers.Application.IRepositories;
 using Volunteers.Domain;
 using DomainSpecies = PetSpecies.Domain.Species;
 
-namespace PetFamily.Application.Tests.VolunteerTests;
+namespace PetFamily.SharedApplication.Tests.VolunteerTests;
 
 public class AddPetHandlerTests
 {

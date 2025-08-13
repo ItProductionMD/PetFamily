@@ -3,7 +3,7 @@ using PetFamily.SharedKernel.ValueObjects.Ids;
 using Volunteers.Domain;
 using Volunteers.Domain.ValueObjects;
 
-namespace PetFamily.Application.Tests.VolunteerTests;
+namespace PetFamily.SharedApplication.Tests.VolunteerTests;
 
 public static class TestDataFactory
 {

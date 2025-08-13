@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Application.Commands.PetTypeManagement.AddPetType;
-using PetFamily.Application.Dtos;
+using PetFamily.SharedApplication.Commands.PetTypeManagement.AddPetType;
+using PetFamily.SharedApplication.Dtos;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
 using PetSpecies.Application.Commands.DeleteBreed;

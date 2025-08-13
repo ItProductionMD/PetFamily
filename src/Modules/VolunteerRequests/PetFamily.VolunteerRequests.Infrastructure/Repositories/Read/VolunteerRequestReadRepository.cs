@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions;
-using PetFamily.SharedApplication.PagedResult;
+using PetFamily.SharedApplication.Abstractions;
+using PetFamily.SharedApplication.PaginationUtils.PagedResult;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;

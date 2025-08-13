@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using PetFamily.Application.Validations;
+using PetFamily.SharedApplication.Validations;
 using PetFamily.SharedKernel.Validations;
 using PetFamily.SharedKernel.ValueObjects;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;

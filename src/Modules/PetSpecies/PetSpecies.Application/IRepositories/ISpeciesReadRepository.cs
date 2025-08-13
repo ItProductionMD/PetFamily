@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Dtos;
+﻿using PetFamily.SharedApplication.Dtos;
 using PetFamily.SharedKernel.Results;
 using PetSpecies.Application.Queries.GetBreedPagedList;
 using PetSpecies.Application.Queries.GetSpeciesPagedList;

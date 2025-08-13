@@ -1,4 +1,4 @@
-﻿using PetFamily.Discussion.Domain.Entities;
+﻿using PetFamily.Discussions.Domain.Entities;
 using PetFamily.SharedKernel.Results;
 using Xunit;
 
@@ -11,10 +11,9 @@ public class DiscussionTests
     {
         // Arrange
         var relationId = Guid.NewGuid();
-        var participants = new[] { Guid.NewGuid(), Guid.NewGuid() };
 
         // Act
-        var result = Discussion.Create(relationId, participants);
+        var result = Discussion.Create(relationId, Guid.NewGuid(), Guid.NewGuid());
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -23,63 +22,33 @@ public class DiscussionTests
     }
 
     [Fact]
-    public void Create_ShouldFail_WhenParticipantsCountIsNotTwo()
-    {
-        // Arrange
-        var relationId = Guid.NewGuid();
-        var participants = new[] { Guid.NewGuid() };
-
-        // Act
-        var result = Discussion.Create(relationId, participants);
-
-        // Assert
-        Assert.True(result.IsFailure);
-    }
-
-    [Fact]
     public void LeaveMessage_ShouldSucceed_ForParticipant()
     {
         // Arrange
         var user1 = Guid.NewGuid();
         var user2 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, user2 }).Data!;
+        var discussion = Discussion.Create(Guid.NewGuid(), user1, user2 ).Data!;
 
         // Act
         var result = discussion.LeaveMessage(user1, "Hello there");
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Single(discussion.Message);
+        Assert.Single(discussion.Messages);
         Assert.Equal("Hello there", result.Data!.Text);
     }
 
-    [Fact]
-    public void LeaveMessage_ShouldFail_ForNonParticipant()
-    {
-        // Arrange
-        var user1 = Guid.NewGuid();
-        var user2 = Guid.NewGuid();
-        var outsider = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, user2 }).Data!;
-
-        // Act
-        var result = discussion.LeaveMessage(outsider, "I shouldn't be here");
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Empty(discussion.Message);
-    }
 
     [Fact]
     public void LeaveMessage_ShouldFail_WhenDiscussionClosed()
     {
         // Arrange
-        var user1 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, Guid.NewGuid() }).Data!;
-        discussion.Close();
+        var userId = Guid.NewGuid();
+        var discussion = Discussion.Create(Guid.NewGuid(),  userId, Guid.NewGuid() ).Data!;
+        discussion.Close(userId);
 
         // Act
-        var result = discussion.LeaveMessage(user1, "Too late");
+        var result = discussion.LeaveMessage(userId, "Too late");
 
         // Assert
         Assert.True(result.IsFailure);
@@ -90,7 +59,7 @@ public class DiscussionTests
     {
         // Arrange
         var user1 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, Guid.NewGuid() }).Data!;
+        var discussion = Discussion.Create(Guid.NewGuid(), user1, Guid.NewGuid()).Data!;
         var message = discussion.LeaveMessage(user1, "Original").Data!;
 
         // Act
@@ -98,8 +67,8 @@ public class DiscussionTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("Updated", discussion.Message.First().Text);
-        Assert.NotNull(discussion.Message.First().EditedAt);
+        Assert.Equal("Updated", discussion.Messages.First().Text);
+        Assert.NotNull(discussion.Messages.First().EditedAt);
     }
 
     [Fact]
@@ -108,7 +77,7 @@ public class DiscussionTests
         // Arrange
         var user1 = Guid.NewGuid();
         var user2 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, user2 }).Data!;
+        var discussion = Discussion.Create(Guid.NewGuid(), user1, user2).Data!;
         var message = discussion.LeaveMessage(user1, "Private note").Data!;
 
         // Act
@@ -116,7 +85,7 @@ public class DiscussionTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal("Private note", discussion.Message.First().Text);
+        Assert.Equal("Private note", discussion.Messages.First().Text);
     }
 
     [Fact]
@@ -124,7 +93,7 @@ public class DiscussionTests
     {
         // Arrange
         var user1 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, Guid.NewGuid() }).Data!;
+        var discussion = Discussion.Create(Guid.NewGuid(), user1, Guid.NewGuid()).Data!;
         var message = discussion.LeaveMessage(user1, "To be removed").Data!;
 
         // Act
@@ -132,7 +101,7 @@ public class DiscussionTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Empty(discussion.Message);
+        Assert.Empty(discussion.Messages);
     }
 
     [Fact]
@@ -141,7 +110,7 @@ public class DiscussionTests
         // Arrange
         var user1 = Guid.NewGuid();
         var user2 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, user2 }).Data!;
+        var discussion = Discussion.Create(Guid.NewGuid(), user1, user2).Data!;
         var message = discussion.LeaveMessage(user1, "Don't touch this").Data!;
 
         // Act
@@ -149,19 +118,19 @@ public class DiscussionTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Single(discussion.Message);
+        Assert.Single(discussion.Messages);
     }
 
     [Fact]
     public void Close_ShouldPreventNewMessages()
     {
         // Arrange
-        var user1 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), new[] { user1, Guid.NewGuid() }).Data!;
-        discussion.Close();
+        var userId = Guid.NewGuid();
+        var discussion = Discussion.Create(Guid.NewGuid(), userId, Guid.NewGuid()).Data!;
+        discussion.Close(userId);
 
         // Act
-        var result = discussion.LeaveMessage(user1, "After closed");
+        var result = discussion.LeaveMessage(userId, "After closed");
 
         // Assert
         Assert.True(result.IsFailure);

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.IntegrationTests.Fixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetSpecies.Domain;
 using Volunteers.Application.Commands.PetManagement.ChangeMainPetImage;
 using Volunteers.Domain;

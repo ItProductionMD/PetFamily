@@ -10,7 +10,7 @@ using PetFamily.VolunteerRequests.Infrastructure.Contexts;
 
 namespace PetFamily.VolunteerRequests.Infrastructure.Migrations
 {
-    [DbContext(typeof(VolunteerRequestDbContext))]
+    [DbContext(typeof(VolunteerRequestWriteDbContext))]
     partial class VolunteerRequestDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

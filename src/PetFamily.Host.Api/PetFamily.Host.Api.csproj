@@ -30,6 +30,7 @@
     <ProjectReference Include="..\BuildingBlocks\Auth\PetFamily.Auth.Presentation\PetFamily.Auth.Presentation.csproj" />
     <ProjectReference Include="..\BuildingBlocks\FileStorage\FileStorage.Infrastructure\FileStorage.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingBlocks\FileStorage\FileStorage.Presentation\FileStorage.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\Discussions\PetFamily.Discussion.Presentation\PetFamily.Discussions.Presentation.csproj" />
     <ProjectReference Include="..\Modules\Discussions\PetFamily.Discussions.Infrastructure\PetFamily.Discussions.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\PetSpecies\PetSpecies.Infrastructure\PetSpecies.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\PetSpecies\PetSpecies.Presentation\PetSpecies.Presentation.csproj" />

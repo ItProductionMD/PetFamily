@@ -3,7 +3,7 @@ using PetSpecies.Application.Commands.AddSpecies;
 using PetSpecies.Domain;
 using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 
-namespace PetFamily.Application.Commands.PetTypeManagement.AddPetType;
+namespace PetFamily.SharedApplication.Commands.PetTypeManagement.AddPetType;
 
 public static class AddPetTypeCommandValidator
 {

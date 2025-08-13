@@ -1,8 +1,10 @@
 using FileStorage.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using PetFamily.Auth.Application.DefaultSeeder;
 using PetFamily.Auth.Infrastructure.AuthInjector;
 using PetFamily.Discussions.Infrastructure;
 using PetFamily.Framework.Middlewares;
+using PetFamily.Framework.SharedAuthorization;
 using PetFamily.Host.Api.Configurations;
 using PetFamily.SharedInfrastructure;
 using PetFamily.VolunteerRequests.Infrastructure;
@@ -25,18 +27,22 @@ builder
     .ConfigureKestrel()
     .ConfigureSwagger();
 
-builder.Services.AddEndpointsApiExplorer();
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddHttpContextAccessor();
 
 builder.Services
     .InjectSharedInfrastructure(builder.Configuration)
     .InjectFileStorage(builder.Configuration)
-    .InjectAuth(builder.Configuration);
+    .InjectAuth(builder.Configuration)
+    .InjectPermissionPoliciesAuthorization();
 
 builder.Services
     .InjectVolunteerModule(builder.Configuration)
     .InjectSpeciesModule(builder.Configuration)
-    .InjectVolunteerRequestModule(builder.Configuration)
-    .InjectDiscussionModule(builder.Configuration);
+    .InjectDiscussionModule(builder.Configuration)
+    .InjectVolunteerRequestModule(builder.Configuration);
+
 
 builder.Services
     .AddSwaggerGen()

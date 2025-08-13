@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using Volunteers.Public.IContracts;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 

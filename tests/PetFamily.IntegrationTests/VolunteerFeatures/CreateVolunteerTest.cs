@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
+using PetFamily.IntegrationTests.Fixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedApplication.IUserContext;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 

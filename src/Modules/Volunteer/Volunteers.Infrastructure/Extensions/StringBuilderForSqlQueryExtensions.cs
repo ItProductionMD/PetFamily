@@ -35,7 +35,7 @@ public static class StringBuilderForSqlQueryExtensions
     {
         if (filter.VolunteerId.HasValue)
         {
-            sqlBuilder.AppendLine($" AND p.{PetsTable.VolunteerId} = @VolunteerId");
+            sqlBuilder.AppendLine($" AND p.{PetsTable.VolunteerId} = @VolunteerId ");
 
             if (parameters.ParameterNames.Contains("VolunteerId") == false)
                 parameters.Add("VolunteerId", filter.VolunteerId.Value);
@@ -55,7 +55,7 @@ public static class StringBuilderForSqlQueryExtensions
 
         if (!string.IsNullOrWhiteSpace(filter.PetName))
         {
-            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.Name}) LIKE LOWER(@PetName)");
+            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.Name}) LIKE LOWER(@PetName) ");
 
             if (parameters.ParameterNames.Contains("PetName") == false)
                 parameters.Add("PetName", $"%{filter.PetName}%");
@@ -63,7 +63,7 @@ public static class StringBuilderForSqlQueryExtensions
 
         if (!string.IsNullOrWhiteSpace(filter.Color))
         {
-            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.Color}) LIKE LOWER(@Color)");
+            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.Color}) LIKE LOWER(@Color) ");
 
             if (parameters.ParameterNames.Contains("Color") == false)
                 parameters.Add("Color", $"%{filter.Color}%");
@@ -71,7 +71,7 @@ public static class StringBuilderForSqlQueryExtensions
 
         if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.AddressCity}) LIKE LOWER(@City)");
+            sqlBuilder.AppendLine($" AND LOWER(p.{PetsTable.AddressCity}) LIKE LOWER(@City) ");
             parameters.Add("City", $"%{filter.City}%");
         }
 
@@ -82,15 +82,23 @@ public static class StringBuilderForSqlQueryExtensions
             string or = string.Empty;
             if (filter.SpeciesIds != null && filter.SpeciesIds.Any())
             {
-                sqlBuilder.AppendLine($"p.{PetsTable.PetTypeSpeciesId} = ANY(@SpeciesIds)");
-                parameters.Add($"SpeciesIds", filter.SpeciesIds);
+                var speciesIds = filter.SpeciesIds
+                    .Select(x => x)
+                    .ToArray();
+
+                sqlBuilder.AppendLine($" p.{PetsTable.PetTypeSpeciesId} = ANY(@SpeciesIds) ");
+                parameters.Add($"SpeciesIds", speciesIds);
                 or = " OR ";
             }
 
             if (filter.BreedIds != null && filter.BreedIds.Any())
             {
-                sqlBuilder.AppendLine($" {or} p.{PetsTable.PetTypeBreedId} = ANY(@BreedIds)");
-                parameters.Add($"BreedIds", filter.BreedIds);
+                var breedIds = filter.BreedIds
+                    .Select(b => b)
+                    .ToArray();
+
+                sqlBuilder.AppendLine($" {or} p.{PetsTable.PetTypeBreedId} = ANY(@BreedIds) ");
+                parameters.Add($"BreedIds", breedIds);
             }
             sqlBuilder.AppendLine(" )");
         }

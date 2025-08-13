@@ -14,12 +14,12 @@ using PetFamily.VolunteerRequests.Domain.Enums;
 using Volunteers.Public.Dto;
 using Volunteers.Public.IContracts;
 
-namespace PetFamily.Application.Tests.VolunteerRequestTests;
+namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 
 public class ApproveVolunteerRequestHandlerTests
 {
     private readonly Mock<IVolunteerRequestWriteRepository> _requestRepo = new();
-    private readonly Mock<IUserContext> _userContext = new();
+    private readonly Mock<IUserContext.IUserContext> _userContext = new();
     private readonly Mock<IUserContract> _userFinder = new();
     private readonly Mock<IVolunteerCreator> _volunteerCreator = new();
     private readonly Mock<ILogger<ApproveVolunteerRequestHandler>> _logger = new();

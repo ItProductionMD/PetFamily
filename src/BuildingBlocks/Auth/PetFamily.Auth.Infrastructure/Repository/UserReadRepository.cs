@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities.UserAggregate;

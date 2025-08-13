@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Abstractions.CQRS;
+﻿using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Results;
 using Volunteers.Application.IRepositories;
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Application.Abstractions.CQRS;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.SharedKernel.Results;

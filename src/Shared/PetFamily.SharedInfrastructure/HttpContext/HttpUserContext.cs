@@ -7,11 +7,11 @@ using System.Security.Claims;
 
 namespace PetFamily.SharedInfrastructure.HttpContext;
 
-public class HttpUserContext : IUserContext
+public class HTTPUserContext : IUserContext
 {
     private readonly IHttpContextAccessor _accessor;
 
-    public HttpUserContext(IHttpContextAccessor accessor) => _accessor = accessor;
+    public HTTPUserContext(IHttpContextAccessor accessor) => _accessor = accessor;
 
     public Result<Guid> TryGetUserId()
     {

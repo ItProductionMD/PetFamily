@@ -1,14 +1,15 @@
-﻿using PetFamily.IntegrationTests.Seeds;
+﻿using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using Volunteers.Application.Queries.GetPets;
 using Volunteers.Application.Queries.GetPets.ForFilter;
 using Volunteers.Domain.Enums;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
-public class GetPetsQueryTest(
-    TestWebApplicationFactory factory
-    ) : QueryHandlerTest<GetPetsResponse, GetPetsQuery>(factory)
+public class GetPetsQueryTest(TestWebApplicationFactory factory) 
+    : QueryHandlerTest<GetPetsResponse, GetPetsQuery>(factory)
 {
     [Fact]
     public async Task Should_GetPets_Successfully()

@@ -1,5 +1,4 @@
-﻿namespace PetFamily.Application.Abstractions.CQRS;
-
+﻿namespace PetFamily.SharedApplication.Abstractions.CQRS;
 
 public interface ICommand;
 

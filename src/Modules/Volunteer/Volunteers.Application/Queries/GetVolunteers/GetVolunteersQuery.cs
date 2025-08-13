@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Abstractions.CQRS;
+﻿using PetFamily.SharedApplication.Abstractions.CQRS;
 
 namespace Volunteers.Application.Queries.GetVolunteers;
 

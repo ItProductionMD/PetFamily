@@ -4,7 +4,7 @@ using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Validations;
 
-namespace PetFamily.Application.Validations;
+namespace PetFamily.SharedApplication.Validations;
 
 public static class ValidationExtensions
 {

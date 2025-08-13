@@ -55,7 +55,7 @@ public class RejectedStatusProcessor(
     public async Task TryRestoreRequest(CancellationToken stoppingToken)
     {
         using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<VolunteerRequestDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<VolunteerRequestWriteDbContext>();
 
         var threshold = DateTime.UtcNow - RejectedTimeout;
 
