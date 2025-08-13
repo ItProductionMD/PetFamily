@@ -23,7 +23,7 @@ public class MinioFileRepository(
     IOptions<MinioOptions> minioOptions,
     IMinioClient client,
     IAmazonS3 amazonClient,
-    ILogger<MinioFileRepository> logger) : IFileRepository 
+    ILogger<MinioFileRepository> logger) : IFileRepository
 {
     private readonly IMinioClient _client = client;
     private readonly IAmazonS3 _amazonClient = amazonClient;
@@ -277,7 +277,7 @@ public class MinioFileRepository(
         foreach (var obj in response.Versions)
         {
             Console.WriteLine($"File is DeletedMarker {obj.IsDeleteMarker}, versionId:{obj.VersionId}");
-            if (obj.IsDeleteMarker!= null && obj.IsDeleteMarker.Value == true)
+            if (obj.IsDeleteMarker != null && obj.IsDeleteMarker.Value == true)
             {
                 var deleteMarkerArgs = new RemoveObjectArgs()
                     .WithBucket(file.Folder)

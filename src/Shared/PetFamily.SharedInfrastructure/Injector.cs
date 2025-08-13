@@ -4,10 +4,8 @@ using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedApplication.Extensions;
 using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedInfrastructure.HttpContext;
-using PetFamily.SharedInfrastructure.Shared;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
-using PetFamily.SharedApplication.IUnitOfWork;
 
 namespace PetFamily.SharedInfrastructure;
 

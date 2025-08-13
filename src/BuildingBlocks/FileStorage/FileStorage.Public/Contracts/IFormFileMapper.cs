@@ -1,3 +1,1 @@
-﻿using FileStorage.Public.Dtos;
-
-namespace FileStorage.Public.Contracts;
+﻿namespace FileStorage.Public.Contracts;

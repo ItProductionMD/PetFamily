@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace PetFamily.Discussions.Application.Dtos;
+﻿namespace PetFamily.Discussions.Application.Dtos;
 
 public class DiscussionDto
 {

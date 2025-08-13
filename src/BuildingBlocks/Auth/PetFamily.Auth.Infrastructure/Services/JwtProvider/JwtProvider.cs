@@ -27,7 +27,7 @@ public class JwtProvider : IJwtProvider
     public Result<string> GetJtiClaim(string accessToken)
     {
         var claimsResult = ValidateToken(accessToken, false);
-        if(claimsResult.IsFailure)
+        if (claimsResult.IsFailure)
             return Result.Fail(claimsResult.Error);
 
         var claims = claimsResult.Data;
@@ -38,7 +38,7 @@ public class JwtProvider : IJwtProvider
         return Result.Fail(Error.Authentication("Access token jti Error"));
     }
 
-    public (string AccessToken, DateTime ExpiresAt,Guid Jti) GenerateAccessTokenForPermissionRequirement(
+    public (string AccessToken, DateTime ExpiresAt, Guid Jti) GenerateAccessTokenForPermissionRequirement(
        UserId userId,
        string login,
        string email,
@@ -61,7 +61,7 @@ public class JwtProvider : IJwtProvider
         }
         if (!string.IsNullOrWhiteSpace(email))
         {
-            claims.Add(new Claim(ClaimTypes.Email, email ));
+            claims.Add(new Claim(ClaimTypes.Email, email));
         }
         claims.AddRange(permissionCodes.Select(permissionCode =>
             new Claim(PermissionRequirement.PERMISSION_CLAIM_TYPE, permissionCode)));
@@ -79,7 +79,7 @@ public class JwtProvider : IJwtProvider
         var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
-        var refreshToken =  Convert.ToBase64String(randomNumber);
+        var refreshToken = Convert.ToBase64String(randomNumber);
         var expires = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenLifetimeDays);
         return (refreshToken, expires);
     }
@@ -106,12 +106,12 @@ public class JwtProvider : IJwtProvider
     }
 
     public (string Token, DateTime ExpiresAt) GenerateJwtToken(
-        IEnumerable<Claim> claims, 
+        IEnumerable<Claim> claims,
         DateTime issuedAt,
         DateTime expiresAt)
     {
         var credentials = new SigningCredentials(
-            new SymmetricSecurityKey(_secret), 
+            new SymmetricSecurityKey(_secret),
             SecurityAlgorithms.HmacSha256);
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -148,7 +148,7 @@ public class JwtProvider : IJwtProvider
                 ClockSkew = TimeSpan.Zero
             }, out var validatedToken);
 
-            if (validatedToken is not JwtSecurityToken jwt 
+            if (validatedToken is not JwtSecurityToken jwt
                 || !jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
                 return Result.Fail(Error.InvalidFormat("Invalid token"));

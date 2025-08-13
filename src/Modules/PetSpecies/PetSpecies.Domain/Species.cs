@@ -16,7 +16,7 @@ public class Species : IEntity<Guid>
     private List<Breed> _breeds = [];
     public IReadOnlyList<Breed> Breeds => _breeds;
 
-    private Species()  { }//Ef core needs this
+    private Species() { }//Ef core needs this
 
     private Species(Guid id, string name)
     {

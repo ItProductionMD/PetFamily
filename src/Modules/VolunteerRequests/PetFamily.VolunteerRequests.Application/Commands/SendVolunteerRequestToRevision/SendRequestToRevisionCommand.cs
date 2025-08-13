@@ -2,5 +2,8 @@
 
 namespace PetFamily.VolunteerRequests.Application.Commands.SendVolunteerRequestToRevision;
 
-public record SendRequestToRevisionCommand(Guid AdminId, Guid VolunteerRequestId, string Comment) : ICommand;
+public record SendRequestToRevisionCommand(
+    Guid AdminId,
+    Guid VolunteerRequestId,
+    string Comment) : ICommand;
 

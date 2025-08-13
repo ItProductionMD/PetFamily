@@ -1,10 +1,8 @@
-﻿using PetFamily.Auth.Application.IRepositories;
+﻿using Microsoft.Extensions.Logging;
+using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities;
 using PetFamily.Auth.Infrastructure.Contexts;
 using PetFamily.SharedKernel.Results;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using PetFamily.Auth.Application.Dtos;
 
 namespace PetFamily.Auth.Infrastructure.Repository;
 

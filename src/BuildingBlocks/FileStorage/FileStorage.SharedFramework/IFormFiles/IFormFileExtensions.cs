@@ -64,7 +64,7 @@ public static class IFormFileExtensions
         return fileDtos;
     }
 
-    
+
 
     public static UploadFileDto ToUploadFileDto(this IFormFile file, string path, Stream? stream)
     {

@@ -17,9 +17,9 @@ public static class PetFamilyAuthApplicationInjector
         IConfiguration configuration)
     {
         configuration.CheckSectionsExistence([
-            AdminIdentity.SECTION_NAME, 
+            AdminIdentity.SECTION_NAME,
             RefreshTokenCookie.SECTION_NAME]);
-        
+
         services.Configure<AdminIdentity>(configuration.GetSection(AdminIdentity.SECTION_NAME));
 
         services.Configure<RefreshTokenCookie>(configuration.GetSection(RefreshTokenCookie.SECTION_NAME));
@@ -35,6 +35,6 @@ public static class PetFamilyAuthApplicationInjector
         return services;
     }
 
-   
+
 }
 internal class ClassForAssemblyReference { }

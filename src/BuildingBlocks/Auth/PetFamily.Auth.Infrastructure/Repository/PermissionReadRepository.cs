@@ -1,7 +1,7 @@
 ﻿using Dapper;
-using PetFamily.SharedApplication.Abstractions;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
@@ -22,7 +22,7 @@ public class PermissionReadRepository(
                 p.{PermissionsTable.Code} AS PermissionCode,
                 p.{PermissionsTable.IsEnabled} As IsEnable
             FROM {PermissionsTable.TableFullName} p
-            ORDER BY p.{PermissionsTable.Code}" ;
+            ORDER BY p.{PermissionsTable.Code}";
 
         var permissions = await connection.QueryAsync<PermissionDto>(sql);
 
@@ -34,7 +34,7 @@ public class PermissionReadRepository(
         var ids = permissionsIds.ToList();
 
         if (ids.Count == 0)
-            return UnitResult.Ok(); 
+            return UnitResult.Ok();
 
         await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 

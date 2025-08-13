@@ -2,4 +2,4 @@
 
 namespace PetFamily.Auth.Application.IRepositories;
 
-public interface IAuthUnitOfWork : IUnitOfWork{}
+public interface IAuthUnitOfWork : IUnitOfWork { }

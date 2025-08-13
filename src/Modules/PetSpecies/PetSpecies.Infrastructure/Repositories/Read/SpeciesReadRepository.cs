@@ -12,7 +12,6 @@ using PetSpecies.Application.Queries.GetBreedPagedList;
 using PetSpecies.Application.Queries.GetSpeciesPagedList;
 using PetSpecies.Domain;
 using PetSpecies.Public.Dtos;
-using PetSpecies.Public.IContracts;
 
 namespace PetSpecies.Infrastructure.Repositories.Read;
 
@@ -21,9 +20,7 @@ public class SpeciesReadRepository(
     IOptions<DapperOptions> options,
     ILogger<SpeciesReadRepository> logger) : ISpeciesReadRepository
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
     private readonly DapperOptions _options = options.Value;
-    private readonly ILogger<SpeciesReadRepository> _logger = logger;
 
     private readonly Dictionary<SpeciesSortProperty, string> SpeciesSortDict =
         new() { [SpeciesSortProperty.name] = SpeciesTable.Name };
@@ -35,14 +32,14 @@ public class SpeciesReadRepository(
         Guid speciesId,
         CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+        using var dbConnection = dbConnectionFactory.CreateConnection();
         var sql = $@"
             SELECT 1 
             FROM {PetsTable.TableFullName} 
             WHERE {PetsTable.PetTypeSpeciesId} = @SpeciesId
             LIMIT 1";
 
-        _logger.LogInformation("EXECUTE(CheckForDeletingAsync) for species,check if exists at least" +
+        logger.LogInformation("EXECUTE(CheckForDeletingAsync) for species,check if exists at least" +
             " one pet with species Id:{speciesId}. SQL: {sql}",
             speciesId, sql);
 
@@ -53,14 +50,14 @@ public class SpeciesReadRepository(
 
         if (hasPet.HasValue)
         {
-            _logger.LogWarning("Deletion of species with id:{Id} prevented - species is in use by pets.",
+            logger.LogWarning("Deletion of species with id:{Id} prevented - species is in use by pets.",
                 speciesId);
 
             return UnitResult.Fail(Error.Conflict($"Cannot delete species with Id:{speciesId}, " +
                 $"because it is used by one or more pets."));
         }
 
-        _logger.LogInformation("Species with id:{Id} can be deleted.", speciesId);
+        logger.LogInformation("Species with id:{Id} can be deleted.", speciesId);
         return UnitResult.Ok();
     }
 
@@ -69,7 +66,7 @@ public class SpeciesReadRepository(
         Guid breedId,
         CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+        using var dbConnection = dbConnectionFactory.CreateConnection();
 
         var sql = $@"
             SELECT 1 
@@ -78,7 +75,7 @@ public class SpeciesReadRepository(
             AND {BreedsTable.Id} = @BreedId
             LIMIT 1";
 
-        _logger.LogInformation("EXECUTE(CheckIfPetTypeExists) for speciesId:{speciesId} and breedId:{breedId}. SQL: {sql}",
+        logger.LogInformation("EXECUTE(CheckIfPetTypeExists) for speciesId:{speciesId} and breedId:{breedId}. SQL: {sql}",
             speciesId, breedId, sql);
 
         var hasPetType = await dbConnection.QueryFirstOrDefaultAsync<int?>(
@@ -88,13 +85,13 @@ public class SpeciesReadRepository(
 
         if (hasPetType == null)
         {
-            _logger.LogWarning("Pet type with speciesId:{speciesId} and breedId:{breedId} not exists!",
+            logger.LogWarning("Pet type with speciesId:{speciesId} and breedId:{breedId} not exists!",
                 speciesId, breedId);
 
             return UnitResult.Fail(Error.NotFound($"Pet type with speciesId:{speciesId}" +
                 $" and breedId:{breedId}"));
         }
-        _logger.LogInformation("Pet type with speciesId:{speciesId} and breedId:{breedId} exists!",
+        logger.LogInformation("Pet type with speciesId:{speciesId} and breedId:{breedId} exists!",
             speciesId, breedId);
 
         return UnitResult.Ok();
@@ -104,7 +101,7 @@ public class SpeciesReadRepository(
         Guid breedId,
         CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+        using var dbConnection = dbConnectionFactory.CreateConnection();
 
         var sql = $@"
             SELECT 1 
@@ -112,7 +109,7 @@ public class SpeciesReadRepository(
             WHERE {PetsTable.PetTypeBreedId} = @BreedId
             LIMIT 1";
 
-        _logger.LogInformation("EXECUTE(CheckForDeleteBreedAsync),check if exists at least" +
+        logger.LogInformation("EXECUTE(CheckForDeleteBreedAsync),check if exists at least" +
             " one pet with breedId:{Id}. SQL: {sql}", breedId, sql);
 
         var hasPet = await dbConnection.QueryFirstOrDefaultAsync<int?>(
@@ -122,14 +119,14 @@ public class SpeciesReadRepository(
 
         if (hasPet.HasValue)
         {
-            _logger.LogWarning("Deletion of breed with id:{Id} prevented - breed is in use by pets.",
+            logger.LogWarning("Deletion of breed with id:{Id} prevented - breed is in use by pets.",
                 breedId);
 
             return UnitResult.Fail(Error.InternalServerError($"Cannot delete breed with Id:{breedId}, " +
                 $"because it is used by one or more pets."));
         }
 
-        _logger.LogInformation("Breed with id:{Id} can be deleted.", breedId);
+        logger.LogInformation("Breed with id:{Id} can be deleted.", breedId);
 
         return UnitResult.Ok();
     }
@@ -138,7 +135,7 @@ public class SpeciesReadRepository(
         Guid breedId,
         CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+        using var dbConnection = dbConnectionFactory.CreateConnection();
 
         var sql = $@"
                 SELECT b.{BreedsTable.Id} AS Id,
@@ -148,7 +145,7 @@ public class SpeciesReadRepository(
                 WHERE b.Id = @BreedId
                 LIMIT 1";
 
-        _logger.LogInformation("EXECUTING DAPPER 'GetBreedById' with breedId:{Id} SQL:{sql}",
+        logger.LogInformation("EXECUTING DAPPER 'GetBreedById' with breedId:{Id} SQL:{sql}",
             breedId, sql);
 
         var breed = await dbConnection.QuerySingleOrDefaultAsync<Breed>(
@@ -158,10 +155,10 @@ public class SpeciesReadRepository(
 
         if (breed == null)
         {
-            _logger.LogWarning("Breed with id:{Id} not found!", breedId);
+            logger.LogWarning("Breed with id:{Id} not found!", breedId);
             return UnitResult.Fail(Error.NotFound($"Breed with id:{breedId} "));
         }
-        _logger.LogInformation("Get breed with id:{Id} succesfull!", breedId);
+        logger.LogInformation("Get breed with id:{Id} succesfull!", breedId);
 
         return Result.Ok(breed);
     }
@@ -170,7 +167,7 @@ public class SpeciesReadRepository(
         Guid speciesId,
         CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+        using var dbConnection = dbConnectionFactory.CreateConnection();
 
         var sql = $@"
             SELECT s.{SpeciesTable.Id} AS Id
@@ -192,16 +189,16 @@ public class SpeciesReadRepository(
             ORDER BY s.{SpeciesTable.Name}
             LIMIT 1";
 
-        _logger.LogInformation("EXECUTING DAPPER GetSpeciesByIdAsync speciesId:{Id} with SQL:{sql} with sp ",
+        logger.LogInformation("EXECUTING DAPPER GetSpeciesByIdAsync speciesId:{Id} with SQL:{sql} with sp ",
             speciesId, sql);
 
         var species = await dbConnection.QuerySingleAsync<Species>(sql, new { SpeciesId = speciesId });
         if (species == null)
         {
-            _logger.LogWarning("Species with id:{Id} not found!", speciesId);
+            logger.LogWarning("Species with id:{Id} not found!", speciesId);
             return UnitResult.Fail(Error.NotFound($"Species with id:{speciesId}"));
         }
-        _logger.LogInformation("Get species with id{Id} ok!", speciesId);
+        logger.LogInformation("Get species with id{Id} ok!", speciesId);
 
         return Result.Ok(species);
     }
@@ -252,11 +249,11 @@ public class SpeciesReadRepository(
             SELECT COUNT(*)
             FROM {SpeciesTable.TableFullName}";
 
-        _logger.LogInformation("EXECUTING GET_SPECIES_PAGED_LIST with sql:{sql}", sql);
-        _logger.LogInformation("EXECUTING GET_SPECIES_PAGED_LIST with count sql:{sql}", countSql);
+        logger.LogInformation("EXECUTING GET_SPECIES_PAGED_LIST with sql:{sql}", sql);
+        logger.LogInformation("EXECUTING GET_SPECIES_PAGED_LIST with count sql:{sql}", countSql);
 
-        await using var conn1 = await _dbConnectionFactory.CreateOpenConnectionAsync();
-        await using var conn2 = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var conn1 = await dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var conn2 = await dbConnectionFactory.CreateOpenConnectionAsync();
 
         var speciesTask = conn1.QueryAsync<SpeciesDto>(sql);
         var countTask = conn2.ExecuteScalarAsync<int>(countSql);

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Auth.Domain;
 using PetFamily.Auth.Domain.Entities.RoleAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
@@ -33,9 +32,9 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .HasForeignKey(rp => rp.RoleId)
             .OnDelete(DeleteBehavior.Cascade);
 
-       // builder.Metadata
-       //    .FindNavigation(nameof(Role.RolePermissions))!
-       //    .SetPropertyAccessMode(PropertyAccessMode.Field);
+        // builder.Metadata
+        //    .FindNavigation(nameof(Role.RolePermissions))!
+        //    .SetPropertyAccessMode(PropertyAccessMode.Field);
 
         builder.Navigation(r => r.RolePermissions)
             .UsePropertyAccessMode(PropertyAccessMode.Field);

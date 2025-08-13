@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moq;
 using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedApplication.Exceptions;
-using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.VolunteerRequests.Application.Commands.SubmitVolunteerRequest;

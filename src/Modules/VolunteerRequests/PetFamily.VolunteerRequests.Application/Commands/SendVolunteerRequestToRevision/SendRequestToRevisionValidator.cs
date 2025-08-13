@@ -1,13 +1,13 @@
-﻿using PetFamily.SharedKernel.Results;
-using static PetFamily.SharedKernel.Validations.ValidationExtensions;
+﻿using PetFamily.SharedApplication.Exceptions;
+using PetFamily.SharedKernel.Results;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
-using PetFamily.SharedApplication.Exceptions;
+using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 
 namespace PetFamily.VolunteerRequests.Application.Commands.SendVolunteerRequestToRevision;
 
 public static class SendRequestToRevisionValidator
 {
-    public static void Validate(SendRequestToRevisionCommand cmd)
+    public static void Validate(this SendRequestToRevisionCommand cmd)
     {
         var result = UnitResult.FromValidationResults(
             () => ValidateIfGuidIsNotEpmty(cmd.VolunteerRequestId, "VolunteerRequestId"),

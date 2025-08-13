@@ -1,8 +1,4 @@
-﻿using PetFamily.SharedApplication.PaginationUtils.PagedResult;
-using PetFamily.SharedKernel.Errors;
-using PetFamily.SharedKernel.Results;
-using PetFamily.SharedApplication.Exceptions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using PetFamily.SharedApplication.Exceptions;
 using Error = PetFamily.SharedKernel.Errors.Error;
 
 namespace PetFamily.SharedApplication.PaginationUtils;

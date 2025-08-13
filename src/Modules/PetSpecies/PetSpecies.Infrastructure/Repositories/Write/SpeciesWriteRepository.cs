@@ -12,48 +12,46 @@ public class SpeciesWriteRepository(
     SpeciesWriteDbContext context,
     ILogger<SpeciesWriteRepository> logger) : ISpeciesWriteRepository
 {
-    private readonly SpeciesWriteDbContext _context = context;
-    private readonly ILogger<SpeciesWriteRepository> _logger = logger;
     public async Task<Guid> AddAndSaveAsync(Species species, CancellationToken token)
     {
-        await _context.AnimalTypes.AddAsync(species, token);
-        await _context.SaveChangesAsync(token);
+        await context.AnimalTypes.AddAsync(species, token);
+        await context.SaveChangesAsync(token);
         return species.Id;
     }
 
     public async Task<UnitResult> DeleteAndSaveAsync(Guid speciesId, CancellationToken cancelToken)
     {
-        var species = await _context
+        var species = await context
             .AnimalTypes.FirstOrDefaultAsync(s => s.Id == speciesId, cancelToken);
         if (species == null)
         {
-            _logger.LogWarning("Attempted to delete non-existent species with id:{Id}", speciesId);
+            logger.LogWarning("Attempted to delete non-existent species with id:{Id}", speciesId);
             return UnitResult.Fail(Error.NotFound($"Species with Id: {speciesId} not found"));
         }
-        _context.AnimalTypes.Remove(species);
+        context.AnimalTypes.Remove(species);
 
-        await _context.SaveChangesAsync(cancelToken);
+        await context.SaveChangesAsync(cancelToken);
 
-        _logger.LogInformation("Successfully deleted species with id: {SpeciesId}", speciesId);
+        logger.LogInformation("Successfully deleted species with id: {SpeciesId}", speciesId);
 
         return UnitResult.Ok();
     }
 
     public async Task<Result<Breed>> GetBreedByIdAsync(Guid breedId, CancellationToken cancelToken)
     {
-        var species = await _context.AnimalTypes
+        var species = await context.AnimalTypes
             .Include(s => s.Breeds)
             .FirstOrDefaultAsync(s => s.Breeds.Any(b => b.Id == breedId), cancelToken);
         if (species == null)
         {
-            _logger.LogWarning("Attempted to get non-existent breed with id: {BreedId}", breedId);
+            logger.LogWarning("Attempted to get non-existent breed with id: {BreedId}", breedId);
 
             return UnitResult.Fail(Error.NotFound($"Breed with Id: {breedId} not found"));
         }
 
         var breed = species.Breeds.First(b => b.Id == breedId);
 
-        _logger.LogInformation("Successfully retrieved breed with id: {BreedId}", breedId);
+        logger.LogInformation("Successfully retrieved breed with id: {BreedId}", breedId);
         return Result.Ok(breed);
     }
 
@@ -64,32 +62,32 @@ public class SpeciesWriteRepository(
 
     public async Task<Result<Species>> GetByBreedIdAsync(Guid breedId, CancellationToken cancelToken)
     {
-        var species = await _context.AnimalTypes
+        var species = await context.AnimalTypes
             .Include(s => s.Breeds)
             .FirstOrDefaultAsync(s => s.Breeds.Any(b => b.Id == breedId), cancelToken);
         if (species == null)
         {
-            _logger.LogWarning("Attempted to get species by non-existent breed with id: {BreedId}",
+            logger.LogWarning("Attempted to get species by non-existent breed with id: {BreedId}",
                 breedId);
 
             return UnitResult.Fail(Error.NotFound($"Breed with Id: {breedId} not found"));
         }
-        _logger.LogInformation("Successfully retrieved species by breed id:{BreedId}", breedId);
+        logger.LogInformation("Successfully retrieved species by breed id:{BreedId}", breedId);
 
         return Result.Ok(species);
     }
 
     public async Task<Result<Species>> GetByIdAsync(Guid speciesId, CancellationToken cancelToken)
     {
-        var species = await _context.AnimalTypes
+        var species = await context.AnimalTypes
              .Include(s => s.Breeds)
              .FirstOrDefaultAsync(s => s.Id == speciesId, cancelToken);
         if (species == null)
         {
-            _logger.LogWarning("Attempted to get non-existent species with id:{Id}", speciesId);
+            logger.LogWarning("Attempted to get non-existent species with id:{Id}", speciesId);
             return UnitResult.Fail(Error.NotFound($"Species with Id: {speciesId} not found"));
         }
-        _logger.LogInformation("Successfully retrieved species with id: {SpeciesId}", speciesId);
+        logger.LogInformation("Successfully retrieved species with id: {SpeciesId}", speciesId);
         return UnitResult.Ok(species);
     }
 
@@ -100,7 +98,7 @@ public class SpeciesWriteRepository(
 
     public Task SaveAsync(Species species, CancellationToken token)
     {
-        var entries = _context.Entry(species);
-        return _context.SaveChangesAsync(token);
+        var entries = context.Entry(species);
+        return context.SaveChangesAsync(token);
     }
 }

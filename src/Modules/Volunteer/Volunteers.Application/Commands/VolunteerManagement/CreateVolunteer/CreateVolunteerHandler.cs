@@ -1,13 +1,8 @@
-﻿using FluentValidation;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.SharedApplication.Validations;
-using PetFamily.SharedApplication.IUserContext;
-using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;
-using System.Net.WebSockets;
 using Volunteers.Application.IRepositories;
 using Volunteers.Domain;
 using Volunteers.Domain.ValueObjects;
@@ -17,23 +12,21 @@ using Volunteers.Domain.ValueObjects;
 namespace Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 
 public class CreateVolunteerHandler(
-    IVolunteerWriteRepository volunteerWriteRepository,
+    IVolunteerWriteRepository volunteerWriteRepo,
     ILogger<CreateVolunteerHandler> logger) : ICommandHandler<Guid, CreateVolunteerCommand>
 {
-    private readonly IVolunteerWriteRepository _volunteerWriteRepository = volunteerWriteRepository;
-    private readonly ILogger<CreateVolunteerHandler> _logger = logger;
 
     public async Task<Result<Guid>> Handle(CreateVolunteerCommand cmd, CancellationToken ct)
     {
-        CreateVolunteerValidator.Validate(cmd);
+        cmd.Validate();
 
         var volunteer = CreateVolunteerProcess(cmd);
 
-        var addResult = await _volunteerWriteRepository.AddAndSaveAsync(volunteer, ct);
+        var addResult = await volunteerWriteRepo.AddAndSaveAsync(volunteer, ct);
         if (addResult.IsFailure)
             return addResult;
 
-        _logger.LogInformation("Volunteer with id:{Id},created successful by admin with id:{adminId}!",
+        logger.LogInformation("Volunteer with id:{Id},created successful by admin with id:{adminId}!",
             volunteer.Id, cmd.AdminId);
 
         return Result.Ok(volunteer.Id);

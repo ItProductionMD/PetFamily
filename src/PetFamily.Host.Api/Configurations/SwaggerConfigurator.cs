@@ -21,7 +21,7 @@ public static class SwaggerConfigurator
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme 
+                    new OpenApiSecurityScheme
                     {
                         Reference = new OpenApiReference
                         {

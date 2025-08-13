@@ -1,9 +1,9 @@
-﻿ using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
+﻿using Microsoft.Extensions.Logging;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
 using PetFamily.Auth.Domain.Entities;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 
@@ -30,7 +30,7 @@ public class LoginByEmailCommandHandler(
     public async Task<Result<TokenResult>> Handle(LoginByEmailCommand cmd, CancellationToken ct)
     {
         LoginByEmailCommandValidator.Validate(cmd);
-        
+
         var user = await _userWriteRepository.GetByEmailAsync(cmd.Email, ct);
         if (user == null)
         {

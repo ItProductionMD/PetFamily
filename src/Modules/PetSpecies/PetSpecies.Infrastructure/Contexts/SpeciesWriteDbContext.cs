@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.SharedInfrastructure.Constants;
 using PetFamily.SharedInfrastructure.Shared.Logger;
 using PetSpecies.Domain;
-using PetFamily.SharedInfrastructure.Constants;
 
 namespace PetSpecies.Infrastructure.Contexts;
 

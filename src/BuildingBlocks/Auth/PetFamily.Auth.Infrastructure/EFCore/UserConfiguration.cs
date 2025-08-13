@@ -47,7 +47,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
             phone.Property(p => p.Number)
                 .HasMaxLength(MAX_LENGTH_SHORT_TEXT)
-                .HasColumnName("phone_number");          
+                .HasColumnName("phone_number");
         });
 
         builder.Property(u => u.HashedPassword)
@@ -75,7 +75,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.IsDeleted)
             .HasColumnName("is_deleted");
-        
+
         builder.Property(u => u.DeletedAt)
             .HasColumnName("deleted_at")
             .IsRequired(false);

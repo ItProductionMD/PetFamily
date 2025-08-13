@@ -1,8 +1,6 @@
-﻿using Org.BouncyCastle.Bcpg;
-using PetFamily.Auth.Domain.ValueObjects;
+﻿using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.SharedKernel.Abstractions;
 using PetFamily.SharedKernel.Results;
-using PetFamily.SharedKernel.ValueObjects;
 
 
 namespace PetFamily.Auth.Domain.Entities;
@@ -21,11 +19,11 @@ public class Permission : IEntity<PermissionId>
         Code = code;
     }
 
-    public static Result<Permission> Create(string code) 
+    public static Result<Permission> Create(string code)
     {
         //Validate name and displayName
 
-        var permission = new Permission (PermissionId.New(), code);
+        var permission = new Permission(PermissionId.New(), code);
 
         return Result.Ok(permission);
     }

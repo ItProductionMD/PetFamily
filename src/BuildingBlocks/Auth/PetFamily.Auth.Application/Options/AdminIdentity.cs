@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-namespace PetFamily.Auth.Application.AdminOptions;
+﻿namespace PetFamily.Auth.Application.AdminOptions;
 
 public class AdminIdentity
 {

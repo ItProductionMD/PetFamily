@@ -10,8 +10,8 @@ namespace PetFamily.Auth.Infrastructure.BackgroundServices;
 public class AuthSoftDeletableCleanupService : SoftDeletableCleanerService
 {
     public AuthSoftDeletableCleanupService(
-        IServiceScopeFactory serviceScopeFactory, 
-        ILogger<SoftDeletableCleanerService> logger, 
+        IServiceScopeFactory serviceScopeFactory,
+        ILogger<SoftDeletableCleanerService> logger,
         IConfiguration configuration) : base(serviceScopeFactory, logger, configuration)
     {
         ServiceName = "AuthDeletableCleanupService";
@@ -24,7 +24,7 @@ public class AuthSoftDeletableCleanupService : SoftDeletableCleanerService
             using var scope = ServiceScopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AuthWriteDbContext>();
 
-            _logger.LogInformation("{ServiceName} starting cleanup task...",ServiceName);
+            _logger.LogInformation("{ServiceName} starting cleanup task...", ServiceName);
 
             int deletedUsersCount = await dbContext.Users
                 .Where(u =>
@@ -38,7 +38,7 @@ public class AuthSoftDeletableCleanupService : SoftDeletableCleanerService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{ServiceName} error occurred during cleanup task.",ServiceName);
+            _logger.LogError(ex, "{ServiceName} error occurred during cleanup task.", ServiceName);
         }
     }
 

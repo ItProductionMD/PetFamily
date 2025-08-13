@@ -9,7 +9,7 @@ namespace PetFamily.VolunteerRequests.Application.Commands.UpdateVolunteerReques
 
 public static class UpdateVolunteerRequestValidator
 {
-    public static void Validate(UpdateVolunteerRequestCommand cmd)
+    public static void Validate(this UpdateVolunteerRequestCommand cmd)
     {
         var result = UnitResult.FromValidationResults(
             () => VolunteerRequest.Validate(

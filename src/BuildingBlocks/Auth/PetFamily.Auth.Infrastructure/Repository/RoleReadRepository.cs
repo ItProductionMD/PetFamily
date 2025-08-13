@@ -1,9 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
-using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
@@ -38,7 +37,7 @@ public class RoleReadRepository(
         ORDER BY p.{PermissionsTable.Code};
     ";
 
-        _logger.LogInformation("EXECUTING QUERY: {sql}",sql);
+        _logger.LogInformation("EXECUTING QUERY: {sql}", sql);
 
         var raw = await connection.QueryAsync<RoleWithPermissionRaw>(sql, new { RoleCode = roleCode });
 
@@ -94,7 +93,7 @@ public class RoleReadRepository(
             g.Key.RoleCode,
             g
              .Where(p => p.PermissionId.HasValue)
-             .Select(p => 
+             .Select(p =>
                 new PermissionDto(
                     p.PermissionId.Value,
                     p.PermissionCode,
@@ -170,7 +169,7 @@ public class RoleReadRepository(
 
         if (count != ids.Count)
             return UnitResult.Fail(Error.NotFound("Some permission IDs do not exist."));
-        
+
 
         return UnitResult.Ok();
     }

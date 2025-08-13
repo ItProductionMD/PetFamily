@@ -30,11 +30,11 @@ public class AdminSeeder(
     private readonly IUserWriteRepository _userWriteRepository = userWriteRepository;
     private readonly IUserReadRepository _userReadRepository = userReadRepository;
 
-    public  async Task  SeedAsync()
+    public async Task SeedAsync()
     {
         var validateResult = UnitResult.FromValidationResults(
             () => ValidateEmail(_admin.Email),
-            () => ValidateLogin(_admin.Login,LoginOptions.Default),
+            () => ValidateLogin(_admin.Login, LoginOptions.Default),
             () => ValidatePassword(_admin.Password));
 
         if (validateResult.IsFailure)
@@ -45,7 +45,7 @@ public class AdminSeeder(
             throw new InvalidOperationException("Admin seeding failed due to validation errors!");
         }
         var checkAdminUniqness = await _userReadRepository.CheckUniqueFields(
-            _admin.Email,_admin.Login,Phone.CreateEmpty(), default);
+            _admin.Email, _admin.Login, Phone.CreateEmpty(), default);
         if (checkAdminUniqness.IsFailure)
         {
             _logger.LogInformation("ADMIN SEEDER: Admin user with email {Email} or login {Login} already exists. " +

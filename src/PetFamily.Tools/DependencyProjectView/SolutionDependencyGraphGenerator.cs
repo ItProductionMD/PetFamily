@@ -1,13 +1,5 @@
-﻿using Microsoft.Build.Evaluation;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Operations;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Microsoft.CodeAnalysis;
 using System.Xml.Linq;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 using static PetFamily.Tools.DependencyProjectView.Extensions.GraphGeneratorExtensions;
 
 namespace PetFamily.Tools.DependencyProjectView;
@@ -137,7 +129,7 @@ public partial class SolutionDependencyGraphGenerator
         writer.WriteLine("        fontname=\"Helvetica\";");
         writer.WriteLine("        color = lightblue;");
         writer.WriteLine("        {");
-        if(projects.FirstOrDefault().ModuleName.ContainsKeyWord(["Public","Contract"]))
+        if (projects.FirstOrDefault().ModuleName.ContainsKeyWord(["Public", "Contract"]))
             writer.WriteLine("             rank=same;");
         foreach (var projectInfo in projects)
         {

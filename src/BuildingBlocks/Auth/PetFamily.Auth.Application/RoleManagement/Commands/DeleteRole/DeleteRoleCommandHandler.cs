@@ -1,6 +1,6 @@
-﻿using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.Auth.Application.IRepositories;
+﻿using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 

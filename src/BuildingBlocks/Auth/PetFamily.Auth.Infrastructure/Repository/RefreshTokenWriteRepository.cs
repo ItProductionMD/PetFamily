@@ -24,9 +24,9 @@ public class RefreshTokenWriteRepository(
     public async Task<Result<RefreshTokenSession>> GetRefreshToken(string token, CancellationToken ct = default)
     {
         var refreshTokenSession = await _context.RefreshTokens
-            .FirstOrDefaultAsync(x => x.Token == token,ct);
+            .FirstOrDefaultAsync(x => x.Token == token, ct);
 
-        if(refreshTokenSession == null)
+        if (refreshTokenSession == null)
         {
             _logger.LogWarning("Refresh token not found!");
             return Result.Fail(Error.NotFound("RefreshToken"));

@@ -5,5 +5,5 @@ namespace Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteerPho
 public record UpdateVolunteerPhoneCommand(
     Guid UserId,
     string PhoneRegionCode,
-    string PhoneNumber): ICommand;
+    string PhoneNumber) : ICommand;
 

@@ -1,5 +1,4 @@
-﻿using PetFamily.VolunteerRequests.Application.Commands.RejectVolunteerRequest;
-using PetFamily.VolunteerRequests.Application.Commands.SendVolunteerRequestToRevision;
+﻿using PetFamily.VolunteerRequests.Application.Commands.SendVolunteerRequestToRevision;
 
 namespace PetFamily.VolunteerRequests.Presentation.Requests;
 

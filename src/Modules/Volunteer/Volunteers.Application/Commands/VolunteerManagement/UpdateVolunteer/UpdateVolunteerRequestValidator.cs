@@ -1,8 +1,8 @@
-﻿using PetFamily.SharedKernel.Results;
-using static PetFamily.SharedKernel.Validations.ValueObjectValidations;
-using static PetFamily.SharedKernel.Validations.ValidationExtensions;
+﻿using PetFamily.SharedApplication.Exceptions;
+using PetFamily.SharedKernel.Results;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
-using PetFamily.SharedApplication.Exceptions;
+using static PetFamily.SharedKernel.Validations.ValidationExtensions;
+using static PetFamily.SharedKernel.Validations.ValueObjectValidations;
 
 
 namespace Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;

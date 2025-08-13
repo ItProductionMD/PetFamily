@@ -1,8 +1,6 @@
-using PetFamily.SharedInfrastructure.Constants;
-
 namespace PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 
-public static class SpeciesTable 
+public static class SpeciesTable
 {
     public const string TableName = "species";
     public const string TableFullName = "species.species";

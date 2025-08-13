@@ -8,7 +8,7 @@ using Volunteers.Domain.Enums;
 
 namespace PetFamily.IntegrationTests.PetFeatures;
 
-public class GetPetsQueryTest(TestWebApplicationFactory factory) 
+public class GetPetsQueryTest(TestWebApplicationFactory factory)
     : QueryHandlerTest<GetPetsResponse, GetPetsQuery>(factory)
 {
     [Fact]

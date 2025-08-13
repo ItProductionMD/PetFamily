@@ -1,12 +1,11 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
-using PetFamily.Auth.Domain.Entities.UserAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.Auth.Public.Contracts;
 using PetFamily.Auth.Public.Dtos;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
@@ -143,7 +142,7 @@ public class UserReadRepository(
 
         var userAccountInfo = await connection.QueryFirstOrDefaultAsync<UserAccountInfoDto>(
             sql,
-            new {UserID = userId});
+            new { UserID = userId });
 
         if (userAccountInfo == null)
         {

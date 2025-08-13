@@ -5,7 +5,7 @@ using PetFamily.SharedInfrastructure.Shared.Logger;
 
 namespace PetFamily.Discussions.Infrastructure.Contexts;
 
-public class DiscussionWriteDbContext : DbContext 
+public class DiscussionWriteDbContext : DbContext
 {
     public DbSet<Discussion> Discussions { get; set; }
     public DbSet<Message> Messages { get; set; }
@@ -14,7 +14,7 @@ public class DiscussionWriteDbContext : DbContext
 
     public DiscussionWriteDbContext(string connectionString)
     {
-        if(string.IsNullOrWhiteSpace(connectionString))
+        if (string.IsNullOrWhiteSpace(connectionString))
             throw new ArgumentException("Connection string cannot be null or empty.", nameof(connectionString));
 
         _connectionString = connectionString;

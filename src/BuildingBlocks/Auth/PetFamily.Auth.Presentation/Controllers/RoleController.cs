@@ -42,5 +42,5 @@ public class RoleController : Controller
             ? result.ToEnvelope()
             : result.ToErrorActionResult();
     }
-    
+
 }

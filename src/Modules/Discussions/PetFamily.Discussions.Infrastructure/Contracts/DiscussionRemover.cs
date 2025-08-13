@@ -1,5 +1,4 @@
 ﻿using PetFamily.Discussions.Public.Contracts;
-using PetFamily.SharedKernel.Results;
 
 namespace PetFamily.Discussions.Infrastructure.Contracts;
 

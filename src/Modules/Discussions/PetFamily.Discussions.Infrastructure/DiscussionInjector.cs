@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Discussions.Application.IRepositories;
 using PetFamily.Discussions.Application;
+using PetFamily.Discussions.Application.IRepositories;
+using PetFamily.Discussions.Infrastructure.Contexts;
 using PetFamily.Discussions.Infrastructure.Contracts;
+using PetFamily.Discussions.Infrastructure.Dapper;
 using PetFamily.Discussions.Infrastructure.Repositories;
 using PetFamily.Discussions.Public.Contracts;
 using PetFamily.SharedApplication.Extensions;
 using PetFamily.SharedInfrastructure.Shared.Constants;
-using PetFamily.Discussions.Infrastructure.Contexts;
-using PetFamily.Discussions.Infrastructure.Dapper;
 
 namespace PetFamily.Discussions.Infrastructure;
 

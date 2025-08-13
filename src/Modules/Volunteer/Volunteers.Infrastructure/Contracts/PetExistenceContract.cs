@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using PetFamily.SharedApplication.Abstractions;
-using Volunteers.Public.IContracts;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
+using Volunteers.Public.IContracts;
 
 namespace Volunteers.Infrastructure.Contracts
 {

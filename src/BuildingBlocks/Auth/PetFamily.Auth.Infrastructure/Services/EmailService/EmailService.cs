@@ -1,10 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Auth.Application.Constants;
 using PetFamily.Auth.Application.Email;
 using PetFamily.Auth.Application.IServices;
-using PetFamily.SharedKernel.Errors;
-using PetFamily.SharedKernel.Results;
-using System.Security.Claims;
 
 namespace PetFamily.Auth.Infrastructure.Services.EmailService;
 
@@ -17,8 +13,8 @@ public class EmailService(
 
     public async Task SendAsync(EmailMessage message, CancellationToken ct = default)
     {
-        _logger.LogInformation("EMAIL SERVICE  send message to: {To} Subject: {Subject} Body: {Body}", 
-            message.To, message.Subject , message.Body);
+        _logger.LogInformation("EMAIL SERVICE  send message to: {To} Subject: {Subject} Body: {Body}",
+            message.To, message.Subject, message.Body);
 
         await Task.CompletedTask; // Simulate sending email
     }

@@ -1,7 +1,7 @@
-﻿using PetFamily.SharedKernel.Validations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Discussions.Domain.Entities;
+using PetFamily.SharedKernel.Validations;
 
 namespace PetFamily.Discussions.Infrastructure.EFCore;
 

@@ -6,16 +6,18 @@ using PetFamily.VolunteerRequests.Application.IRepositories;
 
 namespace PetFamily.VolunteerRequests.Application.Queries.GetUnreviewedRequests;
 
-public class GetUnreviewedRequestsHandler(
-    IVolunteerRequestReadRepository repository
-) : IQueryHandler<PagedResult<VolunteerRequestDto>, GetUnreviewedRequestsQuery>
+public class GetUnreviewedRequestsHandler(IVolunteerRequestReadRepository volunteerRequestReadRepo)
+    : IQueryHandler<PagedResult<VolunteerRequestDto>, GetUnreviewedRequestsQuery>
 {
     public async Task<Result<PagedResult<VolunteerRequestDto>>> Handle(
         GetUnreviewedRequestsQuery query,
         CancellationToken ct)
     {
         //TODO validate query
-        var pagedResult = await repository.GetUnreviewedRequests(query.Page, query.PageSize, ct);
+        var pagedResult = await volunteerRequestReadRepo.GetUnreviewedRequests(
+            query.Page,
+            query.PageSize,
+            ct);
 
         return pagedResult;
     }

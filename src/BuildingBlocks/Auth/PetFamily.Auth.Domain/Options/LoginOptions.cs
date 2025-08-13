@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Cms;
-
-namespace PetFamily.Auth.Domain.Options;
+﻿namespace PetFamily.Auth.Domain.Options;
 
 public class LoginOptions
 {

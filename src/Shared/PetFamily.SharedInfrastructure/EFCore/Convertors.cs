@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PetFamily.SharedKernel.Abstractions;
-using PetFamily.SharedKernel.ValueObjects;
 using System.Text.Json;
 
 namespace PetFamily.SharedInfrastructure.Shared.EFCore;

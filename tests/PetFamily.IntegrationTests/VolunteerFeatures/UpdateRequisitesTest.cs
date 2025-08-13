@@ -5,7 +5,6 @@ using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedApplication.Dtos;
 using Volunteers.Application.Commands.VolunteerManagement.UpdateRequisites;
-using Volunteers.Application.ResponseDtos;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 

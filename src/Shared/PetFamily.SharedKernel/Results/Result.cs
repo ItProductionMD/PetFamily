@@ -73,7 +73,7 @@ public abstract class Result
                 : string.IsNullOrWhiteSpace(Error.Message) == false
                 ? Error.Message
                 : "Empty error message!";
-    
+
 
 }
 

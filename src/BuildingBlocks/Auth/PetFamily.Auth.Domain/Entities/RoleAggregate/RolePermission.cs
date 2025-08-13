@@ -1,8 +1,6 @@
 ﻿using PetFamily.Auth.Domain.ValueObjects;
-using PetFamily.SharedKernel.Abstractions;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
-using PetFamily.SharedKernel.ValueObjects;
 
 namespace PetFamily.Auth.Domain.Entities.RoleAggregate;
 
@@ -20,13 +18,13 @@ public class RolePermission
     }
 
     public static Result<RolePermission> Create(
-        RoleId roleId, 
+        RoleId roleId,
         PermissionId permissionId)
     {
         if (roleId.Value == Guid.Empty)
             return Result.Fail(Error.GuidIsEmpty("RolePermission RoleId"));
 
-        if(permissionId.Value == Guid.Empty)
+        if (permissionId.Value == Guid.Empty)
             return Result.Fail(Error.GuidIsEmpty("RolePermission PermissionId"));
 
         return Result.Ok(new RolePermission(roleId, permissionId));

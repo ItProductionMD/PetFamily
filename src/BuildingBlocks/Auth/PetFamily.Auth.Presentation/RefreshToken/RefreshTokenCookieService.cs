@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Org.BouncyCastle.Asn1.Ocsp;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.Options;
 using PetFamily.SharedApplication.Exceptions;

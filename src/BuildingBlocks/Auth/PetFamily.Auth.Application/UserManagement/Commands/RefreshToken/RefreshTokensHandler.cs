@@ -1,14 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
 using PetFamily.Auth.Domain.Entities;
-using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects.Ids;
-using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Error = PetFamily.SharedKernel.Errors.Error;
 
 namespace PetFamily.Auth.Application.UserManagement.Commands.RefreshToken;
@@ -51,13 +48,13 @@ public class RefreshTokensHandler(
 
         var jti = getJtiFromToken.Data!;
         var isParseJtiOk = Guid.TryParse(jti, out var jtiGuid);
-        if (isParseJtiOk==false)
+        if (isParseJtiOk == false)
         {
             _logger.LogWarning("Parse Jti Error!");
             return Result.Fail(Error.Authentication("Parse Jti Error"));
         }
 
-        if(refreshToken.Jti != jtiGuid)
+        if (refreshToken.Jti != jtiGuid)
         {
             _logger.LogWarning("Jti from access token doesn't correspond to Jti from refreshToken session");
             return Result.Fail(Error.Authentication("Jti does not correspond to existing"));

@@ -3,7 +3,6 @@ using PetFamily.SharedKernel.Abstractions;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Uniqness;
-using PetFamily.SharedKernel.ValueObjects;
 
 namespace PetFamily.Auth.Domain.Entities.RoleAggregate;
 
@@ -17,9 +16,9 @@ public class Role : IEntity<RoleId>
     private readonly List<RolePermission> _rolePermissions = [];
     public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions.AsReadOnly();
 
-    private Role(){ }//EFCore need this
+    private Role() { }//EFCore need this
 
-    private Role(RoleId id,string code, IEnumerable<RolePermission> permissions )
+    private Role(RoleId id, string code, IEnumerable<RolePermission> permissions)
     {
         Id = id;
         Code = code;
@@ -27,7 +26,7 @@ public class Role : IEntity<RoleId>
     }
 
     public static Result<Role> Create(
-        RoleId roleId, 
+        RoleId roleId,
         string code,
         IEnumerable<PermissionId> PermissionsIds)
     {
@@ -65,7 +64,7 @@ public class Role : IEntity<RoleId>
         return toAdd;
     }
 
-   
+
     public void AddPermission(PermissionId permissionId)
     {
         if (_rolePermissions.Any(rp => rp.PermissionId.Value == permissionId.Value))

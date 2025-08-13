@@ -7,5 +7,5 @@ public static class SchemaNames
     public const string USERS = "users";
     public const string AUTH = "auth";
     public const string VOLUNTEER_REQUESTS = "volunteer_requests";
-    public const string DISCUSSION = "discussion"; 
+    public const string DISCUSSION = "discussion";
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.Options;
-using PetFamily.SharedKernel.Results;
 
 namespace PetFamily.Auth.Presentation.Cookies;
 

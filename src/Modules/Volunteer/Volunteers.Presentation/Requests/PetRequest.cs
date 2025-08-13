@@ -1,7 +1,6 @@
 ﻿using PetFamily.SharedApplication.Dtos;
 using Volunteers.Application.Commands.PetManagement.AddPet;
 using Volunteers.Application.Commands.PetManagement.UpdatePet;
-using Volunteers.Application.ResponseDtos;
 
 namespace Volunteers.Presentation.Requests;
 

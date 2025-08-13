@@ -2,7 +2,6 @@
 using global::PetFamily.Auth.Domain.ValueObjects;
 using global::PetFamily.SharedKernel.ValueObjects;
 using global::PetFamily.SharedKernel.ValueObjects.Ids;
-using PetFamily.Auth.Domain.Entities.RoleAggregate;
 using PetFamily.Auth.Domain.Entities.UserAggregate;
 
 namespace PetFamily.IntegrationTests.TestData;

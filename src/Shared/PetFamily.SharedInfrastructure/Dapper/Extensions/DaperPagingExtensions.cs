@@ -1,17 +1,14 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.PaginationUtils.PagedResult;
-using static PetFamily.SharedInfrastructure.Dapper.Extensions.DapperLoggerExtensions;
-using System.Data;
-using System.Diagnostics;
-using System.Reflection;
 using PetFamily.SharedInfrastructure.Dapper.Extensions;
+using System.Data;
+using System.Reflection;
 
 namespace PetFamily.SharedInfrastructure.Dapper.Extensions;
 
 public static class DapperPagingExtensions
 {
-    public static async Task<(int, IReadOnlyList<T>)> GetPagedQuery<T,Repo>(
+    public static async Task<(int, IReadOnlyList<T>)> GetPagedQuery<T, Repo>(
         this IDbConnection connection,
         CommandDefinition baseCommand,
         ILogger<Repo> logger)
@@ -46,7 +43,7 @@ public static class DapperPagingExtensions
         return (totalCount, items);
     }
 
-    
+
 
     private static T MapDynamic<T>(dynamic row)
     {
@@ -62,5 +59,5 @@ public static class DapperPagingExtensions
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .ToDictionary(p => p.Name, p => p.GetValue(obj));
     }
-    
+
 }

@@ -1,22 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using PetFamily.Auth.Application.Dtos;
-using PetFamily.Auth.Application.Options;
 using PetFamily.Auth.Application.UserManagement.Commands.ChangeRoles;
 using PetFamily.Auth.Application.UserManagement.Commands.ConfirmEmail;
 using PetFamily.Auth.Application.UserManagement.Commands.LoginUserByEmail;
 using PetFamily.Auth.Application.UserManagement.Commands.RefreshToken;
 using PetFamily.Auth.Application.UserManagement.Commands.RegisterByEmail;
 using PetFamily.Auth.Application.UserManagement.Queries.GetUserAccountInfo;
-using PetFamily.Auth.Presentation.Cookies;
 using PetFamily.Auth.Presentation.RefreshToken;
 using PetFamily.Auth.Presentation.Requests;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
-using PetFamily.SharedApplication.Exceptions;
-using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
-using static PetFamily.Auth.Presentation.Cookies.HTTPResponseCookiesSetter;
 
 namespace PetFamily.Auth.Presentation.Controllers;
 
@@ -121,7 +115,7 @@ public class UserController(IRefreshTokenService refreshTokenService) : Controll
         var command = request.ToCommand(refreshToken);
 
         var tokenResult = await handler.Handle(command, ct);
-        
+
         return HandleTokenResult(tokenResult);
     }
 
@@ -147,7 +141,7 @@ public class UserController(IRefreshTokenService refreshTokenService) : Controll
         if (tokenResult.IsFailure)
             return tokenResult.ToErrorActionResult();
 
-       _refreshTokenService.SetRefreshToken(tokenResult.Data!);
+        _refreshTokenService.SetRefreshToken(tokenResult.Data!);
 
         return Result.Ok(tokenResult.Data!.AccessToken).ToActionResult();
     }

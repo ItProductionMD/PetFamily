@@ -1,4 +1,5 @@
-﻿using PetFamily.SharedKernel.Results;
+﻿using PetFamily.SharedApplication.Exceptions;
+using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using Volunteers.Domain.Enums;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
@@ -9,9 +10,9 @@ namespace Volunteers.Application.Commands.PetManagement.UpdatePet;
 
 public static class UpdatePetCommandValidator
 {
-    public static UnitResult Validate(UpdatePetCommand command)
+    public static void Validate(this UpdatePetCommand command)
     {
-        return UnitResult.FromValidationResults(
+        var result = UnitResult.FromValidationResults(
 
             () => ValidateIfGuidIsNotEpmty(command.PetId, "Pet id"),
 
@@ -49,6 +50,9 @@ public static class UpdatePetCommandValidator
 
             () => PetType.Validate(
                 BreedID.SetValue(command.BreedId), SpeciesID.SetValue(command.SpeciesId)));
+
+        if (result.IsFailure)
+            throw new ValidationException(result.Error);
     }
 
 }

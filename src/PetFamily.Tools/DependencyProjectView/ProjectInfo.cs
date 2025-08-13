@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using PetFamily.Tools.DependencyProjectView.Extensions;
-using System.IO;
 using System.Xml.Linq;
 using static PetFamily.Tools.DependencyProjectView.Extensions.GraphGeneratorExtensions;
 
@@ -15,12 +14,12 @@ public partial class SolutionDependencyGraphGenerator
         public List<string> ProjectReferences { get; set; } = [];
         public string FilePath { get; set; }
         public static IEnumerable<string> projectsKeyWords => new[] { "Public", "Contract" };
-        public string ModuleName { get;private set; }
+        public string ModuleName { get; private set; }
         public string Color => GetProjectColor(Name);
 
         public static ProjectInfo Create(
             string solutionName,
-            string csprojPath, 
+            string csprojPath,
             XDocument doc,
             IEnumerable<string> excludeProjectsKewords)
         {
@@ -32,10 +31,10 @@ public partial class SolutionDependencyGraphGenerator
                 {
                     var parts = projectName.Split('.');
 
-                    if(parts.Length == 2)
+                    if (parts.Length == 2)
                         moduleName = solutionName + "." + parts[1];
 
-                    else if(parts.Length == 3)
+                    else if (parts.Length == 3)
                         moduleName = solutionName + "." + parts[2];
 
                     else
@@ -62,8 +61,8 @@ public partial class SolutionDependencyGraphGenerator
 
             }
 
-            if (projectName.ContainsKeyWord(["Host","Web"]))
-                moduleName = moduleName+"_Host";
+            if (projectName.ContainsKeyWord(["Host", "Web"]))
+                moduleName = moduleName + "_Host";
 
             var projectReferences = doc.Descendants("ProjectReference")
                 .Select(pr => Path.GetFileNameWithoutExtension(pr.Attribute("Include").Value))
@@ -84,19 +83,19 @@ public partial class SolutionDependencyGraphGenerator
         }
         private string GetProjectColor(string projectName)
         {
-            if (projectName.ContainsKeyWord(new[] { "Public", "Contract","SharedKernel","Domain" }))
+            if (projectName.ContainsKeyWord(new[] { "Public", "Contract", "SharedKernel", "Domain" }))
                 return "red";
 
             if (projectName.ContainsKeyWord(["Infrastructure"]))
                 return "green";
 
-            if (projectName.ContainsKeyWord(["Application","Core"]))
+            if (projectName.ContainsKeyWord(["Application", "Core"]))
                 return "blue";
 
             if (projectName.ContainsKeyWord(["Host", "Web"]))
                 return "#581C87";
 
-            if (projectName.ContainsKeyWord(["Presentation","Shared.Api","Framework","Controllers"]))
+            if (projectName.ContainsKeyWord(["Presentation", "Shared.Api", "Framework", "Controllers"]))
                 return "#3F1F0F";//coffe brown
 
             else
@@ -110,9 +109,9 @@ public partial class SolutionDependencyGraphGenerator
             Console.WriteLine($"\t\tModuleName: {this.ModuleName}" +
                 $"\n\t\tProjectName:{this.Name}" +
                 $"\n\t\tSolutionName:{this.SolutionName}" +
-                $"\n\t\tFilePath:{ this.FilePath}");
+                $"\n\t\tFilePath:{this.FilePath}");
             Console.WriteLine("\t\tReferences:");
-            foreach(var references in this.ProjectReferences)           
+            foreach (var references in this.ProjectReferences)
                 Console.WriteLine($"\t\t\t-> {references}");
             Console.WriteLine("##########################################");
 

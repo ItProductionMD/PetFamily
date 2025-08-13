@@ -1,5 +1,3 @@
-using PetFamily.SharedInfrastructure.Constants;
-
 namespace PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClassesPreview;
 
 public static class VolunteersTable

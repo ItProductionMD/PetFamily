@@ -30,9 +30,9 @@ public class AddPetHandlerTests
 
 
         _handler = new AddPetHandler(
-            _loggerMock.Object,
             _volunteerRepositoryMock.Object,
-            _petTypeCheckerMock.Object);
+            _petTypeCheckerMock.Object,
+            _loggerMock.Object);
 
         _token = CancellationToken.None;
     }

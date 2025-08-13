@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities.RoleAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Results;
 
 namespace PetFamily.Auth.Application.RoleManagement.Commands.AddRole;

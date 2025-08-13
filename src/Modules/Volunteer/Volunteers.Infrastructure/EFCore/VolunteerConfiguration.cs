@@ -58,7 +58,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.Property(v => v.DeletedAt)
             .HasColumnName("deleted_at")
             .IsRequired(false);
-        
+
 
         // Relationships
         builder.HasMany(v => v.Pets)

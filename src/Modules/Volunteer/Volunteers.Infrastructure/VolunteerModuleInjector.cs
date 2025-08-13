@@ -20,7 +20,7 @@ public static class VolunteerModuleInjector
         IConfiguration configuration)
     {
         var postgresConnection = configuration.TryGetConnectionString(ConnectionStringName.POSTGRESQL);
-    
+
         services.InjectVolunteerApplication(configuration);
 
         services.Configure<PetImagesValidatorOptions>(configuration.GetSection("FileValidators:PetImages"));

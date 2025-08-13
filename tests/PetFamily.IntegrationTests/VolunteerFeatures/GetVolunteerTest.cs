@@ -15,7 +15,7 @@ public class GetVolunteerTest(TestWebApplicationFactory factory)
     public async Task Should_get_volunteer_correctly()
     {
         //ARRANGE
-        var seedVolunteer = new VolunteerTestBuilder(volunteersCount:1).Volunteer;
+        var seedVolunteer = new VolunteerTestBuilder(volunteersCount: 1).Volunteer;
 
         await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Results;
 using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 
@@ -9,7 +9,7 @@ namespace PetFamily.Auth.Application.UserManagement.Queries.GetUserAccountInfo;
 
 public class GetUserAccountInfoHandler(
     IUserReadRepository userReadRepository,
-    ILogger<GetUserAccountInfoHandler> logger )
+    ILogger<GetUserAccountInfoHandler> logger)
     : ICommandHandler<UserAccountInfoDto, GetUserAccountInfoCommand>
 {
     private readonly ILogger<GetUserAccountInfoHandler> _logger = logger;
@@ -23,6 +23,6 @@ public class GetUserAccountInfoHandler(
             return Result.Fail(validateCommandResult.Error);
         }
 
-        return await _userReadRepository.GetUserAccountInfo(cmd.userId, ct);       
+        return await _userReadRepository.GetUserAccountInfo(cmd.userId, ct);
     }
 }

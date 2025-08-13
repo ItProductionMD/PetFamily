@@ -1,6 +1,4 @@
-﻿using PetFamily.SharedKernel.Results;
-
-namespace PetFamily.Framework.HTTPContext.Interfaces;
+﻿namespace PetFamily.Framework.HTTPContext.Interfaces;
 
 public interface IUserContext
 {

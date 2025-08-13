@@ -7,7 +7,7 @@ namespace PetFamily.Discussions.Application.IRepositories;
 public interface IDiscussionReadRepository
 {
     Task<Result<DiscussionDto>> GetById(
-        Guid DiscussionId, 
-        PaginationParams paginationParams, 
+        Guid DiscussionId,
+        PaginationParams paginationParams,
         CancellationToken ct);
 }

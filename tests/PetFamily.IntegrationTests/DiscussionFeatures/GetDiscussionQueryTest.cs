@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using PetFamily.Auth.Public.Contracts;
+﻿using Moq;
 using PetFamily.Discussions.Application.Dtos;
 using PetFamily.Discussions.Application.Queries.GetDiscussion;
 using PetFamily.Discussions.Domain.Entities;
@@ -27,7 +25,7 @@ public class GetDiscussionQueryTest : QueryHandlerTest<GetDiscussionResponse, Ge
         var adminId = Guid.NewGuid();
 
 
-        var discussion = Discussion.Create(requestId,adminId,userId).Data!;
+        var discussion = Discussion.Create(requestId, adminId, userId).Data!;
 
         await SeedAsync(typeof(DiscussionWriteDbContext), discussion);
 

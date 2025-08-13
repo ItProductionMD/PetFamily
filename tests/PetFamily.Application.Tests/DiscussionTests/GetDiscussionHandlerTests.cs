@@ -20,7 +20,7 @@ public class GetDiscussionHandlerTests
     private readonly PaginationParams _paginationParams = new(1, 20);
 
     private GetDiscussionHandler CreateHandler() =>
-        new(_discussionRepo.Object, _logger.Object, _participantContract.Object);
+        new(_discussionRepo.Object, _participantContract.Object, _logger.Object);
 
     private static DiscussionDto CreateDiscussionDto(Guid discussionId, List<Guid> participantIds)
         => new()
@@ -58,7 +58,7 @@ public class GetDiscussionHandlerTests
         var result = await handler.Handle(new GetDiscussionQuery(
             userId,
             discussionId,
-            _paginationParams.PageNumber, 
+            _paginationParams.PageNumber,
             _paginationParams.PageSize),
             ct);
 

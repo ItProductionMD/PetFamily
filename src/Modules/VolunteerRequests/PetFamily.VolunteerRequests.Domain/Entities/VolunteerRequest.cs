@@ -105,7 +105,7 @@ public class VolunteerRequest : SoftDeletable, IEntity<Guid>
 
     public UnitResult TakeToReview(Guid adminId, Guid discussionId)
     {
-        if(RequestStatus != RequestStatus.Created)
+        if (RequestStatus != RequestStatus.Created)
             return UnitResult.Fail(Error.InternalServerError("Volunteer request is already taken for review."));
 
         AdminId = adminId;
@@ -119,7 +119,7 @@ public class VolunteerRequest : SoftDeletable, IEntity<Guid>
     {
         if (RequestStatus == RequestStatus.Approved)
             return UnitResult.Fail(Error.Conflict("Request is already approved."));
-        
+
         if (AdminId != adminId)
             return UnitResult.Fail(Error.Conflict("Only the admin who took the request can approve it."));
 
@@ -129,9 +129,9 @@ public class VolunteerRequest : SoftDeletable, IEntity<Guid>
         return UnitResult.Ok();
     }
 
-    public UnitResult Reject(Guid adminId,string comment)
+    public UnitResult Reject(Guid adminId, string comment)
     {
-        if(AdminId != adminId)
+        if (AdminId != adminId)
             return UnitResult.Fail(Error.Conflict("Only the admin who took the request can reject it."));
 
         if (RequestStatus != RequestStatus.OnReview)
@@ -171,7 +171,7 @@ public class VolunteerRequest : SoftDeletable, IEntity<Guid>
 
         if (RejectedAt.Value.AddDays(rejectionDays) <= DateTime.UtcNow)
         {
-            RejectedAt = null; 
+            RejectedAt = null;
             RequestStatus = RequestStatus.NeedsRevision;
             UpdatedAt = DateTime.UtcNow;
             return UnitResult.Ok();
@@ -214,7 +214,7 @@ public class VolunteerRequest : SoftDeletable, IEntity<Guid>
 
     public UnitResult UpdateRequestDetails(
         string firstName,
-        string lastName, 
+        string lastName,
         int experienceYears,
         string documentName,
         string description)

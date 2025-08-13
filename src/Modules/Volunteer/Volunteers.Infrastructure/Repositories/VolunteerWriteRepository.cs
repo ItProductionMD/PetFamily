@@ -4,7 +4,6 @@ using Npgsql;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Validations;
-using PetFamily.SharedKernel.ValueObjects;
 using Polly;
 using Volunteers.Application.IRepositories;
 using Volunteers.Domain;
@@ -13,22 +12,19 @@ using Volunteers.Infrastructure.Contexts;
 namespace Volunteers.Infrastructure.Repositories;
 
 public class VolunteerWriteRepository(
-    ILogger<VolunteerWriteRepository> logger,
-    VolunteerWriteDbContext context) : IVolunteerWriteRepository
+    VolunteerWriteDbContext context,
+    ILogger<VolunteerWriteRepository> logger) : IVolunteerWriteRepository
 {
-    private readonly ILogger<VolunteerWriteRepository> _logger = logger;
-    private readonly VolunteerWriteDbContext _context = context;
-
     public async Task<Result<Guid>> AddAndSaveAsync(
         Volunteer volunteer,
         CancellationToken ct = default)
     {
         try
         {
-            await _context.Volunteers.AddAsync(volunteer, ct);
-            await _context.SaveChangesAsync(ct);
+            await context.Volunteers.AddAsync(volunteer, ct);
+            await context.SaveChangesAsync(ct);
 
-            _logger.LogInformation("Volunteer with Id:{} was updated successfull!", volunteer.Id);
+            logger.LogInformation("Volunteer with Id:{} was updated successfull!", volunteer.Id);
             return Result.Ok(volunteer.Id);
         }
         catch (DbUpdateException ex)
@@ -47,13 +43,13 @@ public class VolunteerWriteRepository(
                     validationErrors.AddRange(
                         Error.ValueIsAlreadyExist(field).ValidationErrors);
 
-                    _logger.LogWarning("Add volunteer with id:{Id} constraint error!" +
+                    logger.LogWarning("Add volunteer with id:{Id} constraint error!" +
                         "{Value} already exist!", volunteer.Id, field);
                 }
             }
             if (validationErrors.Count == 0)
             {
-                _logger.LogError("Add volunteer with id:'{Id}' constraint error, but " +
+                logger.LogError("Add volunteer with id:'{Id}' constraint error, but " +
                     "unique fields doesn't contain the constraint name:{contsraint}!",
                     volunteer.Id, constraintName);
 
@@ -64,7 +60,7 @@ public class VolunteerWriteRepository(
         }
         catch (Exception ex)
         {
-            _logger.LogCritical("Add volunteer with id:{Id} unexpected exception!Exception:{Message}",
+            logger.LogCritical("Add volunteer with id:{Id} unexpected exception!Exception:{Message}",
                 volunteer.Id, ex.Message);
 
             return UnitResult.Fail(Error.InternalServerError(
@@ -74,16 +70,16 @@ public class VolunteerWriteRepository(
 
     public async Task<Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        var volunteer = await _context.Volunteers
+        var volunteer = await context.Volunteers
             .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == id, ct);
 
         if (volunteer == null)
         {
-            _logger.LogError("Volunteer with id:{id} not found", id);
+            logger.LogError("Volunteer with id:{id} not found", id);
             return Result.Fail(Error.NotFound($"Volunteer with id:{id}"));
         }
-        _logger.LogInformation("Volunteer with id:{id} found", id);
+        logger.LogInformation("Volunteer with id:{id} found", id);
         return Result.Ok(volunteer);
     }
 
@@ -91,9 +87,9 @@ public class VolunteerWriteRepository(
     {
         try
         {
-            await _context.SaveChangesAsync(ct);
+            await context.SaveChangesAsync(ct);
 
-            _logger.LogInformation("Volunteer with Id: {Id} updated successful !", volunteer.Id);
+            logger.LogInformation("Volunteer with Id: {Id} updated successful !", volunteer.Id);
 
             return UnitResult.Ok();
         }
@@ -113,13 +109,13 @@ public class VolunteerWriteRepository(
                     validationErrors.AddRange(
                         Error.ValueIsAlreadyExist(field).ValidationErrors);
 
-                    _logger.LogWarning("Add volunteer with id:{Id} constraint error!" +
+                    logger.LogWarning("Add volunteer with id:{Id} constraint error!" +
                         "{Value} already exist!", volunteer.Id, field);
                 }
             }
             if (validationErrors.Count == 0)
             {
-                _logger.LogError("Add volunteer with id:'{Id}' constraint error, but " +
+                logger.LogError("Add volunteer with id:'{Id}' constraint error, but " +
                     "unique fields doesn't contain the constraint name:{contsraint}!",
                     volunteer.Id, constraintName);
 
@@ -130,7 +126,7 @@ public class VolunteerWriteRepository(
         }
         catch (Exception ex)
         {
-            _logger.LogCritical("Save volunteer with id:{Id}unexpected error!Error:{Message}",
+            logger.LogCritical("Save volunteer with id:{Id}unexpected error!Error:{Message}",
                 volunteer.Id, ex.Message);
             return UnitResult.Fail(Error.InternalServerError($"Save volunteer unexpected error!"));
         }
@@ -140,8 +136,8 @@ public class VolunteerWriteRepository(
         Volunteer volunteer,
         CancellationToken ct = default)
     {
-        _context.Volunteers.Remove(volunteer);
-        await _context.SaveChangesAsync(ct);
+        context.Volunteers.Remove(volunteer);
+        await context.SaveChangesAsync(ct);
     }
 
 
@@ -151,7 +147,7 @@ public class VolunteerWriteRepository(
                3, retryAttempt => TimeSpan.FromMilliseconds(200 * Math.Pow(2, retryAttempt)),
                onRetry: (exception, timeSpan, retryCount, context) =>
                {
-                   _logger.LogWarning($"Attempt {retryCount} failed: {exception.Message}, " +
+                   logger.LogWarning($"Attempt {retryCount} failed: {exception.Message}, " +
                        $"retrying in {timeSpan.TotalSeconds}s.");
                });
 
@@ -163,16 +159,16 @@ public class VolunteerWriteRepository(
 
     public async Task<Result<Volunteer>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
-        var volunteer = await _context.Volunteers
+        var volunteer = await context.Volunteers
             .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.UserId.Value == userId, ct);
 
         if (volunteer == null)
         {
-            _logger.LogError("Volunteer with userId:{userId} not found", userId);
+            logger.LogError("Volunteer with userId:{userId} not found", userId);
             return Result.Fail(Error.NotFound($"Volunteer with userId:{userId}"));
         }
-        _logger.LogInformation("Volunteer with userId:{userId} found", userId);
+        logger.LogInformation("Volunteer with userId:{userId} found", userId);
 
         return Result.Ok(volunteer);
     }

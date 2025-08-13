@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.Auth.Domain.Entities;
 using PetFamily.Auth.Domain.Entities.RoleAggregate;
 using PetFamily.Auth.Domain.ValueObjects;
-using PetFamily.Auth.Domain.Entities;
 
 namespace PetFamily.Auth.Infrastructure.EFCore;
 

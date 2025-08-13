@@ -5,11 +5,6 @@ using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.Auth.Infrastructure.Contexts;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetFamily.Auth.Infrastructure.Repository;
 
@@ -42,7 +37,7 @@ public class RoleWriteRepository(
 
         if (role == null)
             return Result.Fail(Error.NotFound($"role with id: {id}"));
-        
+
         return Result.Ok(role);
     }
 

@@ -8,13 +8,12 @@ using Volunteers.Domain.Enums;
 using Volunteers.Domain.ValueObjects;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
 using static PetFamily.SharedKernel.Validations.ValidationExtensions;
-using static PetFamily.SharedKernel.Validations.ValidationPatterns;
 
 namespace Volunteers.Domain;
 
 public class Volunteer : SoftDeletable, IEntity<Guid>, IHasUniqueFields
 {
-    public Guid Id { get;private set; }
+    public Guid Id { get; private set; }
     public FullName FullName { get; private set; }
     [Unique]
     public string Phone { get; private set; }
@@ -278,7 +277,7 @@ public class Volunteer : SoftDeletable, IEntity<Guid>, IHasUniqueFields
         Requisites = requisites.ToList();
     }
 
-  
+
     public Pet GetPet(Guid petId)
     {
         var pet = Pets.FirstOrDefault(p => p.Id == petId);
@@ -370,7 +369,7 @@ public class Volunteer : SoftDeletable, IEntity<Guid>, IHasUniqueFields
 
     public Result<UnitResult> UpdatePhone(Phone newPhone)
     {
-        var validateRequiredPhone = ValidateRequiredObject(newPhone,"Phone for volunteer");
+        var validateRequiredPhone = ValidateRequiredObject(newPhone, "Phone for volunteer");
         if (validateRequiredPhone.IsFailure)
             return Result.Fail(validateRequiredPhone.Error);
 

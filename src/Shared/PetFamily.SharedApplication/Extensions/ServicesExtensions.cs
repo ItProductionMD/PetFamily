@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.SharedApplication.Abstractions.CQRS;
-using Scrutor;
 
 namespace PetFamily.SharedApplication.Extensions;
 
@@ -22,7 +21,7 @@ public static class ServicesExtensions
         }
     }
 
-    public static string TryGetConnectionString(this IConfiguration configuration, string connectionString) 
+    public static string TryGetConnectionString(this IConfiguration configuration, string connectionString)
     {
         var postgresConnection = configuration.GetConnectionString(connectionString);
         if (string.IsNullOrEmpty(postgresConnection))

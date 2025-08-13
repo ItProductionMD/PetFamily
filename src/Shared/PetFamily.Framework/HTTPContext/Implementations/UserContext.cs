@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using PetFamily.Framework.HTTPContext.Interfaces;
 using PetFamily.SharedApplication.Exceptions;
-using PetFamily.SharedKernel.Errors;
-using PetFamily.SharedKernel.Results;
 using System.Security.Claims;
 
 namespace PetFamily.Framework.HTTPContext.Implementations;

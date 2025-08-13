@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using PetFamily.SharedKernel.ValueObjects;
-using PetFamily.VolunteerRequests.Domain.Enums;
 using PetFamily.VolunteerRequests.Domain.Entities;
-using Xunit;
+using PetFamily.VolunteerRequests.Domain.Enums;
 
 namespace TestPetFamilyDomain;
 

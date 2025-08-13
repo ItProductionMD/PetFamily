@@ -1,5 +1,4 @@
-﻿using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.Discussions.Public.Dtos;
+﻿using PetFamily.Discussions.Public.Dtos;
 
 namespace PetFamily.Discussions.Application.Dtos;
 

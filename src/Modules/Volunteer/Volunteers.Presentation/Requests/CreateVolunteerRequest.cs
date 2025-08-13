@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using PetFamily.SharedApplication.Dtos;
+﻿using PetFamily.SharedApplication.Dtos;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
-using Volunteers.Application.ResponseDtos;
 
 namespace Volunteers.Presentation.Requests;
 
@@ -13,7 +11,7 @@ public record CreateVolunteerRequest
     public string Description { get; set; } = null!;
     public string PhoneRegionCode { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;
-    public int ExperienceYears { get; set; } 
+    public int ExperienceYears { get; set; }
     public IEnumerable<RequisitesDto> Requisites { get; set; } = [];
 
     public CreateVolunteerCommand ToCommand(Guid adminId) =>
@@ -22,7 +20,7 @@ public record CreateVolunteerRequest
             UserId,
             FirstName,
             LastName,
-            Description,    
+            Description,
             ExperienceYears,
             PhoneRegionCode,
             PhoneNumber,

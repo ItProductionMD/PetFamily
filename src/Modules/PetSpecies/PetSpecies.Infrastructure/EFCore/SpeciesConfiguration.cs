@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetSpecies.Domain;
-using System.Reflection.Emit;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
 
 namespace PetSpecies.Infrastructure.EFCore;

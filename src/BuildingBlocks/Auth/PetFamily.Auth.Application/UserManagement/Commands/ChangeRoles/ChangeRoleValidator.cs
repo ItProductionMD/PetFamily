@@ -1,6 +1,5 @@
 ﻿using PetFamily.SharedApplication.Exceptions;
 using PetFamily.SharedKernel.Results;
-using PetFamily.SharedKernel.Validations;
 using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 
 namespace PetFamily.Auth.Application.UserManagement.Commands.ChangeRoles;

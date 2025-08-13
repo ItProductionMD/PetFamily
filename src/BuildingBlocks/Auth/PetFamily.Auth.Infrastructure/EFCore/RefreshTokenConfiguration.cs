@@ -1,8 +1,7 @@
-﻿using PetFamily.Auth.Domain.Entities;
-using PetFamily.Auth.Domain.Entities.UserAggregate;
-using PetFamily.SharedInfrastructure.Constants;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.Auth.Domain.Entities;
+using PetFamily.SharedInfrastructure.Constants;
 
 namespace PetFamily.Auth.Infrastructure.EFCore;
 

@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using PetFamily.SharedApplication.Abstractions.CQRS;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Auth.Infrastructure.Contexts;
+using PetFamily.IntegrationTests.WebApplicationFactory;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.VolunteerRequests.Infrastructure.Contexts;
 using PetSpecies.Infrastructure.Contexts;
 using Volunteers.Infrastructure.Contexts;
-using PetFamily.IntegrationTests.WebApplicationFactory;
-using Microsoft.EntityFrameworkCore;
 
 namespace PetFamily.IntegrationTests.IClassFixtures;
 

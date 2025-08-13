@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Moq;
 using PetFamily.Discussions.Public.Contracts;
-using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
@@ -48,7 +47,7 @@ public class SendRequestToRevisionTests
 
         var request = CreateNewRequest();
         var takeResult = request.TakeToReview(adminId, discussionId);
-        if(takeResult.IsFailure)
+        if (takeResult.IsFailure)
         {
             throw new TestCanceledException("Take request to review Failed!");
         }

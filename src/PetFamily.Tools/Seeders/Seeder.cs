@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using PetSpecies.Domain;
-using PetSpecies.Infrastructure.Contexts;
-using Volunteers.Infrastructure.Contexts;
-using static PetFamily.Tools.ToolsExtensions;
 
 namespace PetFamily.Tools.Seeders;
 

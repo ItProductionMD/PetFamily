@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using System.IO;
 
 public static class ResetAndDropDatabaseV2
 {
@@ -70,7 +69,7 @@ public static class ResetAndDropDatabaseV2
 
                         Console.WriteLine($"Add migration...");
                         var scaffolder = dbContext.GetInfrastructure().GetRequiredService<IMigrator>();
-                       
+
 
                         Console.WriteLine($"Update database...");
                         dbContext.Database.Migrate();

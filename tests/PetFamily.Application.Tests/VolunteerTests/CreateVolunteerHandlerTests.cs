@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.SharedApplication.Validations;
 using PetFamily.SharedApplication.Exceptions;
-using PetFamily.SharedApplication.IUserContext;
-using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 using Volunteers.Application.IRepositories;
@@ -41,14 +38,14 @@ public class CreateVolunteerHandlerTests
             userId,
             "invalidName!@",
             "invalidLastName!@",
-            "Description",         
+            "Description",
             0,
             "+39",
             "000000",
             []);
 
         //ACT and ASSERT
-        await Assert.ThrowsAsync<ValidationException>(async () => 
+        await Assert.ThrowsAsync<ValidationException>(async () =>
             await _handler.Handle(command, CancellationToken.None));
     }
 
@@ -63,7 +60,7 @@ public class CreateVolunteerHandlerTests
             userId,
             "firstName",
             "lastName",
-            "Description",           
+            "Description",
             0,
             "+39",
             "0000000",

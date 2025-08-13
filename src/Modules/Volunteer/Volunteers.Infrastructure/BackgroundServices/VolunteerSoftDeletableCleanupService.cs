@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PetFamily.SharedInfrastructure.SoftDeletableCleaner;
 using Volunteers.Infrastructure.Contexts;
@@ -28,7 +27,7 @@ public class VolunteerSoftDeletableCleanupService : SoftDeletableCleanerService
             _logger.LogInformation("{ServiceName} starting cleanup task...", ServiceName);
 
             int deletedVolunteersCount = await dbContext.Volunteers
-                .Where(v => 
+                .Where(v =>
                     v.IsDeleted == true &&
                     v.DeletedAt <= DateTime.UtcNow.AddDays(-DeleteAfterDays))
                 .ExecuteDeleteAsync(cancellationToken);
@@ -43,11 +42,11 @@ public class VolunteerSoftDeletableCleanupService : SoftDeletableCleanerService
 
             _logger.LogInformation("{ServiceName} cleanup task completed, {deletedVolunteersCount} volunteers deleted," +
                 " and {deletedPetsCount} pets deleted"
-                ,ServiceName ,deletedVolunteersCount, deletedPetsCount);
+                , ServiceName, deletedVolunteersCount, deletedPetsCount);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{ServiceName} error occurred during cleanup task.",ServiceName);
+            _logger.LogError(ex, "{ServiceName} error occurred during cleanup task.", ServiceName);
         }
     }
 }

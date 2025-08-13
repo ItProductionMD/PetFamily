@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Public.Contracts;
 using PetFamily.SharedApplication.Extensions;
 using Volunteers.Application.Contracts;

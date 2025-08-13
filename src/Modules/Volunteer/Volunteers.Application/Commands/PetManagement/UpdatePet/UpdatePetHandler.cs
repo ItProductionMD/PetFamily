@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using PetSpecies.Public.IContracts;
@@ -11,31 +10,22 @@ using Volunteers.Domain.Enums;
 namespace Volunteers.Application.Commands.PetManagement.UpdatePet;
 
 public class UpdatePetHandler(
-    IVolunteerWriteRepository volunteerWriteRepository,
-    ISpeciesExistenceContract speciesReadRepository,
+    IVolunteerWriteRepository volunteerWriteRepo,
+    ISpeciesExistenceContract petTypeChecker,
     ILogger<UpdatePetHandler> logger) : ICommandHandler<UpdatePetCommand>
 {
-    private readonly IVolunteerWriteRepository _writeRepository = volunteerWriteRepository;
-    private readonly ILogger<UpdatePetHandler> _logger = logger;
-    private readonly ISpeciesExistenceContract _petTypeChecker = speciesReadRepository;
 
     public async Task<UnitResult> Handle(UpdatePetCommand cmd, CancellationToken cancelToken)
     {
-        var validationResult = UpdatePetCommandValidator.Validate(cmd);
-        if (validationResult.IsFailure)
-        {
-            _logger.LogWarning("Update pet with id:{Id} validation errors:{Errors}",
-                cmd.PetId, validationResult.ValidationMessagesToString());
+        cmd.Validate();
 
-            return validationResult;
-        }
-        var getVolunteer = await _writeRepository.GetByIdAsync(cmd.VolunteerId, cancelToken);
+        var getVolunteer = await volunteerWriteRepo.GetByIdAsync(cmd.VolunteerId, cancelToken);
         if (getVolunteer.IsFailure)
             return UnitResult.Fail(getVolunteer.Error);
 
         var volunteer = getVolunteer.Data!;
 
-        var checkPetType = await _petTypeChecker.VerifySpeciesAndBreedExist(
+        var checkPetType = await petTypeChecker.VerifySpeciesAndBreedExist(
             cmd.SpeciesId,
             cmd.BreedId,
             cancelToken);
@@ -46,16 +36,16 @@ public class UpdatePetHandler(
         if (updatePetResult.IsFailure)
         {
 
-            _logger.LogWarning("Update pet with id:{ id} error:{error}!", 
+            logger.LogWarning("Update pet with id:{ id} error:{error}!",
                 cmd.PetId, updatePetResult.ToErrorMessage());
             return updatePetResult;
         }
 
-        var result = await _writeRepository.SaveAsync(volunteer, cancelToken);
+        var result = await volunteerWriteRepo.SaveAsync(volunteer, cancelToken);
         if (result.IsFailure)
             return result;
 
-        _logger.LogInformation("Update pet with id:{id} successful !", cmd.PetId);
+        logger.LogInformation("Update pet with id:{id} successful !", cmd.PetId);
 
         return UnitResult.Ok();
     }

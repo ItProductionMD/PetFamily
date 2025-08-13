@@ -1,5 +1,4 @@
 ﻿using PetFamily.SharedKernel.Results;
-using PetFamily.SharedKernel.ValueObjects;
 using Volunteers.Public.Dto;
 
 namespace Volunteers.Public.IContracts;

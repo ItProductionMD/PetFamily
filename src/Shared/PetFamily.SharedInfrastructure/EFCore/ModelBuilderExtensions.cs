@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.SharedKernel.Uniqness;
-using PetFamily.SharedKernel.ValueObjects;
 using System.Reflection;
-using static PetFamily.SharedInfrastructure.Shared.EFCore.Convertors;
 
 namespace PetFamily.SharedInfrastructure.Shared.EFCore;
 

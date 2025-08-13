@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Auth.Domain.Entities;
 using PetFamily.Auth.Domain.ValueObjects;
-using PetFamily.SharedKernel.ValueObjects.Ids;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
 
 namespace PetFamily.Auth.Infrastructure.EFCore;

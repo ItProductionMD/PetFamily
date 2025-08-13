@@ -10,21 +10,11 @@ public class ChangePetMainImageHandler(
     IVolunteerWriteRepository repository,
     ILogger<ChangePetMainImageHandler> logger) : ICommandHandler<ChangePetMainImageCommand>
 {
-    private readonly ILogger<ChangePetMainImageHandler> _logger = logger;
-    private readonly IVolunteerWriteRepository _repository = repository;
-
-    public async Task<UnitResult> Handle(ChangePetMainImageCommand cmd, CancellationToken cancelToken)
+    public async Task<UnitResult> Handle(ChangePetMainImageCommand cmd, CancellationToken ct)
     {
-        var validationResult = ChangeMainPetImageValidation.Validate(cmd);
-        if (validationResult.IsFailure)
-        {
-            _logger.LogWarning("Validate changeMainPetImageCommand failure!Error:{Error}",
-                validationResult.ValidationMessagesToString());
+        cmd.Validate();
 
-            return validationResult;
-        }
-
-        var getVolunteer = await _repository.GetByIdAsync(cmd.VolunteerId, cancelToken);
+        var getVolunteer = await repository.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return UnitResult.Fail(getVolunteer.Error);
 
@@ -33,7 +23,7 @@ public class ChangePetMainImageHandler(
         var pet = volunteer.Pets.FirstOrDefault(p => p.Id == cmd.PetId);
         if (pet == null)
         {
-            _logger.LogError("Pet with id:{petId}  for volunteer with id:{volunteerId} not found!",
+            logger.LogError("Pet with id:{petId}  for volunteer with id:{volunteerId} not found!",
                 cmd.PetId, cmd.VolunteerId);
 
             return UnitResult.Fail(Error.NotFound($"Pet with id:{cmd.PetId}"));
@@ -44,17 +34,17 @@ public class ChangePetMainImageHandler(
         var changeImageResult = pet.ChangeMainPhoto(cmd.imageName);
         if (changeImageResult.IsFailure)
         {
-            _logger.LogWarning("Image with name:{name} not found", cmd.imageName);
+            logger.LogWarning("Image with name:{name} not found", cmd.imageName);
             return changeImageResult;
         }
 
         if (initialMainImage != null && initialMainImage.Name == pet.Images[0].Name)
         {
-            _logger.LogWarning("Changed Pet main image is the same!Name:{imageName}", cmd.imageName);
+            logger.LogWarning("Changed Pet main image is the same!Name:{imageName}", cmd.imageName);
             return UnitResult.Ok();
         }
 
-        var saveResult = await _repository.SaveAsync(volunteer, cancelToken);
+        var saveResult = await repository.SaveAsync(volunteer, ct);
 
         return saveResult;
     }

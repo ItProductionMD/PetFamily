@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
 using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Authorization;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects.Ids;

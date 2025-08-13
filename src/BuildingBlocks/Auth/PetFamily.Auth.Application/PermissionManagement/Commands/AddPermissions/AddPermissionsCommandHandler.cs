@@ -1,7 +1,7 @@
-﻿using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.Auth.Application.Dtos;
+﻿using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Domain.Entities;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Results;
 
 namespace PetFamily.Auth.Application.PermissionManagement.Commands.AddPermissions;

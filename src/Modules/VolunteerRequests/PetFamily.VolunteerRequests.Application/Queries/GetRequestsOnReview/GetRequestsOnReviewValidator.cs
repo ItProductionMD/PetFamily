@@ -6,7 +6,7 @@ namespace PetFamily.VolunteerRequests.Application.Queries.GetRequestsOnReview;
 
 public static class GetRequestsOnReviewValidator
 {
-    public static void Validate(GetRequestsOnReviewQuery query)
+    public static void Validate(this GetRequestsOnReviewQuery query)
     {
         foreach (var item in query.Filter.Statuses)
         {

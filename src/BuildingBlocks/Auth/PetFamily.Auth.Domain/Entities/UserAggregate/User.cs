@@ -1,5 +1,4 @@
-﻿using PetFamily.Auth.Domain.Entities.RoleAggregate;
-using PetFamily.Auth.Domain.Enums;
+﻿using PetFamily.Auth.Domain.Enums;
 using PetFamily.Auth.Domain.Options;
 using PetFamily.Auth.Domain.ValueObjects;
 using PetFamily.SharedKernel.Abstractions;
@@ -36,7 +35,7 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
     public IReadOnlyList<SocialNetworkInfo> SocialNetworks { get; private set; }
     public RoleId RoleId { get; set; }
     private const int MAX_LOGIN_ATTEMPTS = 5;
-    private User(){ }//EfCore need this
+    private User() { }//EfCore need this
 
     private User(
         UserId id,
@@ -99,7 +98,7 @@ public class User : SoftDeletable, IEntity<UserId>, IHasUniqueFields
     override public void SoftDelete()
     {
         IsDeleted = true;
-        DeletedAt = DateTime.UtcNow;         
+        DeletedAt = DateTime.UtcNow;
     }
 
     override public void Restore()

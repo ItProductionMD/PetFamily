@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Auth.Application.IRepositories;
 using PetFamily.Auth.Application.IServices;
 using PetFamily.Auth.Domain.Enums;
 using PetFamily.Auth.Domain.ValueObjects;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Authorization;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
@@ -33,13 +33,13 @@ public class RegisterByEmailCommandHandler(
     public async Task<UnitResult> Handle(RegisterByEmailCommand cmd, CancellationToken ct)
     {
         RegisterByEmailCommandValidator.Validate(cmd);
-        
+
         var phone = Phone.CreateNotEmpty(cmd.phoneNumber, cmd.phoneRegionCode).Data!;
 
         var checkUniqueFields = await _userReadRepository.CheckUniqueFields(
             cmd.Email,
             cmd.Login,
-            phone, 
+            phone,
             ct);
         if (checkUniqueFields.IsFailure)
             return checkUniqueFields;

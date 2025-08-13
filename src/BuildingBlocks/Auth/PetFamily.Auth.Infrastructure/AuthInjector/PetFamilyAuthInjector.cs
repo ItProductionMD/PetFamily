@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Auth.Application;
 using PetFamily.Auth.Application.IRepositories;
@@ -13,10 +12,7 @@ using PetFamily.Auth.Infrastructure.Services.JwtProvider;
 using PetFamily.Auth.Infrastructure.Services.PasswordHasher;
 using PetFamily.Auth.Public.Contracts;
 using PetFamily.SharedApplication.Extensions;
-using PetFamily.SharedApplication.IUnitOfWork;
-using PetFamily.SharedInfrastructure.Shared;
 using PetFamily.SharedInfrastructure.Shared.Constants;
-using static PetFamily.Auth.Infrastructure.AuthInjector.JwtAuthenticationInjector;
 
 
 namespace PetFamily.Auth.Infrastructure.AuthInjector;

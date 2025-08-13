@@ -1,8 +1,5 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using PetFamily.SharedApplication.Dtos;
-using PetFamily.SharedInfrastructure.Shared.Dapper;
 using Volunteers.Application.ResponseDtos;
 using static PetFamily.SharedInfrastructure.Shared.Dapper.DapperMappers;
 

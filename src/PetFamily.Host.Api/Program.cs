@@ -1,5 +1,4 @@
 using FileStorage.Infrastructure;
-using Microsoft.AspNetCore.Authorization;
 using PetFamily.Auth.Application.DefaultSeeder;
 using PetFamily.Auth.Infrastructure.AuthInjector;
 using PetFamily.Auth.Presentation;
