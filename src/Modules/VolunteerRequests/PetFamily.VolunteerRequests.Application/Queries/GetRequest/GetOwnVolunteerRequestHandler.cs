@@ -4,23 +4,20 @@ using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Results;
 using PetFamily.VolunteerRequests.Application.Dtos;
 using PetFamily.VolunteerRequests.Application.IRepositories;
+using System.Security.Cryptography;
 
 namespace PetFamily.VolunteerRequests.Application.Queries.GetRequest;
 
 public class GetOwnVolunteerRequestHandler(
-    IUserContext userContext,
     ILogger<GetOwnVolunteerRequestHandler> logger,
-    IVolunteerRequestReadRepository requestReadRepository) : IQueryHandler<VolunteerRequestDto? ,GetOwnVolunteerRequestQuery>
+    IVolunteerRequestReadRepository requestReadRepo) : IQueryHandler<VolunteerRequestDto? ,GetOwnVolunteerRequestQuery>
 {
     private readonly ILogger _logger = logger;
-    private readonly IUserContext _userContext = userContext;
-    private readonly IVolunteerRequestReadRepository _requestReadRepository = requestReadRepository;
-    public async Task<Result<VolunteerRequestDto?>> Handle(GetOwnVolunteerRequestQuery query, CancellationToken ct)
+    private readonly IVolunteerRequestReadRepository _requestReadRepo = requestReadRepo;
+    public async Task<Result<VolunteerRequestDto>> Handle(GetOwnVolunteerRequestQuery query, CancellationToken ct)
     {
-        var userId = _userContext.GetUserId();
+        var userId = query.UserId;
 
-        var request = await _requestReadRepository.GetByUserIdAsync(userId, ct);
-
-        return Result.Ok(request);
+        return (await _requestReadRepo.GetByUserIdAsync(userId, ct));
     }
 }

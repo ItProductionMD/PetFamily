@@ -18,29 +18,23 @@ namespace Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 
 public class CreateVolunteerHandler(
     IVolunteerWriteRepository volunteerWriteRepository,
-    IVolunteerReadRepository volunteerReadRepository,
-    IUserContext userContext,
     ILogger<CreateVolunteerHandler> logger) : ICommandHandler<Guid, CreateVolunteerCommand>
 {
     private readonly IVolunteerWriteRepository _volunteerWriteRepository = volunteerWriteRepository;
-    private readonly IVolunteerReadRepository _volunteerReadRepository = volunteerReadRepository;
     private readonly ILogger<CreateVolunteerHandler> _logger = logger;
-    private readonly IUserContext _userContext = userContext;
 
     public async Task<Result<Guid>> Handle(CreateVolunteerCommand cmd, CancellationToken ct)
     {
         CreateVolunteerValidator.Validate(cmd);
 
-        var adminId = _userContext.GetUserId();
-
         var volunteer = CreateVolunteerProcess(cmd);
 
-        var addResult = await _volunteerWriteRepository.AddAsync(volunteer, ct);
+        var addResult = await _volunteerWriteRepository.AddAndSaveAsync(volunteer, ct);
         if (addResult.IsFailure)
             return addResult;
 
         _logger.LogInformation("Volunteer with id:{Id},created successful by admin with id:{adminId}!",
-            volunteer.Id, adminId);
+            volunteer.Id, cmd.AdminId);
 
         return Result.Ok(volunteer.Id);
     }

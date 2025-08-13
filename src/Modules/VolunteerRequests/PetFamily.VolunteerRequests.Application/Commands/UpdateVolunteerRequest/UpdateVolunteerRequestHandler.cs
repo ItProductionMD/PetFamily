@@ -9,26 +9,22 @@ namespace PetFamily.VolunteerRequests.Application.Commands.UpdateVolunteerReques
 
 public class UpdateVolunteerRequestHandler(
     ILogger<UpdateVolunteerRequestHandler> logger,
-    IUserContext userContext,
-    IVolunteerRequestWriteRepository requestRepository)
+    IVolunteerRequestWriteRepository requestRepo)
     : ICommandHandler<UpdateVolunteerRequestCommand>
 {
     private readonly ILogger<UpdateVolunteerRequestHandler> _logger = logger;
-    private readonly IUserContext _userContext = userContext;
-    private readonly IVolunteerRequestWriteRepository _requestRepository = requestRepository;
+    private readonly IVolunteerRequestWriteRepository _requestRepo = requestRepo;
 
     public async Task<UnitResult> Handle(UpdateVolunteerRequestCommand cmd, CancellationToken ct)
     {
         UpdateVolunteerRequestValidator.Validate(cmd);
       
-        var userId = _userContext.GetUserId();
+        var userId = cmd.UserId;
        
-        var getRequest = await _requestRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
+        var getRequest = await _requestRepo.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getRequest.IsFailure)
-        {
-            _logger.LogWarning("Volunteer request with ID {Id} not found", cmd.VolunteerRequestId);
             return UnitResult.Fail(getRequest.Error);
-        }
+        
         var request = getRequest.Data!;
 
         if (request.UserId != userId)
@@ -53,7 +49,7 @@ public class UpdateVolunteerRequestHandler(
             return UnitResult.Fail(updateResult.Error);
         }
 
-        await _requestRepository.SaveAsync(ct);
+        await _requestRepo.SaveAsync(ct);
 
         _logger.LogInformation("Volunteer request {RequestId} successfully updated", request.Id);
 

@@ -7,7 +7,7 @@ using Volunteers.Infrastructure.Contexts;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using Microsoft.EntityFrameworkCore;
 
-namespace PetFamily.IntegrationTests.Fixtures;
+namespace PetFamily.IntegrationTests.IClassFixtures;
 
 public abstract class BaseTest(TestWebApplicationFactory factory)
     : IClassFixture<TestWebApplicationFactory>, IAsyncLifetime
@@ -59,6 +59,19 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
             throw new InvalidOperationException($"DbContext of type {dbContextType.Name} not registered");
 
         dbContext.Set<T>().Add(entity);
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task SeedRangeAsync<T>(Type dbContextType, List<T> entities) where T : class
+    {
+        using var scope = _factory.Services.CreateScope();
+
+        var dbContext = scope.ServiceProvider.GetRequiredService(dbContextType) as DbContext;
+        if (dbContext == null)
+            throw new InvalidOperationException($"DbContext of type {dbContextType.Name} not registered");
+
+        await dbContext.Set<T>().AddRangeAsync(entities);
 
         await dbContext.SaveChangesAsync();
     }

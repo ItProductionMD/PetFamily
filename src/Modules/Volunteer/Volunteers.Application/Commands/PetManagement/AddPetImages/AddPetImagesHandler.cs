@@ -75,7 +75,7 @@ public class AddPetImagesHandler(
             pet.DeleteImages(unsavedFiles);
         }
 
-        var saveResult = await _repository.Save(volunteer, ct);
+        var saveResult = await _repository.SaveAsync(volunteer, ct);
         if (saveResult.IsFailure)
         {
             var fileDtosToDelete = uploadFileDtos

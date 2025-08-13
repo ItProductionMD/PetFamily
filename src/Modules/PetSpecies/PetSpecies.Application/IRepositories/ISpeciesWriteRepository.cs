@@ -11,11 +11,11 @@ public interface ISpeciesWriteRepository
 
     Task<Result<List<Species>>> GetSpecies(CancellationToken cancellationToken);
 
-    Task<Guid> AddAsync(Species species, CancellationToken cancellationToken);
+    Task<Guid> AddAndSaveAsync(Species species, CancellationToken cancellationToken);
 
     Task SaveAsync(Species species, CancellationToken cancellationToken);
 
-    Task<UnitResult> DeleteAsync(Guid speciesId, CancellationToken cancellationToken);
+    Task<UnitResult> DeleteAndSaveAsync(Guid speciesId, CancellationToken cancellationToken);
 
     Task<Result<Breed>> GetBreedByIdAsync(Guid breedId, CancellationToken cancellationToken);
 

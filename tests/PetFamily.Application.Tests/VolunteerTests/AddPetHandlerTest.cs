@@ -189,7 +189,7 @@ public class AddPetHandlerTests
            .ReturnsAsync(resultGetVolunteer);
 
         _volunteerRepositoryMock
-            .Setup(x => x.Save(resultGetVolunteer.Data!, _token))
+            .Setup(x => x.SaveAsync(resultGetVolunteer.Data!, _token))
             .ReturnsAsync(UnitResult.Ok());
 
         //ACT

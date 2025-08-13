@@ -33,7 +33,7 @@ IFileService fileService) : ICommandHandler<RestoreVolunteerCommand>
             imagesToRestore.AddRange(pet.Images
                 .Select(x => new FileDto(x.Name, Constants.BUCKET_FOR_PET_IMAGES)));
 
-        var restoreResult = await _repository.Save(volunteer, ct);
+        var restoreResult = await _repository.SaveAsync(volunteer, ct);
         if (restoreResult.IsFailure)
             return restoreResult;
 
@@ -56,7 +56,7 @@ IFileService fileService) : ICommandHandler<RestoreVolunteerCommand>
 
                 volunteer.DeleteImagesFromPets(unrestoredFiles);
 
-                var saveResult = await _repository.Save(volunteer, ct);
+                var saveResult = await _repository.SaveAsync(volunteer, ct);
                 if (saveResult.IsFailure)
                 {
                     _logger.LogCritical("Save Volunteer with id:{Id} after updating restoring Images Fail!" +

@@ -16,17 +16,16 @@ namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 public class SendRequestToRevisionTests
 {
     private readonly Mock<IVolunteerRequestWriteRepository> _repo = new();
-    private readonly Mock<IUserContext.IUserContext> _userContext = new();
     private readonly Mock<IDiscussionMessageSender> _messageSender = new();
     private readonly Mock<ILogger<SendRequestToRevisionHandler>> _logger = new();
 
     private SendRequestToRevisionHandler CreateHandler() =>
-        new(_repo.Object, _userContext.Object, _messageSender.Object, _logger.Object);
+        new(_repo.Object, _messageSender.Object, _logger.Object);
 
-    private static VolunteerRequest CreateNewRequest(Guid userId)
+    private static VolunteerRequest CreateNewRequest()
     {
         var create = VolunteerRequest.Create(
-            userId: userId,
+            userId: Guid.NewGuid(),
             documentName: "doc.pdf",
             lastName: "Doe",
             firstName: "John",
@@ -45,10 +44,9 @@ public class SendRequestToRevisionTests
         var ct = CancellationToken.None;
         var requestId = Guid.NewGuid();
         var adminId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
         var discussionId = Guid.NewGuid();
 
-        var request = CreateNewRequest(userId);
+        var request = CreateNewRequest();
         var takeResult = request.TakeToReview(adminId, discussionId);
         if(takeResult.IsFailure)
         {
@@ -57,9 +55,6 @@ public class SendRequestToRevisionTests
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.GetUserId())
-             .Returns(adminId);
-
         _repo.Setup(r => r.SaveAsync(ct))
              .Returns(Task.CompletedTask);
 
@@ -67,7 +62,7 @@ public class SendRequestToRevisionTests
              .ReturnsAsync(UnitResult.Ok());
 
         var handler = CreateHandler();
-        var cmd = new SendRequestToRevisionCommand(requestId, "Комментарий для доработки");
+        var cmd = new SendRequestToRevisionCommand(adminId, requestId, "Комментарий для доработки");
 
         // act
         var result = await handler.Handle(cmd, ct);
@@ -86,35 +81,13 @@ public class SendRequestToRevisionTests
     {
         var ct = CancellationToken.None;
         var requestId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
 
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Fail(Error.NotFound("not found")));
 
         var handler = CreateHandler();
-        var cmd = new SendRequestToRevisionCommand(requestId, "any");
-
-        var result = await handler.Handle(cmd, ct);
-
-        Assert.True(result.IsFailure);
-        _repo.Verify(r => r.SaveAsync(ct), Times.Never);
-        _messageSender.Verify(s => s.Send(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), ct), Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_Should_Fail_When_AdminId_Not_Available()
-    {
-        var ct = CancellationToken.None;
-        var requestId = Guid.NewGuid();
-        var request = CreateNewRequest(Guid.NewGuid());
-
-        _repo.Setup(r => r.GetByIdAsync(requestId, ct))
-             .ReturnsAsync(Result.Ok(request));
-
-        _userContext.Setup(c => c.TryGetUserId())
-             .Returns(UnitResult.Fail(Error.InternalServerError("no user")));
-
-        var handler = CreateHandler();
-        var cmd = new SendRequestToRevisionCommand(requestId, "any");
+        var cmd = new SendRequestToRevisionCommand(adminId, requestId, "any");
 
         var result = await handler.Handle(cmd, ct);
 
@@ -130,16 +103,13 @@ public class SendRequestToRevisionTests
         var ct = CancellationToken.None;
         var requestId = Guid.NewGuid();
         var adminId = Guid.NewGuid();
-        var request = CreateNewRequest(Guid.NewGuid());
+        var request = CreateNewRequest();
 
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.TryGetUserId())
-             .Returns(Result.Ok(adminId));
-
         var handler = CreateHandler();
-        var cmd = new SendRequestToRevisionCommand(requestId, "any");
+        var cmd = new SendRequestToRevisionCommand(adminId, requestId, "any");
 
         // act
         var result = await handler.Handle(cmd, ct);
@@ -158,9 +128,8 @@ public class SendRequestToRevisionTests
         var ct = CancellationToken.None;
         var requestId = Guid.NewGuid();
         var adminId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
 
-        var request = CreateNewRequest(userId);
+        var request = CreateNewRequest();
 
         // Заявка должна быть в OnReview
         var discussionId = Guid.NewGuid();
@@ -168,9 +137,6 @@ public class SendRequestToRevisionTests
 
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Ok(request));
-
-        _userContext.Setup(c => c.TryGetUserId())
-             .Returns(Result.Ok(adminId));
 
         // Save вызывается 1) после SendBackToRevision, 2) после CancelSendBackToRevision
         _repo.Setup(r => r.SaveAsync(ct))
@@ -181,7 +147,7 @@ public class SendRequestToRevisionTests
              .ReturnsAsync(UnitResult.Fail(Error.InternalServerError("send failed")));
 
         var handler = CreateHandler();
-        var cmd = new SendRequestToRevisionCommand(requestId, "bad");
+        var cmd = new SendRequestToRevisionCommand(adminId, requestId, "bad");
 
         // act
         var result = await handler.Handle(cmd, ct);

@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Modules\Volunteer\Volunteers.Public\Volunteers.Public.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
     <ProjectReference Include="..\PetFamily.Auth.Domain\PetFamily.Auth.Domain.csproj" />

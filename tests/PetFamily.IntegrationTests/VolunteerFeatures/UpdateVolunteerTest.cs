@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
@@ -15,10 +15,12 @@ public class UpdateVolunteerTest(TestWebApplicationFactory factory)
     public async Task Should_update_volunteer_correctly()
     {
         //ARRANGE
+        var userId = Guid.NewGuid();
         var seedVolunteer = new VolunteerTestBuilder().Volunteer;
         await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var command = new UpdateVolunteerCommand(
+            userId,
             seedVolunteer.Id,
             "updatedFirstName",
             "updatedLastName",

@@ -6,7 +6,7 @@ using PetFamily.Discussions.Application.Queries.GetDiscussion;
 using PetFamily.Discussions.Domain.Entities;
 using PetFamily.Discussions.Infrastructure.Contexts;
 using PetFamily.Discussions.Public.Dtos;
-using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedKernel.Results;
 

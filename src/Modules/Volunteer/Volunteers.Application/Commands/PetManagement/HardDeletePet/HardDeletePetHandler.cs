@@ -46,7 +46,7 @@ public class HardDeletePetHandler(
 
         volunteer.HardDeletePet(pet);
 
-        var result = await _repository.Save(volunteer, ct);
+        var result = await _repository.SaveAsync(volunteer, ct);
         if (result.IsFailure)
             return result;
 

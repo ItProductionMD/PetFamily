@@ -73,6 +73,7 @@ public static class AssertCustom
         SubmitVolunteerRequestCommand cmd,
         VolunteerRequest volunteerRequest)
     {
+        Assert.Equal(cmd.UserId, volunteerRequest.UserId);
         Assert.Equal(cmd.FirstName, volunteerRequest.FirstName);
         Assert.Equal(cmd.LastName, volunteerRequest.LastName);
         Assert.Equal(cmd.Description, volunteerRequest.Description);

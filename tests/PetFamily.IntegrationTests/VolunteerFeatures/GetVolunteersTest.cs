@@ -1,4 +1,4 @@
-﻿using PetFamily.IntegrationTests.Fixtures;
+﻿using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;

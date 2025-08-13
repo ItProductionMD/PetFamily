@@ -38,7 +38,7 @@ public class RestorePetHandler(
         if (restoredPet.IsFailure)
             return restoredPet;
 
-        var saveResult = await _repository.Save(volunteer, ct);
+        var saveResult = await _repository.SaveAsync(volunteer, ct);
         if (saveResult.IsFailure)
             return saveResult;
 

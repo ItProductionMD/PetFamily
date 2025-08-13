@@ -19,7 +19,6 @@ namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 public class ApproveVolunteerRequestHandlerTests
 {
     private readonly Mock<IVolunteerRequestWriteRepository> _requestRepo = new();
-    private readonly Mock<IUserContext.IUserContext> _userContext = new();
     private readonly Mock<IUserContract> _userFinder = new();
     private readonly Mock<IVolunteerCreator> _volunteerCreator = new();
     private readonly Mock<ILogger<ApproveVolunteerRequestHandler>> _logger = new();
@@ -28,13 +27,12 @@ public class ApproveVolunteerRequestHandlerTests
         new
         (
             _requestRepo.Object,
-            _userContext.Object,
             _userFinder.Object,
             _volunteerCreator.Object,
             _logger.Object
         );
 
-    private static VolunteerRequest CreateRequest(Guid userId, bool takenForReview, Guid? adminId = null)
+    private static VolunteerRequest CreateRequest(Guid userId, bool takenForReview, Guid adminId)
     {
         var create = VolunteerRequest.Create(
             userId: userId,
@@ -43,13 +41,13 @@ public class ApproveVolunteerRequestHandlerTests
             firstName: "John",
             description: "desc",
             experienceYears: 2,
-            requisites: Array.Empty<RequisitesInfo>() // если тип другой — подстрой
+            requisites: Array.Empty<RequisitesInfo>() 
         );
         var req = create.Data!;
 
         if (takenForReview)
         {
-            var effectiveAdmin = adminId ?? Guid.NewGuid();
+            var effectiveAdmin = adminId;
             var discussionId = Guid.NewGuid();
             var take = req.TakeToReview(effectiveAdmin, discussionId);
             Assert.True(take.IsSuccess);
@@ -72,9 +70,6 @@ public class ApproveVolunteerRequestHandlerTests
         _requestRepo.Setup(r => r.GetByIdAsync(requestId, ct))
             .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.GetUserId())
-            .Returns(adminId);
-
         _requestRepo.Setup(r => r.SaveAsync(ct))
             .Returns(Task.Delay(0));
 
@@ -95,7 +90,7 @@ public class ApproveVolunteerRequestHandlerTests
         var handler = CreateHandler();
 
         // act
-        var result = await handler.Handle(new ApproveVolunteerRequestCommand(requestId), ct);
+        var result = await handler.Handle(new ApproveVolunteerRequestCommand(adminId, requestId), ct);
 
         // assert
         Assert.True(result.IsSuccess);
@@ -113,6 +108,7 @@ public class ApproveVolunteerRequestHandlerTests
     public async Task Handle_Should_Fail_When_Request_Not_Found()
     {
         // arrange
+        var adminId = Guid.NewGuid();
         var ct = CancellationToken.None;
         var requestId = Guid.NewGuid();
 
@@ -122,7 +118,7 @@ public class ApproveVolunteerRequestHandlerTests
         var handler = CreateHandler();
 
         // act
-        var result = await handler.Handle(new ApproveVolunteerRequestCommand(requestId), ct);
+        var result = await handler.Handle(new ApproveVolunteerRequestCommand(adminId, requestId), ct);
 
         // assert
         Assert.True(result.IsFailure);
@@ -145,13 +141,12 @@ public class ApproveVolunteerRequestHandlerTests
         _requestRepo.Setup(r => r.GetByIdAsync(requestId, ct))
             .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.TryGetUserId())
-            .Returns(Result.Ok(adminTryingToApprove)); // другой админ → Approve вернёт Fail
-
         var handler = CreateHandler();
 
         // act
-        var result = await handler.Handle(new ApproveVolunteerRequestCommand(requestId), ct);
+        var result = await handler.Handle(
+            new ApproveVolunteerRequestCommand(adminTryingToApprove, requestId),
+            ct);
 
         // assert
         Assert.True(result.IsFailure);
@@ -173,9 +168,6 @@ public class ApproveVolunteerRequestHandlerTests
         _requestRepo.Setup(r => r.GetByIdAsync(requestId, ct))
             .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.GetUserId())
-            .Returns(adminId);
-
         _requestRepo.Setup(r => r.SaveAsync(ct))
             .Returns(Task.CompletedTask);
 
@@ -196,7 +188,7 @@ public class ApproveVolunteerRequestHandlerTests
         var handler = CreateHandler();
 
         // act
-        var result = await handler.Handle(new ApproveVolunteerRequestCommand(requestId), ct);
+        var result = await handler.Handle(new ApproveVolunteerRequestCommand(adminId, requestId), ct);
 
         // assert
         Assert.True(result.IsFailure);

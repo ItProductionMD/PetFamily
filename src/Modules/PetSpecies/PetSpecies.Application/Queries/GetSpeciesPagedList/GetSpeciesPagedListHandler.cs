@@ -15,14 +15,14 @@ public class GetSpeciesPagedListHandler(
 
     public async Task<Result<SpeciesPagedListDto>> Handle(
         GetSpeciesPagedListQuery query,
-        CancellationToken cancelToken)
+        CancellationToken ct)
     {
-        //Validate query
+        //TODO Validate query
 
         var response = await _readRepository.GetSpeciesPagedList(
             query.SpeciesFilter,
             query.Pagination,
-            cancelToken);
+            ct);
 
         return Result.Ok(response);
     }

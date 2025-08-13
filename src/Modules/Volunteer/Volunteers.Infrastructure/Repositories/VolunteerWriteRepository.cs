@@ -7,8 +7,8 @@ using PetFamily.SharedKernel.Validations;
 using PetFamily.SharedKernel.ValueObjects;
 using Polly;
 using Volunteers.Application.IRepositories;
+using Volunteers.Domain;
 using Volunteers.Infrastructure.Contexts;
-using VolunteerDomain = Volunteers.Domain.Volunteer;
 
 namespace Volunteers.Infrastructure.Repositories;
 
@@ -19,8 +19,8 @@ public class VolunteerWriteRepository(
     private readonly ILogger<VolunteerWriteRepository> _logger = logger;
     private readonly VolunteerWriteDbContext _context = context;
 
-    public async Task<Result<Guid>> AddAsync(
-        VolunteerDomain volunteer,
+    public async Task<Result<Guid>> AddAndSaveAsync(
+        Volunteer volunteer,
         CancellationToken ct = default)
     {
         try
@@ -36,7 +36,7 @@ public class VolunteerWriteRepository(
         {
             string constraintName = pgEx.ConstraintName?.ToLower() ?? string.Empty;
 
-            string[] uniqueFields = VolunteerDomain.GetUniqueFields();
+            string[] uniqueFields = Volunteer.GetUniqueFields();
 
             var validationErrors = new List<ValidationError>();
 
@@ -72,7 +72,7 @@ public class VolunteerWriteRepository(
         }
     }
 
-    public async Task<Result<VolunteerDomain>> GetByIdAsync(Guid id, CancellationToken ct)
+    public async Task<Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var volunteer = await _context.Volunteers
             .Include(v => v.Pets)
@@ -87,7 +87,7 @@ public class VolunteerWriteRepository(
         return Result.Ok(volunteer);
     }
 
-    public async Task<UnitResult> Save(VolunteerDomain volunteer, CancellationToken ct)
+    public async Task<UnitResult> SaveAsync(Volunteer volunteer, CancellationToken ct)
     {
         try
         {
@@ -102,7 +102,7 @@ public class VolunteerWriteRepository(
         {
             string constraintName = pgEx.ConstraintName?.ToLower() ?? string.Empty;
 
-            string[] uniqueFields = VolunteerDomain.GetUniqueFields();
+            string[] uniqueFields = Volunteer.GetUniqueFields();
 
             var validationErrors = new List<ValidationError>();
 
@@ -137,7 +137,7 @@ public class VolunteerWriteRepository(
     }
 
     public async Task Delete(
-        VolunteerDomain volunteer,
+        Volunteer volunteer,
         CancellationToken ct = default)
     {
         _context.Volunteers.Remove(volunteer);
@@ -145,7 +145,7 @@ public class VolunteerWriteRepository(
     }
 
 
-    public async Task SaveWithRetry(VolunteerDomain volunteer, CancellationToken ct = default)
+    public async Task SaveWithRetry(Volunteer volunteer, CancellationToken ct = default)
     {
         var retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(
                3, retryAttempt => TimeSpan.FromMilliseconds(200 * Math.Pow(2, retryAttempt)),
@@ -157,7 +157,23 @@ public class VolunteerWriteRepository(
 
         await retryPolicy.ExecuteAsync(async () =>
         {
-            await Save(volunteer, ct);
+            await SaveAsync(volunteer, ct);
         });
+    }
+
+    public async Task<Result<Volunteer>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
+    {
+        var volunteer = await _context.Volunteers
+            .Include(v => v.Pets)
+            .FirstOrDefaultAsync(v => v.UserId.Value == userId, ct);
+
+        if (volunteer == null)
+        {
+            _logger.LogError("Volunteer with userId:{userId} not found", userId);
+            return Result.Fail(Error.NotFound($"Volunteer with userId:{userId}"));
+        }
+        _logger.LogInformation("Volunteer with userId:{userId} found", userId);
+
+        return Result.Ok(volunteer);
     }
 }

@@ -2,6 +2,7 @@ using FileStorage.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using PetFamily.Auth.Application.DefaultSeeder;
 using PetFamily.Auth.Infrastructure.AuthInjector;
+using PetFamily.Auth.Presentation;
 using PetFamily.Discussions.Infrastructure;
 using PetFamily.Framework.Middlewares;
 using PetFamily.Framework.SharedAuthorization;
@@ -34,6 +35,7 @@ builder.Services
 builder.Services
     .InjectSharedInfrastructure(builder.Configuration)
     .InjectFileStorage(builder.Configuration)
+    .InjectAuthPresentation()
     .InjectAuth(builder.Configuration)
     .InjectPermissionPoliciesAuthorization();
 
@@ -66,8 +68,8 @@ if (app.Environment.IsDevelopment())
     var rolesSeeder = scope.ServiceProvider.GetRequiredService<RolesSeeder>();
     var adminSeeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
 
-    //await rolesSeeder.SeedAsync();
-    //await adminSeeder.SeedAsync();
+    await rolesSeeder.SeedAsync();
+    await adminSeeder.SeedAsync();
 }
 
 app

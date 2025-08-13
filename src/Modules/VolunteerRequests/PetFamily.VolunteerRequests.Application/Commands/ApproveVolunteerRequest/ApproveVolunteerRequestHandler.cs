@@ -11,27 +11,25 @@ using Volunteers.Public.IContracts;
 namespace PetFamily.VolunteerRequests.Application.Commands.ApproveVolunteerRequest;
 
 public class ApproveVolunteerRequestHandler(
-    IVolunteerRequestWriteRepository requestWriteRepository,
-    IUserContext userContext,
+    IVolunteerRequestWriteRepository requestWriteRepo,
     IUserContract userFinder,
     IVolunteerCreator volunteerCreator,
     ILogger<ApproveVolunteerRequestHandler> logger) : ICommandHandler<ApproveVolunteerRequestCommand>
 {
-    private readonly IVolunteerRequestWriteRepository _requestWriteRepository = requestWriteRepository;
-    private readonly IUserContext _userContext = userContext;
+    private readonly IVolunteerRequestWriteRepository _requestWriteRepo = requestWriteRepo;
     private readonly IUserContract _userFinder = userFinder;
     private readonly IVolunteerCreator _volunteerCreator = volunteerCreator;
     private readonly ILogger<ApproveVolunteerRequestHandler> _logger = logger;
 
     public async Task<UnitResult> Handle(ApproveVolunteerRequestCommand cmd, CancellationToken ct)
     {
-        var getRequest = await _requestWriteRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
+        var adminId = cmd.AdminId;
+
+        var getRequest = await _requestWriteRepo.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getRequest.IsFailure)
             return UnitResult.Fail(getRequest.Error);
         
         var request = getRequest.Data!;
-
-        var adminId = _userContext.GetUserId();
 
         var approveResult = request.Approve(adminId);
         if (approveResult.IsFailure)
@@ -42,7 +40,7 @@ public class ApproveVolunteerRequestHandler(
             return UnitResult.Fail(approveResult.Error);
         }
 
-        await _requestWriteRepository.SaveAsync(ct);
+        await _requestWriteRepo.SaveAsync(ct);
 
         try
         {
@@ -54,6 +52,7 @@ public class ApproveVolunteerRequestHandler(
             var user = getUser.Data!;
 
             var createVolunteerDto = new CreateVolunteerDto(
+                adminId,
                 request.UserId,
                 request.LastName,
                 request.FirstName,
@@ -77,7 +76,7 @@ public class ApproveVolunteerRequestHandler(
             var cancelResult = request.CancelApproval(adminId);
             if (cancelResult.IsSuccess)
             {
-                await _requestWriteRepository.SaveAsync(ct);
+                await _requestWriteRepo.SaveAsync(ct);
 
                 _logger.LogInformation("Approval for request ID {Id} was rolled back.", cmd.VolunteerRequestId);
                 return UnitResult.Fail(Error.InternalServerError("Failed to create volunteer after approving request."));

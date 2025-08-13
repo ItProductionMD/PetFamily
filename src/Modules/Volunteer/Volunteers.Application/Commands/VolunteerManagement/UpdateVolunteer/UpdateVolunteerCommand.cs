@@ -4,6 +4,7 @@ namespace Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
 
 public record UpdateVolunteerCommand
 (
+    Guid UserId,
     Guid VolunteerId,
     string FirstName,
     string LastName, 

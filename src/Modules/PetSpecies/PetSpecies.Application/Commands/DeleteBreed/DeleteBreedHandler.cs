@@ -9,35 +9,35 @@ namespace PetSpecies.Application.Commands.DeleteBreed;
 
 public class DeleteBreedHandler(
     IPetExistenceContract petExistenceChecker,
-    ISpeciesWriteRepository speciesWriteRepository,
+    ISpeciesWriteRepository speciesWriteRepo,
     ILogger<DeleteBreedHandler> logger) : ICommandHandler<DeleteBreedCommand>
 {
     private readonly ILogger<DeleteBreedHandler> _logger = logger;
     private readonly IPetExistenceContract _petExistenceChecker = petExistenceChecker;
-    private readonly ISpeciesWriteRepository _writeRepository = speciesWriteRepository;
+    private readonly ISpeciesWriteRepository _speciesWriteRepo = speciesWriteRepo;
 
-    public async Task<UnitResult> Handle(DeleteBreedCommand command, CancellationToken cancelToken)
+    public async Task<UnitResult> Handle(DeleteBreedCommand cmd, CancellationToken ct)
     {
-        if (command.BreedId == Guid.Empty)
+        if (cmd.BreedId == Guid.Empty)
         {
             _logger.LogWarning("BreedId cannot be empty");
             return UnitResult.Fail(Error.GuidIsEmpty("BreedId"));
         }
-        var isPetExist = await _petExistenceChecker.ExistsWithBreedAsync(command.BreedId);
+        var isPetExist = await _petExistenceChecker.ExistsWithBreedAsync(cmd.BreedId);
         if (isPetExist)
             return UnitResult.Fail(Error.Conflict("Breed can't be deleted because it is used by a pet!"));
 
-        var getSpecies = await _writeRepository.GetByBreedIdAsync(command.BreedId, cancelToken);
+        var getSpecies = await _speciesWriteRepo.GetByBreedIdAsync(cmd.BreedId, ct);
         if (getSpecies.IsFailure)
             return UnitResult.Fail(getSpecies.Error);
 
         var species = getSpecies.Data!;
 
-        var deleteResult = species.DeleteBreedById(command.BreedId);
+        var deleteResult = species.DeleteBreedById(cmd.BreedId);
         if (deleteResult.IsFailure)
             return UnitResult.Fail(deleteResult.Error);
 
-        await _writeRepository.SaveAsync(species, cancelToken);
+        await _speciesWriteRepo.SaveAsync(species, ct);
 
         return UnitResult.Ok();
     }

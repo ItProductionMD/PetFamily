@@ -8,7 +8,7 @@ namespace PetFamily.SharedKernel.Validations;
 
 public static class ValueObjectValidations
 {
-    public static UnitResult ValidatePhone(string? regionCode, string? number) =>
+    public static UnitResult ValidateRequiredPhone(string? regionCode, string? number) =>
 
         UnitResult.FromValidationResults(
 
@@ -23,4 +23,14 @@ public static class ValueObjectValidations
                 "Phone number",
                 MAX_LENGTH_SHORT_TEXT,
                 PHONE_NUMBER_PATTERN));
+
+    public static UnitResult ValidateFullName(string? firstName, string? lastName)
+    {
+        return UnitResult.FromValidationResults(
+
+            () => ValidateRequiredField(lastName, "LastName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN),
+
+            () => ValidateRequiredField(firstName, "FirstName", MAX_LENGTH_SHORT_TEXT, NAME_PATTERN)
+        );
+    }
 }

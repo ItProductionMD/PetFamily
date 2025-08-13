@@ -54,7 +54,7 @@ public class ChangePetMainImageHandler(
             return UnitResult.Ok();
         }
 
-        var saveResult = await _repository.Save(volunteer, cancelToken);
+        var saveResult = await _repository.SaveAsync(volunteer, cancelToken);
 
         return saveResult;
     }

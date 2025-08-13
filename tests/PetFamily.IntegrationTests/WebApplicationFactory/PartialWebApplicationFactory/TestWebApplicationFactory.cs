@@ -28,54 +28,9 @@ public partial class TestWebApplicationFactory : WebApplicationFactory<Program>,
 
     private Respawner _respawner = null!;
     private NpgsqlConnection _dbConnection = null!;
+    public string ConnectionString { get; set; } = string.Empty;
     public Mock<IFileService> FileServiceMock = new Mock<IFileService>();
     public Mock<IUserContext> UserContextMock = new Mock<IUserContext>();
     public Mock<IUploadFileDtoValidator> FileValidator = new Mock<IUploadFileDtoValidator>();
     public Mock<IParticipantContract> ParticipantContractMock = new Mock<IParticipantContract>();
-    public Guid UserContextId = Guid.NewGuid();
-    public string ConnectionString = string.Empty;
-
-    public async Task InitializeRespawner()
-    {
-        await _dbConnection.OpenAsync();
-        _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
-        {
-            DbAdapter = DbAdapter.Postgres,
-
-            SchemasToInclude = new[]
-            {
-                SchemaNames.SPECIES,
-                SchemaNames.VOLUNTEER,
-                SchemaNames.AUTH,
-                SchemaNames.VOLUNTEER_REQUESTS,
-                SchemaNames.DISCUSSION
-            }
-
-        });
-    }
-
-    public async Task ResetCheckpoint()
-    {
-        Console.WriteLine("ResetBd");
-        await _respawner.ResetAsync(_dbConnection);
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _dbContainer.StartAsync();
-
-        _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
-
-        ConnectionString = _dbContainer.GetConnectionString();
-
-        await ApplyAllMigrationsToDbContainerAsync();
-
-        await InitializeRespawner();
-    }
-
-    public new async Task DisposeAsync()
-    {
-        await _dbContainer.StopAsync();
-        await _dbContainer.DisposeAsync();
-    }
 }

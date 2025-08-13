@@ -30,7 +30,7 @@ public class RefreshTokensHandler(
         RefreshTokenCommand cmd,
         CancellationToken ct)
     {
-        var getRefreshToken = await _refreshTokenWriteRepository.GetRefreshToken(cmd.Token, ct);
+        var getRefreshToken = await _refreshTokenWriteRepository.GetRefreshToken(cmd.RefreshToken, ct);
         if (getRefreshToken.IsFailure)
             return Result.Fail(getRefreshToken.Error);
 
@@ -38,7 +38,7 @@ public class RefreshTokensHandler(
         if (refreshToken.IsActive == false)
         {
             _logger.LogWarning("RefreshToken:{token} for userId:{userId} is not active!",
-                 cmd.Token, refreshToken.UserId);
+                 cmd.RefreshToken, refreshToken.UserId);
 
             return Result.Fail(Error.Authentication("Refresh token is not active!"));
         }
@@ -67,7 +67,7 @@ public class RefreshTokensHandler(
         var validateFingerPrintResult = refreshToken.ValidateFingerPrint(cmd.FingerPrint);
         if (validateFingerPrintResult.IsFailure)
         {
-            _logger.LogWarning("Validate fingerprint error!for token:{token}", cmd.Token);
+            _logger.LogWarning("Validate fingerprint error!for token:{token}", cmd.RefreshToken);
             return Result.Fail(validateFingerPrintResult.Error);
         }
 

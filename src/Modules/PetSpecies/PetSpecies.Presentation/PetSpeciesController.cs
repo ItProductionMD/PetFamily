@@ -23,20 +23,17 @@ public class PetSpeciesController : ControllerBase
     /// </summary>
     /// <param name="request">The data for the new pet species.</param>
     /// <param name="handler">The handler for processing the add species command.</param>
-    /// <param name="cancelToken">A token to cancel the operation.</param>
+    /// <param name="ct">A token to cancel the operation.</param>
     /// <returns>Returns a response with the operation result (200 OK or an error).</returns>
     [Authorize(Policy = SpeciesCreate)]
     [HttpPost]
     public async Task<ActionResult<Envelope>> AddSpecies(
         [FromBody] AddPetTypeRequest request,
         [FromServices] AddPetTypeHandler handler,
-        CancellationToken cancelToken)
+        CancellationToken ct = default)
     {
-        var addPetType = await handler.Handle(request.ToCommand(), cancelToken);
-
-        return addPetType.IsFailure
-           ? addPetType.ToErrorActionResult()
-           : Ok(addPetType.ToEnvelope());
+        var command = request.ToCommand();
+        return (await handler.Handle(command, ct)).ToActionResult();
     }
 
     /// <summary>
@@ -44,21 +41,17 @@ public class PetSpeciesController : ControllerBase
     /// </summary>
     /// <param name="speciesId"></param>
     /// <param name="handler"></param>
-    /// <param name="cancelToken"></param>
+    /// <param name="ct"></param>
     /// <returns></returns>
     [Authorize(Policy = SpeciesDelete)]
     [HttpDelete("{speciesId}")]
     public async Task<ActionResult<Envelope>> DeleteSpecies(
         [FromRoute] Guid speciesId,
         [FromServices] DeleteSpeciesHandler handler,
-        CancellationToken cancelToken)
+        CancellationToken ct = default)
     {
-
-        var deleteSpecies = await handler.Handle(new(speciesId), cancelToken);
-
-        return deleteSpecies.IsFailure
-            ? deleteSpecies.ToErrorActionResult()
-            : Ok(deleteSpecies.ToEnvelope());
+        var command = new DeleteSpeciesCommand(speciesId);
+        return (await handler.Handle(command, ct)).ToActionResult();
     }
 
 
@@ -68,7 +61,7 @@ public class PetSpeciesController : ControllerBase
     /// <param name="speciesId"></param>
     /// <param name="breedId"></param>
     /// <param name="handler"></param>
-    /// <param name="cancelToken"></param>
+    /// <param name="ct"></param>
     /// <returns></returns>
     [Authorize(Policy = SpeciesEdit)]
     [HttpDelete("{speciesId}/{breedId}")]
@@ -76,13 +69,10 @@ public class PetSpeciesController : ControllerBase
         [FromRoute] Guid speciesId,
         [FromRoute] Guid breedId,
         [FromServices] DeleteBreedHandler handler,
-        CancellationToken cancelToken)
+        CancellationToken ct = default)
     {
-        var deleteBreed = await handler.Handle(new(speciesId, breedId), cancelToken);
-
-        return deleteBreed.IsFailure
-            ? deleteBreed.ToErrorActionResult()
-            : Ok(deleteBreed.ToEnvelope());
+        var command = new DeleteBreedCommand(speciesId, breedId);
+        return (await handler.Handle(command, ct)).ToActionResult();
     }
 
     /// <summary>
@@ -99,31 +89,21 @@ public class PetSpeciesController : ControllerBase
         [FromServices] GetSpeciesPagedListHandler handler,
         [FromQuery] PaginationDto? pagination = default,
         [FromQuery] SpeciesFilterDto? filterDto = default,
-        CancellationToken cancelToken = default)
+        CancellationToken ct = default)
     {
 
         var query = new GetSpeciesPagedListQuery(filterDto, pagination);
-
-        var response = await handler.Handle(query, cancelToken);
-
-        return response.IsFailure
-            ? response.ToErrorActionResult()
-            : Ok(response.ToEnvelope());
+        return (await handler.Handle(query, ct)).ToActionResult();
     }
 
-    [HttpGet("{speciesId}")]
+    [HttpGet("breeds")]
     public async Task<ActionResult<Envelope>> GetBreeds(
         [FromServices] GetBreedsHandler handler,
         [FromQuery] PaginationDto? pagination,
         [FromQuery] BreedFilterDto? filter,
-        CancellationToken cancelToken = default)
+        CancellationToken ct = default)
     {
         var query = new GetBreedPageListQuery(pagination, filter);
-
-        var response = await handler.Handle(query, cancelToken);
-
-        return response.IsFailure
-            ? response.ToErrorActionResult()
-            : Ok(response.ToEnvelope());
+        return (await handler.Handle(query, ct)).ToActionResult();
     }
 }

@@ -14,14 +14,14 @@ public class GetBreedsHandler(
 
     public async Task<Result<BreedPagedListDto>> Handle(
         GetBreedPageListQuery query,
-        CancellationToken cancelToken)
+        CancellationToken ct)
     {
         //Validate query
         BreedFilterDto filterDto = new();
         var response = await _readRepository.GetBreedPagedList(
             query.BreedFilter,
             query.Pagination,
-            cancelToken);
+            ct);
 
         return Result.Ok(response);
     }

@@ -2,5 +2,5 @@
 
 namespace PetFamily.VolunteerRequests.Application.Commands.ApproveVolunteerRequest;
 
-public record ApproveVolunteerRequestCommand(Guid VolunteerRequestId) : ICommand;
+public record ApproveVolunteerRequestCommand(Guid AdminId, Guid VolunteerRequestId) : ICommand;
 
