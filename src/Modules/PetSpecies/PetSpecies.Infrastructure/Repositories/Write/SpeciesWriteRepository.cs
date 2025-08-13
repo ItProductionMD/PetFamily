@@ -14,14 +14,14 @@ public class SpeciesWriteRepository(
 {
     private readonly SpeciesWriteDbContext _context = context;
     private readonly ILogger<SpeciesWriteRepository> _logger = logger;
-    public async Task<Guid> AddAsync(Species species, CancellationToken token)
+    public async Task<Guid> AddAndSaveAsync(Species species, CancellationToken token)
     {
         await _context.AnimalTypes.AddAsync(species, token);
         await _context.SaveChangesAsync(token);
         return species.Id;
     }
 
-    public async Task<UnitResult> DeleteAsync(Guid speciesId, CancellationToken cancelToken)
+    public async Task<UnitResult> DeleteAndSaveAsync(Guid speciesId, CancellationToken cancelToken)
     {
         var species = await _context
             .AnimalTypes.FirstOrDefaultAsync(s => s.Id == speciesId, cancelToken);

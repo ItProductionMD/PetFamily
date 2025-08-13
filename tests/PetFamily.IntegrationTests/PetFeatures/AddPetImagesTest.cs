@@ -1,7 +1,7 @@
 ﻿using FileStorage.Public.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;

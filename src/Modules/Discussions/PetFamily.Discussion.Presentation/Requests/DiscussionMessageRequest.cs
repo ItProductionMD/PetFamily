@@ -5,7 +5,7 @@ namespace PetFamily.Discussions.Presentation.Requests;
 
 public class DiscussionMessageRequest
 {
-    string Message { get; set; } = string.Empty; // The message text to leave in the discussion
+    public string Message { get; set; } 
 
     public LeaveDiscussionMessageCommand ToLeaveCommand(Guid userId,Guid discussionId)
     {

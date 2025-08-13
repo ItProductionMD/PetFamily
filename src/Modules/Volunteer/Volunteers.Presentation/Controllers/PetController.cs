@@ -11,8 +11,6 @@ namespace Volunteers.Presentation.Controllers;
 [ApiController]
 public class PetController(ISpeciesQueryContract speciesForFilter) : Controller
 {
-    private readonly ISpeciesQueryContract _speciesForFilter = speciesForFilter;
-
     /// <summary>
     /// Get pets with filters and orders by
     /// </summary>
@@ -34,20 +32,17 @@ public class PetController(ISpeciesQueryContract speciesForFilter) : Controller
         CancellationToken cancellationToken = default)
     {
         var petsQuery = new GetPetsQuery(pageNumber, pageSize, filter);
+
         var petsTask = petHandler.Handle(petsQuery, cancellationToken);
+        var speciesTask = speciesForFilter.GetAllSpeciesAsync(cancellationToken);
 
-        var speciesTask = _speciesForFilter.GetAllSpeciesAsync();
+        var (petsResult, species) = (await petsTask, await speciesTask);
 
-        await Task.WhenAll(petsTask, speciesTask);
+        if (petsResult.IsFailure)
+            return petsResult.ToActionResult();
 
-        var getPetsResult = petsTask.Result;
-        if (getPetsResult.IsFailure)
-            return getPetsResult.ToErrorActionResult();
+        petsResult.Data!.SpeciesDtos = species ?? [];
 
-        var petsResponse = getPetsResult.Data!;
-
-        petsResponse.SpeciesDtos = speciesTask.Result ?? [];
-
-        return getPetsResult.ToEnvelope();
+        return petsResult.ToActionResult();
     }
 }

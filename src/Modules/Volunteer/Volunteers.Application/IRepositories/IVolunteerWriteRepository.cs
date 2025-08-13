@@ -1,18 +1,20 @@
 ﻿using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
-using VolunteerFromDomain = Volunteers.Domain.Volunteer;
+using Volunteers.Domain;
 
 namespace Volunteers.Application.IRepositories;
 
 public interface IVolunteerWriteRepository
 {
-    Task<Result<Guid>> AddAsync(VolunteerFromDomain volunteer, CancellationToken cancellation = default);
+    Task<Result<Volunteer>> GetByUserIdAsync(Guid userId, CancellationToken cancelToken = default);
 
-    Task<UnitResult> Save(VolunteerFromDomain volunteer, CancellationToken cancelToken = default);
+    Task<Result<Guid>> AddAndSaveAsync(Volunteer volunteer, CancellationToken cancellation = default);
 
-    Task SaveWithRetry(VolunteerFromDomain volunteer, CancellationToken cancelToken = default);
+    Task<UnitResult> SaveAsync(Volunteer volunteer, CancellationToken cancelToken = default);
 
-    Task<Result<VolunteerFromDomain>> GetByIdAsync(Guid id, CancellationToken cancelToken = default);
+    Task SaveWithRetry(Volunteer volunteer, CancellationToken cancelToken = default);
 
-    Task Delete(VolunteerFromDomain volunteer, CancellationToken cancelToken = default);
+    Task<Result<Volunteer>> GetByIdAsync(Guid id, CancellationToken cancelToken = default);
+
+    Task Delete(Volunteer volunteer, CancellationToken cancelToken = default);
 }

@@ -20,6 +20,7 @@ public static class VolunteerApplicationInjector
         services.AddValidatorsFromAssembly(typeof(VolunteerApplicationInjector).Assembly);
         services.AddCommandsAndQueries<ClassForAssemblyReference>();
         services.AddSingleton<PetImagesValidatorOptions>();
+        services.AddScoped<IVolunteerPhoneUpdater, VolunteerPhoneUpdater>();
 
         return services;
     }

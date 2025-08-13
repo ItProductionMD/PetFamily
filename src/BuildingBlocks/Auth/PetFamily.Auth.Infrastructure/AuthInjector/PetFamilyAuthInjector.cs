@@ -13,6 +13,8 @@ using PetFamily.Auth.Infrastructure.Services.JwtProvider;
 using PetFamily.Auth.Infrastructure.Services.PasswordHasher;
 using PetFamily.Auth.Public.Contracts;
 using PetFamily.SharedApplication.Extensions;
+using PetFamily.SharedApplication.IUnitOfWork;
+using PetFamily.SharedInfrastructure.Shared;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using static PetFamily.Auth.Infrastructure.AuthInjector.JwtAuthenticationInjector;
 

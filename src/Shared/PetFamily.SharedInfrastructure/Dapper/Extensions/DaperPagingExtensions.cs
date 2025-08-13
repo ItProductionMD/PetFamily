@@ -37,10 +37,10 @@ public static class DapperPagingExtensions
             cancellationToken: baseCommand.CancellationToken
         );
 
-        logger.DapperLogInformation(countSqlCmd.CommandText, baseCommand.Parameters);
+        logger.DapperLogSqlQuery(countSqlCmd.CommandText, baseCommand.Parameters);
         var totalCount = await connection.ExecuteScalarAsync<int>(countSqlCmd);
 
-        logger.DapperLogInformation(itemsSqlCmd.CommandText, baseCommand.Parameters);
+        logger.DapperLogSqlQuery(itemsSqlCmd.CommandText, baseCommand.Parameters);
         var items = (await connection.QueryAsync<T>(itemsSqlCmd)).ToList();
 
         return (totalCount, items);

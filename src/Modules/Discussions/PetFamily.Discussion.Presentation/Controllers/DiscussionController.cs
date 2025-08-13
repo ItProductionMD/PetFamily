@@ -9,6 +9,8 @@ using PetFamily.Discussions.Application.Queries.GetDiscussion;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
 using PetFamily.SharedApplication.IUserContext;
+using Microsoft.AspNetCore.Authorization;
+using static PetFamily.SharedKernel.Authorization.PermissionCodes.DiscussionManagement;
 
 namespace PetFamily.Discussions.Presentation.Controllers;
 
@@ -19,6 +21,16 @@ public class DiscussionController(
 {
     private readonly IUserContext _userContext = userContext;
 
+    /// <summary>
+    /// Gets a discussion by its ID.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="discussionId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    [Authorize(Policy = DiscussionMessageView)]
     [HttpGet("{discussionId:guid}")]
     public async Task<ActionResult<Envelope>> GetDiscussion(
         [FromServices] GetDiscussionHandler handler,
@@ -33,7 +45,15 @@ public class DiscussionController(
         return (await handler.Handle(query, ct)).ToActionResult();
     }
 
+    /// <summary>
+    /// Closes a discussion by its ID.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="discussionId"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpPatch("{discussionId:guid}/close")]
+    [Authorize(Policy = DiscussionClose)]
     public async Task<ActionResult<Envelope>> CloseDiscussion(
         [FromServices] CloseDiscussionHandler handler,
         Guid discussionId,
@@ -57,7 +77,16 @@ public class DiscussionController(
         return (await handler.Handle(command, ct)).ToActionResult();
     }
 
+    /// <summary>
+    /// Creates a new discussion message.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="discussionId"></param>
+    /// <param name="request"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpPost("{discussionId:guid}/messages")]
+    [Authorize(Policy = DiscussionMessageCreate)]
     public async Task<ActionResult<Envelope>> LeaveDiscussionMessage(
         [FromServices] LeaveDiscussionMessageHandler handler,
         Guid discussionId,
@@ -70,7 +99,17 @@ public class DiscussionController(
         return (await handler.Handle(command, ct)).ToActionResult();
     }
 
+    /// <summary>
+    /// Updates an existing discussion message.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="discussionId"></param>
+    /// <param name="messageId"></param>
+    /// <param name="request"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpPatch("{discussionId:guid}/messages/{messageId:guid}")]
+    [Authorize(Policy = DiscussionMessageEdit)]
     public async Task<ActionResult<Envelope>> UpdateDiscussionMessage(
         [FromServices] UpdateDiscussionMessageHandler handler,
         Guid discussionId,
@@ -84,7 +123,16 @@ public class DiscussionController(
         return (await handler.Handle(command, ct)).ToActionResult();
     }
 
+    /// <summary>
+    /// Deletes a discussion message.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="discussionId"></param>
+    /// <param name="messageId"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpDelete("{discussionId:guid}/messages/{messageId:guid}")]
+    [Authorize(Policy = DiscussionMessageDelete)]
     public async Task<ActionResult<Envelope>> DeleteDiscussionMessage(
        [FromServices] DeleteDiscussionMessageHandler handler,
        Guid discussionId,

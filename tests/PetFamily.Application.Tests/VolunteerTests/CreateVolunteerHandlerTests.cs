@@ -18,7 +18,6 @@ public class CreateVolunteerHandlerTests
     private readonly Mock<ILogger<CreateVolunteerHandler>> _loggerMock;
     private readonly CreateVolunteerHandler _handler;
     private readonly CreateVolunteerFluentValidator _validator;
-    private readonly Mock<IUserContext.IUserContext> _userContextMock;
 
     public CreateVolunteerHandlerTests()
     {
@@ -26,11 +25,8 @@ public class CreateVolunteerHandlerTests
         _loggerMock = new Mock<ILogger<CreateVolunteerHandler>>();
         _validator = new CreateVolunteerFluentValidator();
         _volunteerReadRepositoryMock = new Mock<IVolunteerReadRepository>();
-        _userContextMock = new Mock<IUserContext.IUserContext>();
         _handler = new CreateVolunteerHandler(
             _volunteerRepositoryMock.Object,
-            _volunteerReadRepositoryMock.Object,
-            _userContextMock.Object,
             _loggerMock.Object);
     }
 
@@ -38,8 +34,11 @@ public class CreateVolunteerHandlerTests
     public async Task Should_ThrowException_When_Command_Is_Invalid()
     {
         //ARRANGE
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var command = new CreateVolunteerCommand(
-            Guid.NewGuid(),
+            adminId,
+            userId,
             "invalidName!@",
             "invalidLastName!@",
             "Description",         
@@ -57,8 +56,11 @@ public class CreateVolunteerHandlerTests
     public async Task Handle_ShouldReturnSuccess_WhenVolunteerIsCreated()
     {
         //ARRANGE
+        var adminId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var command = new CreateVolunteerCommand(
-            Guid.NewGuid(),
+            adminId,
+            userId,
             "firstName",
             "lastName",
             "Description",           
@@ -71,12 +73,8 @@ public class CreateVolunteerHandlerTests
         var addResult = Result.Ok(volunteer.Id);
 
         _volunteerRepositoryMock
-            .Setup(x => x.AddAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.AddAndSaveAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(addResult);
-
-        _userContextMock
-            .Setup(x => x.GetUserId())
-            .Returns(Guid.NewGuid());
 
         //ACT
         var result = await _handler.Handle(command, CancellationToken.None);

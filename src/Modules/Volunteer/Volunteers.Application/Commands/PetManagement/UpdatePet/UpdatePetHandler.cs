@@ -51,7 +51,7 @@ public class UpdatePetHandler(
             return updatePetResult;
         }
 
-        var result = await _writeRepository.Save(volunteer, cancelToken);
+        var result = await _writeRepository.SaveAsync(volunteer, cancelToken);
         if (result.IsFailure)
             return result;
 

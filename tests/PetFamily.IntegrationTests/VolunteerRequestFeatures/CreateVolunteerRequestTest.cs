@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedApplication.Exceptions;
 using PetFamily.SharedApplication.IUserContext;
@@ -18,16 +18,16 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
     public async Task Should_create_one_volunteer_request_successfully()
     {
         //ARRANGE
+        var userId = Guid.NewGuid();
+
         var command = new SubmitVolunteerRequestCommand(
+            userId,
             "file.doc",
             "Iurii",
             "Godina",
             "description",
             1,
             [new("victoriabank", "iban12345")]);
-
-        _factory.UserContextMock.Setup(x => x.GetUserId())
-            .Returns(Guid.NewGuid());
 
         //ACT
         var handleResult = await _sut.Handle(command, CancellationToken.None);
@@ -48,6 +48,7 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
 
         // ARRANGE
         var command = new SubmitVolunteerRequestCommand(
+            userId,
             "file.doc",
             "Iurii",
             "Godina",
@@ -68,8 +69,6 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
         await _volunteerRequestDbContext.VolunteerRequests.AddAsync(existingRequest);
         await _volunteerRequestDbContext.SaveChangesAsync();
 
-        _factory.UserContextMock.Setup(x => x.GetUserId())
-            .Returns(userId);
         // ACT
         var result = await _sut.Handle(command, CancellationToken.None);
 
@@ -82,7 +81,10 @@ public class CreateVolunteerRequestTest(TestWebApplicationFactory factory)
     public async Task Should_fail_if_first_name_is_empty()
     {
         // ARRANGE
+        var userId = Guid.NewGuid();
+
         var command = new SubmitVolunteerRequestCommand(
+            userId,
             "file.doc",
             "Iurii",
             "",

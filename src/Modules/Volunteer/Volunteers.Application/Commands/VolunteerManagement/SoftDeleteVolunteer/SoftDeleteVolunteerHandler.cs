@@ -32,7 +32,7 @@ public class SoftDeleteVolunteerHandler(
 
         volunteer.SoftDelete();
 
-        var result = await _volunteerRepository.Save(volunteer, ct);
+        var result = await _volunteerRepository.SaveAsync(volunteer, ct);
         if (result.IsFailure)
             return result;
 

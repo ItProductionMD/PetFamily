@@ -13,17 +13,17 @@ namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 
 public class SubmitVolunteerRequestTests
 {
-    private readonly Mock<IUserContext.IUserContext> _userContext = new();
     private readonly Mock<IVolunteerRequestWriteRepository> _writeRepo = new();
     private readonly Mock<IVolunteerRequestReadRepository> _readRepo = new();
     private readonly Mock<ILogger<SubmitVolunteerRequestHandler>> _logger = new();
 
     private SubmitVolunteerRequestHandler CreateHandler()
-        => new(_userContext.Object, _writeRepo.Object, _readRepo.Object, _logger.Object);
+        => new(_writeRepo.Object, _readRepo.Object, _logger.Object);
 
     private static SubmitVolunteerRequestCommand CreateValidCommand()
     {
         return new SubmitVolunteerRequestCommand(
+            Guid.NewGuid(),
             DocumentName: "doc.pdf",
             LastName: "Doe",
             FirstName: "John",
@@ -39,12 +39,8 @@ public class SubmitVolunteerRequestTests
         // arrange
         var ct = CancellationToken.None;
         var cmd = CreateValidCommand();
-        var userId = Guid.NewGuid();
 
-        _userContext.Setup(x => x.GetUserId())
-            .Returns(userId);
-
-        _readRepo.Setup(x => x.CheckIfRequestExistAsync(userId, ct))
+        _readRepo.Setup(x => x.CheckIfRequestExistAsync(cmd.UserId, ct))
             .ReturnsAsync(false);
 
         _writeRepo.Setup(x => x.AddAsync(It.IsAny<VolunteerRequest>(), ct))
@@ -61,9 +57,9 @@ public class SubmitVolunteerRequestTests
         // assert
         Assert.True(result.IsSuccess);
 
-        _readRepo.Verify(x => x.CheckIfRequestExistAsync(userId, ct), Times.Once);
+        _readRepo.Verify(x => x.CheckIfRequestExistAsync(cmd.UserId, ct), Times.Once);
         _writeRepo.Verify(x => x.AddAsync(It.Is<VolunteerRequest>(vr =>
-                vr.UserId == userId &&
+                vr.UserId == cmd.UserId &&
                 vr.DocumentName == cmd.DocumentName &&
                 vr.FirstName == cmd.FirstName &&
                 vr.LastName == cmd.LastName &&
@@ -83,6 +79,7 @@ public class SubmitVolunteerRequestTests
         var ct = CancellationToken.None;
 
         var invalidCmd = new SubmitVolunteerRequestCommand(
+            Guid.NewGuid(),
             DocumentName: "",           
             LastName: "Doe",
             FirstName: "",             
@@ -97,29 +94,6 @@ public class SubmitVolunteerRequestTests
         await Assert.ThrowsAsync<ValidationException>(() =>
              handler.Handle(invalidCmd, ct));
 
-        _userContext.Verify(x => x.TryGetUserId(), Times.Never);
-        _readRepo.Verify(x => x.CheckIfRequestExistAsync(It.IsAny<Guid>(), ct), Times.Never);
-        _writeRepo.Verify(x => x.AddAsync(It.IsAny<VolunteerRequest>(), ct), Times.Never);
-        _writeRepo.Verify(x => x.SaveAsync(ct), Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_Should_ThrowException_When_UserId_Not_Found_In_Context()
-    {
-        // arrange
-        var ct = CancellationToken.None;
-
-        var cmd = CreateValidCommand();
-
-        var handler = CreateHandler();
-
-        _userContext.Setup(u => u.GetUserId())
-            .Throws<UserNotAuthenticatedException>();
-
-        // act and assert
-        await Assert.ThrowsAsync<UserNotAuthenticatedException>(() =>
-            handler.Handle(cmd, CancellationToken.None));
-
         _readRepo.Verify(x => x.CheckIfRequestExistAsync(It.IsAny<Guid>(), ct), Times.Never);
         _writeRepo.Verify(x => x.AddAsync(It.IsAny<VolunteerRequest>(), ct), Times.Never);
         _writeRepo.Verify(x => x.SaveAsync(ct), Times.Never);
@@ -131,12 +105,8 @@ public class SubmitVolunteerRequestTests
         // arrange
         var ct = CancellationToken.None;
         var cmd = CreateValidCommand();
-        var userId = Guid.NewGuid();
 
-        _userContext.Setup(x => x.GetUserId())
-            .Returns(userId);
-
-        _readRepo.Setup(x => x.CheckIfRequestExistAsync(userId, ct))
+        _readRepo.Setup(x => x.CheckIfRequestExistAsync(cmd.UserId, ct))
             .ReturnsAsync(true); 
 
         var handler = CreateHandler();

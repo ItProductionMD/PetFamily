@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedApplication.PaginationUtils.PagedResult;
+using PetFamily.SharedInfrastructure.Dapper.Extensions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
@@ -34,7 +35,7 @@ public class VolunteerRequestReadRepository(
         return count > 0;
     }
 
-    public async Task<VolunteerRequestDto?> GetByUserIdAsync(Guid userId, CancellationToken ct)
+    public async Task<Result<VolunteerRequestDto>> GetByUserIdAsync(Guid userId, CancellationToken ct)
     {
         var sql = $@"
                 SELECT 
@@ -53,16 +54,23 @@ public class VolunteerRequestReadRepository(
 
         await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
-        _logger.LogInformation("EXECUTING QUERY: {sql};", sql);
+        var sqlParameters = new { UserId = userId };
 
-        var result = await dbConnection.QuerySingleOrDefaultAsync<VolunteerRequestDto>(
+        _logger.DapperLogSqlQuery(sql, sqlParameters);
+
+        var volunteerRequestDto = await dbConnection.QuerySingleOrDefaultAsync<VolunteerRequestDto>(
             sql,
-            new
-            {
-                UserId = userId
-            });
+            sqlParameters);
 
-        return result;
+        if (volunteerRequestDto == null)
+        {
+            _logger.LogWarning("Volunteer request with userId: {UserId} not found", userId);
+            return Result.Fail(Error.NotFound($"VolunteerRequest request with userI: {userId}"));
+        }
+
+        _logger.LogInformation("Volunteer request with userId: {UserId} found successful!", userId);
+
+        return Result.Ok(volunteerRequestDto);
     }
 
     public async Task<Result<PagedResult<VolunteerRequestDto>>> GetRequestsOnReview(
@@ -78,7 +86,7 @@ public class VolunteerRequestReadRepository(
             ? @$"AND {VolunteerRequestsTable.RequestStatus} IN @Statuses"
             : string.Empty;
 
-        var sql = $@"
+        var sqlVolunteerRequest = $@"
                 SELECT 
                 {VolunteerRequestsTable.Id} As Id,
                 {VolunteerRequestsTable.UserId} As UserId,
@@ -101,31 +109,33 @@ public class VolunteerRequestReadRepository(
                 WHERE {VolunteerRequestsTable.AdminId} = @AdminId
                 {statusFilter}";
 
+        var sqlCountParameters = new
+        {
+            AdminId = adminId,
+            Statuses = filter.Statuses
+        };
+
+        var sqlVolunteerRequestParameters = new
+        {
+            AdminId = adminId,
+            Statuses = filter.Statuses,
+            Offset = offset,
+            Limit = pageSize
+        };
+
         await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
-        _logger.LogInformation("EXECUTING QUERY: {sqlCount}; with params:{statuses},{adminId}",
-            sqlCount, filter.Statuses, adminId);
+        _logger.DapperLogSqlQuery(sqlCount, sqlCountParameters);
 
         var count = await dbConnection.ExecuteScalarAsync<int>(
             sqlCount,
-            new
-            {
-                AdminId = adminId,
-                Statuses = filter.Statuses
-            });
+            sqlCountParameters);
 
-        _logger.LogInformation("EXECUTING QUERY: {sql} ; with params: {pageSize}, {offset},{statuses}" +
-            ",{adminId}", sql, pageSize, offset, filter.Statuses, adminId);
+        _logger.DapperLogSqlQuery(sqlVolunteerRequest, sqlVolunteerRequestParameters);
 
         var items = await dbConnection.QueryAsync<VolunteerRequestDto>(
-             sql,
-             new
-             {
-                 AdminId = adminId,
-                 Statuses = filter.Statuses,
-                 Offset = offset,
-                 Limit = pageSize
-             }
+             sqlVolunteerRequest,
+             sqlVolunteerRequestParameters
         );
 
         var pageResult = new PagedResult<VolunteerRequestDto>(items.ToList(), count, pageSize);
@@ -142,7 +152,7 @@ public class VolunteerRequestReadRepository(
 
         var offset = Offset.Calculate(page, pageSize);
 
-        var sql = $@"
+        var sqlVolunteerRequest = $@"
                 SELECT 
                 {VolunteerRequestsTable.Id} As Id,
                 {VolunteerRequestsTable.UserId} As UserId,
@@ -165,26 +175,32 @@ public class VolunteerRequestReadRepository(
                 WHERE {VolunteerRequestsTable.AdminId} IS NULL 
                 AND {VolunteerRequestsTable.RequestStatus} = @Status";
 
+        var sqlCountParameters = new { Count = sqlCount };
+
         await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
-        _logger.LogInformation("EXECUTING QUERY: {sqlCount}; with params:{status}", sqlCount, status);
+        _logger.DapperLogSqlQuery(sqlCount, sqlCountParameters);
 
         var count = await dbConnection.ExecuteScalarAsync<int>(sqlCount, new { Status = status });
 
-        _logger.LogInformation("EXECUTING QUERY: {sql} ; with params: {pageSize}, {offset}",
-            sql, pageSize, offset);
+        var sqlVolunteerRequestParameters = new
+        {
+            Status = status,
+            Offset = offset,
+            Limit = pageSize
+        };
 
-        var items = await dbConnection.QueryAsync<VolunteerRequestDto>(
-             sql,
-             new
-             {
-                 Status = status,
-                 Offset = offset,
-                 Limit = pageSize
-             }
+        _logger.DapperLogSqlQuery(sqlVolunteerRequest, sqlVolunteerRequestParameters);
+
+        var volunteerRequests = await dbConnection.QueryAsync<VolunteerRequestDto>(
+             sqlVolunteerRequest,
+             sqlVolunteerRequestParameters
         );
 
-        var pageResult = new PagedResult<VolunteerRequestDto>(items.ToList(), count, pageSize);
+        var pageResult = new PagedResult<VolunteerRequestDto>(
+            volunteerRequests.ToList(),
+            count, 
+            pageSize);
 
         return Result.Ok(pageResult);
     }

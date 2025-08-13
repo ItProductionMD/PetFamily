@@ -8,7 +8,7 @@ namespace PetFamily.VolunteerRequests.Application.IRepositories;
 
 public interface IVolunteerRequestReadRepository
 {
-    Task<VolunteerRequestDto?> GetByUserIdAsync(Guid userId, CancellationToken ct);
+    Task<Result<VolunteerRequestDto>> GetByUserIdAsync(Guid userId, CancellationToken ct);
 
     Task<bool> CheckIfRequestExistAsync(Guid userId, CancellationToken ct); 
     

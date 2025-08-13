@@ -4,7 +4,7 @@ namespace PetFamily.SharedInfrastructure.Dapper.Extensions;
 
 public static class DapperLoggerExtensions
 {
-    public static void DapperLogInformation<Repo>(this ILogger<Repo> logger, string sql, object? parameters)
+    public static void DapperLogSqlQuery<Repo>(this ILogger<Repo> logger, string sql, object? parameters)
     {
         //if info mode, log the SQL command
         logger.LogInformation("EXECUTING QUERY: {CommandText}",

@@ -41,7 +41,7 @@ public class DiscussionReadRepository(
 
         await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
 
-        _logger.DapperLogInformation(discussionCmd.CommandText, discussionCmd.Parameters);
+        _logger.DapperLogSqlQuery(discussionCmd.CommandText, discussionCmd.Parameters);
 
         var discussion = await connection.QuerySingleOrDefaultAsync<DiscussionDto>(discussionCmd);
         if (discussion == null)

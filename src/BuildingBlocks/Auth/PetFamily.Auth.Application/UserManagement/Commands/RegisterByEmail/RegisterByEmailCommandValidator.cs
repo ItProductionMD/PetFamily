@@ -20,7 +20,7 @@ public static class RegisterByEmailCommandValidator
 
             () => ValidateLogin(cmd.Login,LoginOptions.Default),
 
-            () => ValidatePhone(cmd.phoneRegionCode, cmd.phoneNumber),
+            () => ValidateRequiredPhone(cmd.phoneRegionCode, cmd.phoneNumber),
 
             () => ValidateItems(cmd.SocialNetworksList, s => SocialNetworkInfo.Validate(s.Name, s.Url))
         );

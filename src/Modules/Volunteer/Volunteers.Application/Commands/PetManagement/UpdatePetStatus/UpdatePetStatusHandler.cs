@@ -41,7 +41,7 @@ public class UpdatePetStatusHandler(
 
         pet.ChangePetStatus((HelpStatus)cmd.HelpStatus);
 
-        var result = await _repository.Save(volunteer, ct);
+        var result = await _repository.SaveAsync(volunteer, ct);
 
         return result;
     }

@@ -17,6 +17,7 @@ public class VolunteerRequestSubmission(
         CancellationToken ct)
     {
         var cmd = new SubmitVolunteerRequestCommand(
+            dto.userId,
             dto.documentName,
             dto.lastName,
             dto.firstName,

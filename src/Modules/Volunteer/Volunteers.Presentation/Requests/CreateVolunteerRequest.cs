@@ -1,27 +1,32 @@
-﻿using PetFamily.SharedApplication.Dtos;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using PetFamily.SharedApplication.Dtos;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 using Volunteers.Application.ResponseDtos;
 
 namespace Volunteers.Presentation.Requests;
 
-public record CreateVolunteerRequest(
-    string FirstName,
-    string LastName,
-    string Description,
-    int ExperienceYears,
-    string PhoneRegionCode,
-    string PhoneNumber,
-    IEnumerable<RequisitesDto> Requisites)
+public record CreateVolunteerRequest
 {
-    public CreateVolunteerCommand ToCommand() =>
+    public Guid UserId { get; set; }
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public string PhoneRegionCode { get; set; } = null!;
+    public string PhoneNumber { get; set; } = null!;
+    public int ExperienceYears { get; set; } 
+    public IEnumerable<RequisitesDto> Requisites { get; set; } = [];
+
+    public CreateVolunteerCommand ToCommand(Guid adminId) =>
         new(
-            Guid.NewGuid(),
+            adminId,
+            UserId,
             FirstName,
             LastName,
             Description,    
             ExperienceYears,
             PhoneRegionCode,
             PhoneNumber,
-            Requisites);
+            Requisites
+        );
 }
 

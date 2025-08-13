@@ -1,7 +1,7 @@
 ﻿using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedApplication.Abstractions.CQRS;
 
-namespace PetFamily.IntegrationTests.Fixtures;
+namespace PetFamily.IntegrationTests.IClassFixtures;
 
 public abstract class QueryHandlerTest<TQuery>(
     TestWebApplicationFactory factory) : BaseTest(factory) where TQuery : IQuery

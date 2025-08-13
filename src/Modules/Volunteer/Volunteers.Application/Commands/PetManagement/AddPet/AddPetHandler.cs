@@ -47,7 +47,7 @@ public class AddPetHandler(
 
         var newPet = CreatePetProcess(command, volunteer);
 
-        var result = await _repository.Save(volunteer, cancelToken);
+        var result = await _repository.SaveAsync(volunteer, cancelToken);
         if (result.IsFailure)
             return result;
 

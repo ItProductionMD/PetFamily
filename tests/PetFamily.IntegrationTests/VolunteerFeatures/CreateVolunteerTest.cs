@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
@@ -16,7 +16,9 @@ public class CreateVolunteerTest(TestWebApplicationFactory factory)
     public async Task Should_create_one_volunteer_successfully()
     {
         //ARRANGE
+        var adminId = Guid.NewGuid();
         var command = new CreateVolunteerCommand(
+            adminId,
             Guid.NewGuid(),
             "Iurii",
             "Godina",

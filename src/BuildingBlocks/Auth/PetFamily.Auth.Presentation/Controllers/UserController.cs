@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.BearerToken;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.Options;
@@ -12,52 +9,66 @@ using PetFamily.Auth.Application.UserManagement.Commands.RefreshToken;
 using PetFamily.Auth.Application.UserManagement.Commands.RegisterByEmail;
 using PetFamily.Auth.Application.UserManagement.Queries.GetUserAccountInfo;
 using PetFamily.Auth.Presentation.Cookies;
+using PetFamily.Auth.Presentation.RefreshToken;
 using PetFamily.Auth.Presentation.Requests;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
+using PetFamily.SharedApplication.Exceptions;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
+using static PetFamily.Auth.Presentation.Cookies.HTTPResponseCookiesSetter;
 
 namespace PetFamily.Auth.Presentation.Controllers;
 
+//TODO ADD PERMISSIONS
 [ApiController]
 [Route("api/users")]
-public class UserController : Controller
+public class UserController(IRefreshTokenService refreshTokenService) : Controller
 {
+    private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
+
+    /// <summary>
+    /// Registers a new user by email.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="request"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpPost("register_by_email")]
     public async Task<ActionResult<Envelope>> RegisterByEmail(
         [FromServices] RegisterByEmailCommandHandler handler,
         [FromBody] RegistrationByEmailRequest request,
         CancellationToken ct = default)
     {
-        var cmd = new RegisterByEmailCommand(
-            request.Email,
-            request.Login,
-            request.Password,
-            request.PhoneRegionCode,
-            request.PhoneNumber,
-            request.SocialNetworks);
-
-        var result = await handler.Handle(cmd, ct);
-        return result.IsSuccess
-            ? result.ToEnvelope()
-            : result.ToErrorActionResult();
+        var command = request.ToCommand();
+        return (await handler.Handle(command, ct)).ToActionResult();
     }
 
+    /// <summary>
+    /// Confirms the user's email address using a confirmation token.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="token"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpGet("confirm_email/{token}")]
     public async Task<ActionResult<Envelope>> ConfirmEmail(
-        [FromServices] ConfirmEmailCommandHandler handler,
+        [FromServices] ConfirmEmailHandler handler,
         [FromRoute] string token,
         CancellationToken ct)
     {
-        var cmd = new ConfirmEmailCommand(token);
-
-        var result = await handler.Handle(cmd, ct);
-        return result.IsSuccess
-            ? result.ToEnvelope()
-            : result.ToErrorActionResult();
+        var command = new ConfirmEmailCommand(token);
+        return (await handler.Handle(command, ct)).ToActionResult();
     }
 
+    /// <summary>
+    /// Changes the role of a user.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="userId"></param>
+    /// <param name="roleId"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpPatch("{id}/change_roles")]
     public async Task<ActionResult<Envelope>> ChangeRoles(
         [FromServices] ChangeRoleCommandHandler handler,
@@ -65,77 +76,62 @@ public class UserController : Controller
         [FromBody] Guid roleId,
         CancellationToken ct)
     {
-
         var cmd = new ChangeRoleCommand(userId, roleId);
-
-        var result = await handler.Handle(cmd, ct);
-
-        return result.IsSuccess
-            ? result.ToEnvelope()
-            : result.ToErrorActionResult();
+        return (await handler.Handle(cmd, ct)).ToActionResult();
     }
 
+    /// <summary>
+    /// Logs in a user by email and sets a refresh token in cookies.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="request"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpPost("login")]
     public async Task<ActionResult<Envelope>> Login(
-        [FromServices] IOptions<RefreshTokenCookie> cookieOptions,
         [FromServices] LoginByEmailCommandHandler handler,
         [FromBody] LoginByEmailRequest request,
         CancellationToken ct = default)
     {
-        var tokenCookieOptions = cookieOptions.Value;
+        var refreshToken = _refreshTokenService.GetRefreshToken();
 
-        var refreshToken = Request.Cookies["refreshToken"];
+        var command = request.ToCommand();
 
-        var cmd = new LoginByEmailCommand(
-            request.Email,
-            request.Password,
-            request.FingerPrint
-            );
+        var tokenResult = await handler.Handle(command, ct);
 
-        var result = await handler.Handle(cmd, ct);
-        if (result.IsFailure)
-            return result.ToErrorActionResult();
-
-        HTTPResponseCookiesSetter.SetRefreshTokenCookie(
-            Response,
-            result.Data!.RefreshToken,
-            result.Data!.RefreshTokenExpiresAt,
-            tokenCookieOptions);
-
-        return Result.Ok(result.Data!.AccessToken).ToEnvelope();
+        return HandleTokenResult(tokenResult);
     }
 
+    /// <summary>
+    /// Refreshes the access token using the refresh token from cookies.
+    /// </summary>
+    /// <param name="cookieOptions"></param>
+    /// <param name="handler"></param>
+    /// <param name="request"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpPost("tokens")]
     public async Task<ActionResult<Envelope>> RefreshTokens(
-        [FromServices] IOptions<RefreshTokenCookie> cookieOptions,
         [FromServices] RefreshTokensHandler handler,
         [FromBody] RefreshTokensRequest request,
         CancellationToken ct = default)
     {
-        var tokenCookieOptions = cookieOptions.Value;
+        var refreshToken = _refreshTokenService.GetRefreshToken();
 
-        var refreshToken = Request.Cookies["refreshToken"];
+        var command = request.ToCommand(refreshToken);
 
-        if (string.IsNullOrWhiteSpace(refreshToken))
-            return Result.Fail(Error.Authorization("Refresh Token doesn't exist"))
-                .ToErrorActionResult();
-
-        var command = new RefreshTokenCommand(request.AccessToken, refreshToken, request.FingerPrint);
-
-        var result = await handler.Handle(command, ct);
-
-        if (result.IsFailure)
-            return result.ToErrorActionResult();
-
-        HTTPResponseCookiesSetter.SetRefreshTokenCookie(
-            Response,
-            result.Data!.RefreshToken,
-            result.Data!.RefreshTokenExpiresAt,
-            tokenCookieOptions);
-
-        return Result.Ok(result.Data!.AccessToken).ToEnvelope();
+        var tokenResult = await handler.Handle(command, ct);
+        
+        return HandleTokenResult(tokenResult);
     }
 
+    /// <summary>
+    /// Retrieves the account information of a user by their ID.
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="id"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     [HttpGet("account_info/{id:Guid}")]
     public async Task<ActionResult<Envelope>> GetUserAccountInfo(
         [FromServices] GetUserAccountInfoHandler handler,
@@ -143,10 +139,16 @@ public class UserController : Controller
         CancellationToken ct)
     {
         var cmd = new GetUserAccountInfoCommand(id);
+        return (await handler.Handle(cmd, ct)).ToActionResult();
+    }
 
-        var result = await handler.Handle(cmd, ct);
-        return result.IsSuccess
-            ? result.ToEnvelope()
-            : result.ToErrorActionResult();
+    private ActionResult<Envelope> HandleTokenResult(Result<TokenResult> tokenResult)
+    {
+        if (tokenResult.IsFailure)
+            return tokenResult.ToErrorActionResult();
+
+       _refreshTokenService.SetRefreshToken(tokenResult.Data!);
+
+        return Result.Ok(tokenResult.Data!.AccessToken).ToActionResult();
     }
 }

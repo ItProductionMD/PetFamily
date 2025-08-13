@@ -15,6 +15,7 @@ public class VolunteerCreator(
         CancellationToken ct = default)
     {
         var cmd = new CreateVolunteerCommand(
+            dto.AdminId,
             dto.UserId,
             dto.FirstName,
             dto.LastName,

@@ -37,7 +37,7 @@ public class ChangePetsOrderHandler(
 
             return changePetsOrderResult;
         }
-        var result = await _repository.Save(volunteer, cancelToken);
+        var result = await _repository.SaveAsync(volunteer, cancelToken);
         if (result.IsFailure)
             return result;
 

@@ -2,6 +2,9 @@
 
 namespace PetFamily.Auth.Application.UserManagement.Commands.RefreshToken;
 
-public record RefreshTokenCommand(string AccessToken, string Token, string FingerPrint) : ICommand;
+public record RefreshTokenCommand(
+    string AccessToken,
+    string RefreshToken,
+    string FingerPrint) : ICommand;
 
 

@@ -28,6 +28,7 @@ public static class VolunteerModuleInjector
         services
             .AddScoped<IVolunteerReadRepository, VolunteerReadRepository>()
             .AddScoped<IVolunteerWriteRepository, VolunteerWriteRepository>()
+            .AddScoped<IVolunteerUnitOfWork, VolunteerUnitOfWork>()
             .AddScoped<VolunteerWriteDbContext>(_ => new VolunteerWriteDbContext(postgresConnection));
 
         services.AddHostedService<VolunteerSoftDeletableCleanupService>();

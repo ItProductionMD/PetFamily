@@ -46,7 +46,7 @@ public class DeletePetImagesHandler(
             .Select(i => new FileDto(i, Constants.BUCKET_FOR_PET_IMAGES))
             .ToList();
 
-        await _repository.Save(volunteer, ct);
+        await _repository.SaveAsync(volunteer, ct);
 
         await _fileService.DeleteFilesUsingMessageQueue(fileDtos, ct);
 

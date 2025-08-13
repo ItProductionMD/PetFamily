@@ -1,28 +1,25 @@
-﻿using FluentValidation;
-using PetFamily.SharedApplication.Validations;
-using PetFamily.SharedKernel.Validations;
-using PetFamily.SharedKernel.ValueObjects;
+﻿using PetFamily.SharedKernel.Results;
+using static PetFamily.SharedKernel.Validations.ValueObjectValidations;
+using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
+using PetFamily.SharedApplication.Exceptions;
 
 
 namespace Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
 
-public class UpdateVolunteerRequestValidator : AbstractValidator<UpdateVolunteerCommand>
+public static class UpdateVolunteerRequestValidator
 {
-    public UpdateVolunteerRequestValidator()
+    public static void Validate(this UpdateVolunteerCommand cmd)
     {
-        RuleFor(c => new { c.FirstName, c.LastName })
-            .MustBeValueObject(fullName => FullName.Validate(fullName.FirstName, fullName.LastName));
+        var validationResult = UnitResult.FromValidationResults(
+            () => ValidateFullName(cmd.FirstName, cmd.LastName),
+            () => ValidateIfGuidIsNotEpmty(cmd.UserId, "UserId"),
+            () => ValidateIfGuidIsNotEpmty(cmd.VolunteerId, "VolunteerId"),
+            () => ValidateNonRequiredField(cmd.Description, "Description", MAX_LENGTH_LONG_TEXT),
+            () => ValidateIntegerNumber(cmd.ExperienceYears, "ExperienceYears", 0, 100)
+        );
 
-        RuleFor(c => c.Description).MaximumLength(MAX_LENGTH_LONG_TEXT)
-            .WithMessage($"Description length is bigger than {MAX_LENGTH_LONG_TEXT}")
-            .WithErrorCode(ValidationErrorCodes.VALUE_INVALID_LENGTH);
-
-        RuleFor(c => c.ExperienceYears)
-            .GreaterThanOrEqualTo(0)
-            .LessThanOrEqualTo(100)
-            .WithMessage($"Value is bigger than 100 or less than 0")
-            .WithErrorCode(ValidationErrorCodes.VALUE_OUT_OF_RANGE);
-
+        if (validationResult.IsFailure)
+            throw new ValidationException(validationResult.Error);
     }
 }

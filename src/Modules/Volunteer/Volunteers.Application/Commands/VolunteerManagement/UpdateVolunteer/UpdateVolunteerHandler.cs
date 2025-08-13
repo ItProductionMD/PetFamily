@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedApplication.Validations;
+using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using Volunteers.Application.IRepositories;
@@ -10,43 +11,38 @@ using VolunteerDomain = Volunteers.Domain.Volunteer;
 namespace Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
 
 public class UpdateVolunteerHandler(
-    IVolunteerWriteRepository volunteerRepository,
+    IVolunteerWriteRepository volunteerWriteRepo,
     ILogger<UpdateVolunteerHandler> logger,
-    IVolunteerReadRepository volunteerReadRepository,
-    IValidator<UpdateVolunteerCommand> validator)
-    : ICommandHandler<VolunteerDomain, UpdateVolunteerCommand>
+    IVolunteerReadRepository volunteerReadRepo) : ICommandHandler<VolunteerDomain, UpdateVolunteerCommand>
 {
-    private readonly IVolunteerWriteRepository _writeRepository = volunteerRepository;
-    private readonly IVolunteerReadRepository _readRepository = volunteerReadRepository;
+    private readonly IVolunteerWriteRepository _volunteerWriteRepo = volunteerWriteRepo;
+    private readonly IVolunteerReadRepository _volunteerReadRepo = volunteerReadRepo;
     private readonly ILogger<UpdateVolunteerHandler> _logger = logger;
-    private readonly IValidator<UpdateVolunteerCommand> _validator = validator;
+
     public async Task<Result<VolunteerDomain>> Handle(
         UpdateVolunteerCommand cmd,
         CancellationToken ct = default)
     {
-        var validateResult = await _validator.ValidateAsync(cmd, ct);
-        if (validateResult.IsValid == false)
-        {
-            var errorResult = validateResult.ToResultFailure<VolunteerDomain>();
-            _logger.LogError(
-                "Fail validate volunteerRequest! Errors: {Errors}",
-                errorResult.ValidationMessagesToString());
+        cmd.Validate();
 
-            return errorResult;
-        }
-
-        var getVolunteer = await _writeRepository.GetByIdAsync(cmd.VolunteerId, ct);
+        var getVolunteer = await _volunteerWriteRepo.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return getVolunteer;
 
         var volunteer = getVolunteer.Data!;
 
-        var fullName = FullName.Create(cmd.FirstName, cmd.LastName).Data!;
+        if(volunteer.UserId.Value != cmd.UserId)
+        {
+            _logger.LogError("Access  for update volunteer with Id: {VolunteerId } - forbidden for " +
+                "user with id: {UserId}",cmd.VolunteerId, cmd.UserId);
+            return Result.Fail(Error.Forbidden($"Access forbidden for user with id: {cmd.UserId}"));
+        }
 
+        var fullName = FullName.Create(cmd.FirstName, cmd.LastName).Data!;
 
         volunteer.UpdateMainInfo(fullName, cmd.ExperienceYears, cmd.Description);
 
-        var updateResult = await _writeRepository.Save(volunteer, ct);
+        var updateResult = await _volunteerWriteRepo.SaveAsync(volunteer, ct);
         if (updateResult.IsFailure)
             return updateResult;
 

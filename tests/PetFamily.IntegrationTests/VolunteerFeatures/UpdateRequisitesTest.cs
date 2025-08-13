@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PetFamily.IntegrationTests.Fixtures;
+using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
@@ -20,6 +20,7 @@ public class UpdateRequisitesTest(TestWebApplicationFactory factory)
         await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var command = new UpdateRequisitesCommand(
+            seedVolunteer.UserId.Value,
             seedVolunteer.Id,
             [
                 new RequisitesDto("testName","test description"),

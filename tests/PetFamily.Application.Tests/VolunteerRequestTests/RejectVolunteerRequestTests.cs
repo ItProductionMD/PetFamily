@@ -13,11 +13,10 @@ namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 public class RejectVolunteerRequestTests
 {
     private readonly Mock<IVolunteerRequestWriteRepository> _repo = new();
-    private readonly Mock<IUserContext.IUserContext> _userContext = new();
     private readonly Mock<ILogger<RejectVolunteerRequestHandler>> _logger = new();
 
     private RejectVolunteerRequestHandler CreateHandler()
-        => new(_repo.Object, _userContext.Object, _logger.Object);
+        => new(_repo.Object, _logger.Object);
 
     private static VolunteerRequest CreateNewRequest(Guid userId)
     {
@@ -51,14 +50,11 @@ public class RejectVolunteerRequestTests
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.GetUserId())
-             .Returns(adminId);
-
         _repo.Setup(r => r.SaveAsync(ct))
              .Returns(Task.CompletedTask);
 
         var handler = CreateHandler();
-        var cmd = new RejectVolunteerRequestCommand(requestId, "Недостаточно данных");
+        var cmd = new RejectVolunteerRequestCommand(adminId, requestId, "Недостаточно данных");
 
         // act
         var result = await handler.Handle(cmd, ct);
@@ -78,34 +74,13 @@ public class RejectVolunteerRequestTests
     {
         var ct = CancellationToken.None;
         var requestId = Guid.NewGuid();
+        var adminId = Guid.NewGuid();
 
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Fail(Error.NotFound("not found")));
 
         var handler = CreateHandler();
-        var cmd = new RejectVolunteerRequestCommand(requestId, "any");
-
-        var result = await handler.Handle(cmd, ct);
-
-        Assert.True(result.IsFailure);
-        _repo.Verify(r => r.SaveAsync(ct), Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_Should_Fail_When_AdminId_Not_Available()
-    {
-        var ct = CancellationToken.None;
-        var requestId = Guid.NewGuid();
-        var request = CreateNewRequest(Guid.NewGuid());
-
-        _repo.Setup(r => r.GetByIdAsync(requestId, ct))
-             .ReturnsAsync(Result.Ok(request));
-
-        _userContext.Setup(c => c.TryGetUserId())
-             .Returns(Result.Fail(Error.InternalServerError("no user")));
-
-        var handler = CreateHandler();
-        var cmd = new RejectVolunteerRequestCommand(requestId, "any");
+        var cmd = new RejectVolunteerRequestCommand(adminId, requestId, "any");
 
         var result = await handler.Handle(cmd, ct);
 
@@ -127,11 +102,8 @@ public class RejectVolunteerRequestTests
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.TryGetUserId())
-             .Returns(Result.Ok(adminId));
-
         var handler = CreateHandler();
-        var cmd = new RejectVolunteerRequestCommand(requestId, "any");
+        var cmd = new RejectVolunteerRequestCommand(adminId, requestId, "any");
 
         var result = await handler.Handle(cmd, ct);
 
@@ -157,11 +129,8 @@ public class RejectVolunteerRequestTests
         _repo.Setup(r => r.GetByIdAsync(requestId, ct))
              .ReturnsAsync(Result.Ok(request));
 
-        _userContext.Setup(c => c.TryGetUserId())
-             .Returns(Result.Ok(anotherAdmin)); // другой админ
-
         var handler = CreateHandler();
-        var cmd = new RejectVolunteerRequestCommand(requestId, "any");
+        var cmd = new RejectVolunteerRequestCommand(anotherAdmin, requestId, "any");
 
         var result = await handler.Handle(cmd, ct);
 

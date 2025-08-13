@@ -2,4 +2,4 @@
 
 namespace PetFamily.VolunteerRequests.Application.Queries.GetRequest;
 
-public record GetOwnVolunteerRequestQuery():IQuery;
+public record GetOwnVolunteerRequestQuery(Guid UserId):IQuery;

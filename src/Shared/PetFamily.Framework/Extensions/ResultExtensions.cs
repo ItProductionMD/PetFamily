@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
@@ -22,6 +23,28 @@ namespace PetFamily.Framework.Extensions
             : new OkObjectResult(result.ToEnvelope());
         }
 
+        public static ActionResult ToCreatedAtActionResult<T>(
+            this Result<T> result,
+            string actionName)
+        {
+            return result.IsFailure
+                ? result.ToErrorActionResult()
+                : new CreatedAtActionResult(
+                    actionName,
+                    controllerName: null, // можно задать явно, если нужно
+                    routeValues: "",
+                    value: result.ToEnvelope());
+        }
+        public static ActionResult ToCreatedAtActionResult(this UnitResult result, string actionName)
+        {
+            return result.IsFailure
+                ? result.ToErrorActionResult()
+                : new CreatedAtActionResult(
+                    actionName,
+                    controllerName: null, // можно задать явно, если нужно
+                    routeValues: "",
+                    value: result.ToEnvelope());
+        }
         public static ActionResult ToErrorActionResult(this UnitResult result)
         {
             if (result.Error is null)

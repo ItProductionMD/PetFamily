@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using PetFamily.Auth.Application.Dtos;
 using PetFamily.Auth.Application.Options;
 using PetFamily.SharedKernel.Results;
 
@@ -6,12 +7,14 @@ namespace PetFamily.Auth.Presentation.Cookies;
 
 public static class HTTPResponseCookiesSetter
 {
-    public static void SetRefreshTokenCookie(
+    public static void SetRefreshTokenInCookies(
         HttpResponse response,
-        string refreshToken,
-        DateTime refreshTokenExpiresAt,
+        TokenResult tokenResult,
         RefreshTokenCookie tokenCookieOptions)
     {
+
+        var refreshToken = tokenResult.RefreshToken;
+        var refreshTokenExpiresAt = tokenResult.RefreshTokenExpiresAt;
 
         var sameSiteMode = tokenCookieOptions.SameSiteMode.ToLower() switch
         {

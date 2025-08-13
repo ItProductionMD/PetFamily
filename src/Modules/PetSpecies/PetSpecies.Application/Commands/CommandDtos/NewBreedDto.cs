@@ -1,3 +1,3 @@
 ﻿namespace PetSpecies.Application.Commands.CommandsDtos;
 
-public record BreedDtos(string Name, string Description);
+public record NewBreedDto(string Name, string Description);

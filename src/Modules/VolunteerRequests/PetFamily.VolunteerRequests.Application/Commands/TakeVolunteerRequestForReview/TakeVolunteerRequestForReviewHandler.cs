@@ -10,15 +10,13 @@ using PetFamily.VolunteerRequests.Domain.Enums;
 namespace PetFamily.VolunteerRequests.Application.Commands.TakeVolunteerRequestForReview;
 
 public class TakeVolunteerRequestForReviewHandler(
-    IVolunteerRequestWriteRepository requestRepository,
+    IVolunteerRequestWriteRepository requestRepo,
     IDiscussionCreator discussionCreator,
     IDiscussionRemover discussionRemover,
-    IUserContext userContext,
     ILogger<TakeVolunteerRequestForReviewHandler> logger) : ICommandHandler<TakeVolunteerRequestForReviewCommand>
 {
-    private readonly IVolunteerRequestWriteRepository _requestRepository = requestRepository;
+    private readonly IVolunteerRequestWriteRepository _requestRepo = requestRepo;
     private readonly ILogger<TakeVolunteerRequestForReviewHandler> _logger = logger;
-    private readonly IUserContext _userContext = userContext;
     private readonly IDiscussionRemover _discussionRemover = discussionRemover;
     private readonly IDiscussionCreator _discussionCreator = discussionCreator;
 
@@ -26,15 +24,12 @@ public class TakeVolunteerRequestForReviewHandler(
     {
         TakeVolunteerRequestForReviewValidator.Validate(cmd);
         
-        var getVolunteerRequest = await _requestRepository.GetByIdAsync(cmd.VolunteerRequestId, ct);
+        var adminId = cmd.AdminId;
+
+        var getVolunteerRequest = await _requestRepo.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getVolunteerRequest.IsFailure)
-        {
-            _logger.LogWarning("Failed to retrieve volunteer request with ID {VolunteerRequestId}. Error: {Error}",
-                cmd.VolunteerRequestId, getVolunteerRequest.Error);
-
             return UnitResult.Fail(getVolunteerRequest.Error);
-        }
-
+        
         var volunteerRequest = getVolunteerRequest.Data!;
 
         if (volunteerRequest.RequestStatus != RequestStatus.Created)
@@ -45,8 +40,6 @@ public class TakeVolunteerRequestForReviewHandler(
             return UnitResult.Fail(Error.InternalServerError("Volunteer request is already taken for review."));
         }
         
-        var adminId = _userContext.GetUserId();
-
         var createDiscussion = await _discussionCreator.CreateDiscussion(
             volunteerRequest.Id,
             adminId,
@@ -65,7 +58,7 @@ public class TakeVolunteerRequestForReviewHandler(
         volunteerRequest.TakeToReview(adminId, discussionId);
         try
         {
-            await _requestRepository.SaveAsync(ct);
+            await _requestRepo.SaveAsync(ct);
         }
         catch (Exception ex)
         {

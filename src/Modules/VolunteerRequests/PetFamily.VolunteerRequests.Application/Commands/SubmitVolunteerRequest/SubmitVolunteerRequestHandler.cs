@@ -10,23 +10,21 @@ using PetFamily.VolunteerRequests.Domain.Entities;
 namespace PetFamily.VolunteerRequests.Application.Commands.SubmitVolunteerRequest;
 
 public class SubmitVolunteerRequestHandler(
-    IUserContext userContext,
-    IVolunteerRequestWriteRepository requestWriteRepository,
-    IVolunteerRequestReadRepository requestReadRepository,
+    IVolunteerRequestWriteRepository requestWriteRepo,
+    IVolunteerRequestReadRepository requestReadRepo,
     ILogger<SubmitVolunteerRequestHandler> logger) : ICommandHandler<SubmitVolunteerRequestCommand>
 {
-    private readonly IVolunteerRequestWriteRepository _requestWriteRepository = requestWriteRepository;
-    private readonly IUserContext _userContext = userContext;
-    private readonly IVolunteerRequestReadRepository _requestReadRepository = requestReadRepository;
+    private readonly IVolunteerRequestWriteRepository _requestWriteRepo = requestWriteRepo;
+    private readonly IVolunteerRequestReadRepository _requestReadRepo = requestReadRepo;
     private readonly ILogger<SubmitVolunteerRequestHandler> _logger = logger;
 
     public async Task<UnitResult> Handle(SubmitVolunteerRequestCommand cmd, CancellationToken ct)
     {
         SubmitVolunteerRequestValidator.Validate(cmd);
 
-        var userId = _userContext.GetUserId();
+        var userId = cmd.UserId;
         
-        var isRequestExist = await _requestReadRepository.CheckIfRequestExistAsync(userId, ct);
+        var isRequestExist = await _requestReadRepo.CheckIfRequestExistAsync(userId, ct);
         if (isRequestExist)
         {
             _logger.LogWarning("Volunteer request already exists for user {UserId}", userId);
@@ -44,12 +42,13 @@ public class SubmitVolunteerRequestHandler(
             cmd.ExperienceYears,
             requisites).Data!;
 
-        await _requestWriteRepository.AddAsync(volunteerRequest, ct);
+        await _requestWriteRepo.AddAsync(volunteerRequest, ct);
 
-        await _requestWriteRepository.SaveAsync(ct);
+
+        await _requestWriteRepo.SaveAsync(ct);
 
         _logger.LogInformation("Volunteer request submitted successfully for user {UserId}", userId);
 
-        return await Task.FromResult<UnitResult>(UnitResult.Ok());
+        return UnitResult.Ok();
     }
 }
