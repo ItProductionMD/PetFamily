@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\BuildingBlocks\Account\Account.Public\Account.Public.csproj" />
     <ProjectReference Include="..\..\src\Modules\Discussions\PetFamily.Discussions.Application\PetFamily.Discussions.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\VolunteerRequests\PetFamily.VolunteerRequests.Application\PetFamily.VolunteerRequests.Application.csproj" />
     <ProjectReference Include="..\..\src\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />

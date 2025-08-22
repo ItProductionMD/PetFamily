@@ -25,9 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildingBlocks\Auth\PetFamily.Auth.Application\PetFamily.Auth.Application.csproj" />
-    <ProjectReference Include="..\BuildingBlocks\Auth\PetFamily.Auth.Infrastructure\PetFamily.Auth.Infrastructure.csproj" />
-    <ProjectReference Include="..\BuildingBlocks\Auth\PetFamily.Auth.Presentation\PetFamily.Auth.Presentation.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Account\Account.Infrastructure\Account.Infrastructure.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Account\Account.Presentation\Account.Presentation.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Authorization\Authorization.Application\Authorization.Application.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Authorization\Authorization.Infrastructure\Authorization.Infrastructure.csproj" />
+    <ProjectReference Include="..\BuildingBlocks\Authorization\Authorization.Presentation\Authorization.Presentation.csproj" />
     <ProjectReference Include="..\BuildingBlocks\FileStorage\FileStorage.Infrastructure\FileStorage.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingBlocks\FileStorage\FileStorage.Presentation\FileStorage.Presentation.csproj" />
     <ProjectReference Include="..\Modules\Discussions\PetFamily.Discussion.Presentation\PetFamily.Discussions.Presentation.csproj" />

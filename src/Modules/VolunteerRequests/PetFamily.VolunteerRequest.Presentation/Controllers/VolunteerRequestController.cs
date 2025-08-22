@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Framework;
-using PetFamily.Framework.HTTPContext.Interfaces;
+using PetFamily.Framework.HTTPContext.User;
 using PetFamily.VolunteerRequests.Application.Commands.ApproveVolunteerRequest;
 using PetFamily.VolunteerRequests.Application.Commands.RejectVolunteerRequest;
 using PetFamily.VolunteerRequests.Application.Commands.SendVolunteerRequestToRevision;

@@ -1,5 +1,5 @@
-﻿using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
+﻿using PetFamily.IntegrationTests.DbContextExtensions;
+using PetFamily.IntegrationTests.IClassFixtures;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using Volunteers.Application.Queries.GetVolunteers;
@@ -32,7 +32,7 @@ public class GetVolunteersTest(TestWebApplicationFactory factory)
 
         var volunteers = new VolunteerTestBuilder(volunteersCount: volunteersCount).Volunteers;
 
-        await DbContextSeedExtensions.SeedRangeAsync(_volunteerDbContext, volunteers);
+        await DbContextSeeder.SeedRangeAsync(_volunteerDbContext, volunteers);
         //ACT
         var result = await _sut.Handle(query, CancellationToken.None);
         //ASSERT

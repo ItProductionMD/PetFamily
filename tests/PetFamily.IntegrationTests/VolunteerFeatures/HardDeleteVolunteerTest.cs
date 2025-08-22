@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.IntegrationTests.DbContextExtensions;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using Volunteers.Application.Commands.VolunteerManagement.DeleteVolunteer;
@@ -17,11 +17,11 @@ public class HardDeleteVolunteerTest(TestWebApplicationFactory factory)
         //ARRANGE
         var species = new SpeciesTestBuilder()
             .WithBreeds(["breedOne", "breedTwo"]).Species;
-        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, species);
+        await DbContextSeeder.SeedAsync(_speciesDbContext, species);
 
         var volunteer = new VolunteerTestBuilder()
             .WithPets(10, species).Volunteer;
-        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, volunteer);
+        await DbContextSeeder.SeedAsync(_volunteerDbContext, volunteer);
 
         var command = new HardDeleteVolunteerCommand(volunteer.Id);
         //ACT

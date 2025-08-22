@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Moq;
 using Npgsql;
-using PetFamily.Auth.Public.Contracts;
+using Account.Public.Contracts;
 using PetFamily.SharedApplication.IUserContext;
 using Respawn;
 using Testcontainers.PostgreSql;

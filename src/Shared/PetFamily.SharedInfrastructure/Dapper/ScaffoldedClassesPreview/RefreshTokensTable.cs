@@ -1,9 +1,11 @@
+using PetFamily.SharedInfrastructure.Constants;
+
 namespace PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClassesPreview;
 
 public static class RefreshTokensTable
 {
     public const string TableName = "refresh_tokens";
-    public const string TableFullName = "auth.refresh_tokens";
+    public const string TableFullName = "jwt_token.refresh_tokens";
     public const string Id = "id";
     public const string UserId = "user_id";
     public const string Jti = "jti";

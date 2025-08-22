@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Auth.Public.Contracts;
+using Account.Public.Contracts;
 using PetFamily.Discussions.Application.Dtos;
 using PetFamily.Discussions.Application.IRepositories;
 using PetFamily.Discussions.Application.Queries.GetDiscussion;

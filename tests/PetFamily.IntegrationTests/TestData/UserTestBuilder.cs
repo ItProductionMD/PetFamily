@@ -1,8 +1,8 @@
-﻿using global::PetFamily.Auth.Domain.Enums;
-using global::PetFamily.Auth.Domain.ValueObjects;
+﻿using global::Account.Domain.Enums;
+using global::Account.Domain.ValueObjects;
 using global::PetFamily.SharedKernel.ValueObjects;
 using global::PetFamily.SharedKernel.ValueObjects.Ids;
-using PetFamily.Auth.Domain.Entities.UserAggregate;
+using Account.Domain.Entities.UserAggregate;
 
 namespace PetFamily.IntegrationTests.TestData;
 
@@ -74,7 +74,6 @@ public class UserTestBuilder
             _phone,
             _hashedPassword,
             _socialNetworks,
-            _roleId,
             _providerType);
 
         return result.Data!;

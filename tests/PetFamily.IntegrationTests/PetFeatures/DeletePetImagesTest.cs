@@ -1,8 +1,8 @@
 ﻿using FileStorage.Public.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using PetFamily.IntegrationTests.DbContextExtensions;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedKernel.Errors;
@@ -26,7 +26,7 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
         var seedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["testBreed"])
             .GetSpecies();
-        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, seedSpecies);
+        await DbContextSeeder.SeedAsync(_speciesDbContext, seedSpecies);
 
         _seedVolunteer = new VolunteerTestBuilder()
             .WithPets(1, seedSpecies)
@@ -34,7 +34,7 @@ public class DeletePetImagesTest(TestWebApplicationFactory factory)
 
         _seedVolunteer.Pets[0].AddImages([IMAGE_NAME]);
 
-        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, _seedVolunteer);
+        await DbContextSeeder.SeedAsync(_volunteerDbContext, _seedVolunteer);
 
         _seedPet = _seedVolunteer.Pets[0] ?? throw new Exception("seeded Pet is Null!");
     }

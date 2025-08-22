@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.IntegrationTests.DbContextExtensions;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using Volunteers.Application.Queries.GetVolunteer;
@@ -17,7 +17,7 @@ public class GetVolunteerTest(TestWebApplicationFactory factory)
         //ARRANGE
         var seedVolunteer = new VolunteerTestBuilder(volunteersCount: 1).Volunteer;
 
-        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
+        await DbContextSeeder.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         var query = new GetVolunteerQuery(seedVolunteer.Id);
         //ACT

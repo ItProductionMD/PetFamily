@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.IntegrationTests.DbContextExtensions;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using Volunteers.Application.Commands.VolunteerManagement.SoftDeleteVolunteer;
@@ -17,11 +17,11 @@ public class SoftDeleteVolunteerTest(
         //ARRANGE
         var species = new SpeciesTestBuilder()
             .WithBreeds(["breedOne", "breedTwo"]).Species;
-        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, species);
+        await DbContextSeeder.SeedAsync(_speciesDbContext, species);
 
         var seedVolunteer = new VolunteerTestBuilder()
             .WithPets(10, species).Volunteer;
-        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
+        await DbContextSeeder.SeedAsync(_volunteerDbContext, seedVolunteer);
 
         //ACT
         var result = await _sut.Handle(new(seedVolunteer.Id), CancellationToken.None);

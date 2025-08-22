@@ -1,9 +1,11 @@
+using PetFamily.SharedInfrastructure.Constants;
+
 namespace PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClassesPreview;
 
 public static class VolunteerRequestsTable
 {
     public const string TableName = "volunteer_requests";
-    public const string TableFullName = "volunteer_requests.volunteer_requests";
+    public const string TableFullName = "volunteer_request.volunteer_requests";
     public const string Id = "id";
     public const string UserId = "user_id";
     public const string AdminId = "admin_id";

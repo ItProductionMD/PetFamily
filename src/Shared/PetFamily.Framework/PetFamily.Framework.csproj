@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\Authorization\Authorization.Public\Authorization.Public.csproj" />
     <ProjectReference Include="..\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
     <ProjectReference Include="..\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
   </ItemGroup>

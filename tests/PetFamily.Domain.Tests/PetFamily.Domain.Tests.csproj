@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BuildingBlocks\Auth\PetFamily.Auth.Domain\PetFamily.Auth.Domain.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Auth\PetFamily.Auth.Domain\Account.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Discussions\PetFamily.Disscussions.Domain\PetFamily.Discussions.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\VolunteerRequests\PetFamily.VolunteerRequests.Domain\PetFamily.VolunteerRequests.Domain.csproj" />
     <ProjectReference Include="..\..\src\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />

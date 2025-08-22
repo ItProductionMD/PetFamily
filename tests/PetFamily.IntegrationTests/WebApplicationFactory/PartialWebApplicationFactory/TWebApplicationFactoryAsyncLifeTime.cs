@@ -72,8 +72,8 @@ public partial class TestWebApplicationFactory
             {
                 SchemaNames.SPECIES,
                 SchemaNames.VOLUNTEER,
-                SchemaNames.AUTH,
-                SchemaNames.VOLUNTEER_REQUESTS,
+                SchemaNames.USER_ACCOUNT,
+                SchemaNames.VOLUNTEER_REQUEST,
                 SchemaNames.DISCUSSION
             }
 

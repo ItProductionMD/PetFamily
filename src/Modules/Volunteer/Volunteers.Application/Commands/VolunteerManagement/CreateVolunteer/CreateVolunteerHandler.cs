@@ -1,18 +1,20 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Authorization.Public.Contracts;
+using Microsoft.Extensions.Logging;
 using PetFamily.SharedApplication.Abstractions.CQRS;
+using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;
 using Volunteers.Application.IRepositories;
 using Volunteers.Domain;
 using Volunteers.Domain.ValueObjects;
+using static PetFamily.SharedKernel.Authorization.RoleCodes;
 
-
-//-------------------------------Handler,UseCases,Services----------------------------------------//
 namespace Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 
 public class CreateVolunteerHandler(
     IVolunteerWriteRepository volunteerWriteRepo,
+    IRoleContract roleContract,
     ILogger<CreateVolunteerHandler> logger) : ICommandHandler<Guid, CreateVolunteerCommand>
 {
 
@@ -25,11 +27,32 @@ public class CreateVolunteerHandler(
         var addResult = await volunteerWriteRepo.AddAndSaveAsync(volunteer, ct);
         if (addResult.IsFailure)
             return addResult;
-
-        logger.LogInformation("Volunteer with id:{Id},created successful by admin with id:{adminId}!",
+        try
+        {
+            var result = await roleContract.AssignRole(cmd.UserId, VOLUNTEER, ct);
+            if(result.IsFailure)
+            {
+                logger.LogWarning("Failed to change role for user with id:{UserId} to {RoleCode}: {Error}",
+                    cmd.UserId, VOLUNTEER, result.Error);
+                return Result.Fail(result.Error);
+            }
+            logger.LogInformation("Volunteer with id:{Id},created successful by admin with id:{adminId}!",
             volunteer.Id, cmd.AdminId);
 
-        return Result.Ok(volunteer.Id);
+            return Result.Ok(volunteer.Id);
+        }
+        catch(Exception ex)
+        {
+            // If role assignment fails, we need to clean up the volunteer record
+            await volunteerWriteRepo.Delete(volunteer, CancellationToken.None);
+
+            logger.LogWarning("Failed to change role for user with id:{UserId} to {RoleCode}: {Message}",
+                    cmd.UserId, VOLUNTEER, ex.Message);
+
+            var errorResult = Error.InternalServerError(
+                $"Failed to change role for user with id:{cmd.UserId} to {VOLUNTEER}: {ex.Message}");
+            return Result.Fail(errorResult);
+        }
     }
 
     private static Volunteer CreateVolunteerProcess(CreateVolunteerCommand cmd)

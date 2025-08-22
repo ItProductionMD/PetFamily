@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Auth.Public.Contracts;
-using PetFamily.Auth.Public.Dtos;
+using Account.Public.Contracts;
+using Account.Public.Dtos;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;

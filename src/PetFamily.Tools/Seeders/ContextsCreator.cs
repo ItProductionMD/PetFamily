@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PetFamily.Auth.Infrastructure.Contexts;
+using Account.Infrastructure.Contexts;
 using PetSpecies.Infrastructure.Contexts;
 using Volunteers.Infrastructure.Contexts;
 using static PetFamily.Tools.ToolsExtensions;
@@ -59,7 +59,7 @@ public class ContextsCreator
         return (scope, _dbContext);
     }
 
-    public static (IServiceScope scope, AuthWriteDbContext context) CreateAuthDbContext()
+    public static (IServiceScope scope, UserWriteDbContext context) CreateAuthDbContext()
     {
         var connectionString = GetConnectionString();
         Console.WriteLine("###Creating host...###");
@@ -67,12 +67,12 @@ public class ContextsCreator
             .ConfigureServices((context, services) =>
             {
                 services.AddScoped(_ =>
-                new AuthWriteDbContext(connectionString));
+                new UserWriteDbContext(connectionString));
             })
        .Build();
         var scope = host.Services.CreateScope();
         Console.WriteLine("###Getting Auth dbContext...###");
-        var _dbContext = scope.ServiceProvider.GetRequiredService<AuthWriteDbContext>();
+        var _dbContext = scope.ServiceProvider.GetRequiredService<UserWriteDbContext>();
         if (_dbContext == null)
             throw new Exception("###auth _dbContext is null!###");
 

@@ -10,6 +10,7 @@ using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClassesPreview;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using static PetFamily.SharedInfrastructure.Dapper.Extensions.DapperLoggerExtensions;
+using DiscussionsTable = PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses.DiscussionsTable;
 
 namespace PetFamily.Discussions.Infrastructure.Repositories;
 

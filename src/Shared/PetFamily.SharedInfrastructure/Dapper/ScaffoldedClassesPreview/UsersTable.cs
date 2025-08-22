@@ -1,9 +1,11 @@
+using PetFamily.SharedInfrastructure.Constants;
+
 namespace PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClassesPreview;
 
 public static class UsersTable
 {
     public const string TableName = "users";
-    public const string TableFullName = "auth.users";
+    public const string TableFullName = "user_account.users";
     public const string Id = "id";
     public const string Login = "login";
     public const string HashedPassword = "hashed_password";
@@ -21,7 +23,6 @@ public static class UsersTable
     public const string UpdatedAt = "updated_at";
     public const string LoginAttempts = "login_attempts";
     public const string SocialNetworks = "social_networks";
-    public const string RoleId = "role_id";
     public const string IsDeleted = "is_deleted";
     public const string DeletedAt = "deleted_at";
 }
