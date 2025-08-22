@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.Discussions.Public.Contracts;
-using PetFamily.SharedApplication.IUserContext;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.VolunteerRequests.Application.IRepositories;
@@ -10,26 +9,21 @@ using PetFamily.VolunteerRequests.Domain.Enums;
 namespace PetFamily.VolunteerRequests.Application.Commands.TakeVolunteerRequestForReview;
 
 public class TakeVolunteerRequestForReviewHandler(
-    IVolunteerRequestWriteRepository requestRepo,
+    IVolunteerRequestWriteRepository volunteerRequestRepo,
     IDiscussionCreator discussionCreator,
     IDiscussionRemover discussionRemover,
-    ILogger<TakeVolunteerRequestForReviewHandler> logger) : ICommandHandler<TakeVolunteerRequestForReviewCommand>
+    ILogger<TakeVolunteerRequestForReviewHandler> _logger) : ICommandHandler<TakeVolunteerRequestForReviewCommand>
 {
-    private readonly IVolunteerRequestWriteRepository _requestRepo = requestRepo;
-    private readonly ILogger<TakeVolunteerRequestForReviewHandler> _logger = logger;
-    private readonly IDiscussionRemover _discussionRemover = discussionRemover;
-    private readonly IDiscussionCreator _discussionCreator = discussionCreator;
-
     public async Task<UnitResult> Handle(TakeVolunteerRequestForReviewCommand cmd, CancellationToken ct)
     {
-        TakeVolunteerRequestForReviewValidator.Validate(cmd);
-        
+        cmd.Validate();
+
         var adminId = cmd.AdminId;
 
-        var getVolunteerRequest = await _requestRepo.GetByIdAsync(cmd.VolunteerRequestId, ct);
+        var getVolunteerRequest = await volunteerRequestRepo.GetByIdAsync(cmd.VolunteerRequestId, ct);
         if (getVolunteerRequest.IsFailure)
             return UnitResult.Fail(getVolunteerRequest.Error);
-        
+
         var volunteerRequest = getVolunteerRequest.Data!;
 
         if (volunteerRequest.RequestStatus != RequestStatus.Created)
@@ -39,8 +33,8 @@ public class TakeVolunteerRequestForReviewHandler(
 
             return UnitResult.Fail(Error.InternalServerError("Volunteer request is already taken for review."));
         }
-        
-        var createDiscussion = await _discussionCreator.CreateDiscussion(
+
+        var createDiscussion = await discussionCreator.CreateDiscussion(
             volunteerRequest.Id,
             adminId,
             volunteerRequest.UserId,
@@ -58,14 +52,14 @@ public class TakeVolunteerRequestForReviewHandler(
         volunteerRequest.TakeToReview(adminId, discussionId);
         try
         {
-            await _requestRepo.SaveAsync(ct);
+            await volunteerRequestRepo.SaveAsync(ct);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to save volunteer request with ID {VolunteerRequestId}. Error: {Message}",
                 volunteerRequest.Id, ex.Message);
 
-            await _discussionRemover.RemoveDisscusion(discussionId);
+            await discussionRemover.RemoveDisscusion(discussionId);
 
             return UnitResult.Fail(Error.InternalServerError("Failed to save volunteer request after taking it for review."));
         }

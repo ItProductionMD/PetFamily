@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Account.Infrastructure.Contexts;
+using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.Auth.Infrastructure.Contexts;
 using PetFamily.VolunteerRequests.Infrastructure.Contexts;
 using PetSpecies.Infrastructure.Contexts;
 using Volunteers.Infrastructure.Contexts;
-using PetFamily.IntegrationTests.WebApplicationFactory;
-using Microsoft.EntityFrameworkCore;
 
 namespace PetFamily.IntegrationTests.IClassFixtures;
 
@@ -18,7 +18,7 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
     protected VolunteerWriteDbContext _volunteerDbContext = null!;
     protected VolunteerRequestWriteDbContext _volunteerRequestDbContext = null!;
     protected SpeciesWriteDbContext _speciesDbContext = null!;
-    protected AuthWriteDbContext _authDbContext = null!;
+    protected UserWriteDbContext _authDbContext = null!;
 
     public virtual Task InitializeAsync()
     {
@@ -26,7 +26,7 @@ public abstract class BaseTest(TestWebApplicationFactory factory)
 
         _volunteerDbContext = _scope.ServiceProvider.GetService<VolunteerWriteDbContext>()!;
         _speciesDbContext = _scope.ServiceProvider.GetService<SpeciesWriteDbContext>()!;
-        _authDbContext = _scope.ServiceProvider.GetRequiredService<AuthWriteDbContext>()!;
+        _authDbContext = _scope.ServiceProvider.GetRequiredService<UserWriteDbContext>()!;
         _volunteerRequestDbContext = _scope.ServiceProvider.GetRequiredService<VolunteerRequestWriteDbContext>()!;
 
         return Task.CompletedTask;

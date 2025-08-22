@@ -21,7 +21,7 @@ public class ExceptionMiddleware
         {
             await _next(context);
         }
-        catch(UserNotAuthenticatedException ex)
+        catch (UserNotAuthenticatedException ex)
         {
             _logger.LogError(ex, message: "UserNotAuthenticatedException:{Message}", ex.Message);
 
@@ -35,7 +35,7 @@ public class ExceptionMiddleware
 
             await context.Response.WriteAsJsonAsync(envelope);
         }
-        catch(ValidationException ex)
+        catch (ValidationException ex)
         {
             _logger.LogError(ex, message: "Exception:{Exception}", ex.Message);
 

@@ -1,11 +1,9 @@
-using PetFamily.SharedInfrastructure.Constants;
-
 namespace PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 
-public static class UsersTable 
+public static class UsersTable
 {
     public const string TableName = "users";
-    public const string TableFullName = "auth.users";
+    public const string TableFullName = "\"user_account\".users";
     public const string Id = "id";
     public const string Login = "login";
     public const string HashedPassword = "hashed_password";

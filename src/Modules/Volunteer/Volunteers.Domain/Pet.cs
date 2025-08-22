@@ -51,7 +51,7 @@ public class Pet : SoftDeletable, IEntity<Guid>
         HelpStatus helpStatus,
         string? healthInfo,
         Address address,
-        PetSerialNumber serialNumber) 
+        PetSerialNumber serialNumber)
     {
         Id = id;
         DateTimeCreated = DateTime.UtcNow;
@@ -194,7 +194,7 @@ public class Pet : SoftDeletable, IEntity<Guid>
         Description = info.Description;
         IsVaccinated = info.IsVaccinated;
         IsSterilized = info.IsSterilized;
-        Weight =info.Weight;
+        Weight = info.Weight;
         Height = info.Height;
         Color = info.Color;
         PetType = info.PetType;

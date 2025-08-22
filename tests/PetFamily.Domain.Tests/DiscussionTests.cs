@@ -1,6 +1,4 @@
 ﻿using PetFamily.Discussions.Domain.Entities;
-using PetFamily.SharedKernel.Results;
-using Xunit;
 
 namespace TestPetFamilyDomain;
 
@@ -27,7 +25,7 @@ public class DiscussionTests
         // Arrange
         var user1 = Guid.NewGuid();
         var user2 = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(), user1, user2 ).Data!;
+        var discussion = Discussion.Create(Guid.NewGuid(), user1, user2).Data!;
 
         // Act
         var result = discussion.LeaveMessage(user1, "Hello there");
@@ -44,7 +42,7 @@ public class DiscussionTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var discussion = Discussion.Create(Guid.NewGuid(),  userId, Guid.NewGuid() ).Data!;
+        var discussion = Discussion.Create(Guid.NewGuid(), userId, Guid.NewGuid()).Data!;
         discussion.Close(userId);
 
         // Act

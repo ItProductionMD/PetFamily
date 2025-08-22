@@ -1,8 +1,7 @@
 ﻿using PetFamily.SharedKernel.Results;
-using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 using static PetFamily.SharedKernel.Validations.ValidationConstants;
+using static PetFamily.SharedKernel.Validations.ValidationExtensions;
 using static PetFamily.SharedKernel.Validations.ValidationPatterns;
-using PetFamily.SharedKernel.ValueObjects;
 
 namespace PetFamily.SharedKernel.Validations;
 

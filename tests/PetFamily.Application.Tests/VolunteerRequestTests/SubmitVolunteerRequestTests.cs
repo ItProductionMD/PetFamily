@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using PetFamily.SharedApplication.Exceptions;
-using PetFamily.SharedApplication.IUserContext;
-using PetFamily.SharedKernel.Errors;
-using PetFamily.SharedKernel.Results;
 using PetFamily.VolunteerRequests.Application.Commands.SubmitVolunteerRequest;
 using PetFamily.VolunteerRequests.Application.IRepositories;
 using PetFamily.VolunteerRequests.Domain.Entities;
-using Xunit.Sdk;
 
 namespace PetFamily.SharedApplication.Tests.VolunteerRequestTests;
 
@@ -80,11 +76,11 @@ public class SubmitVolunteerRequestTests
 
         var invalidCmd = new SubmitVolunteerRequestCommand(
             Guid.NewGuid(),
-            DocumentName: "",           
+            DocumentName: "",
             LastName: "Doe",
-            FirstName: "",             
-            Description: new string('a', 5000), 
-            ExperienceYears: -1,       
+            FirstName: "",
+            Description: new string('a', 5000),
+            ExperienceYears: -1,
             Requisites: []
         );
 
@@ -107,7 +103,7 @@ public class SubmitVolunteerRequestTests
         var cmd = CreateValidCommand();
 
         _readRepo.Setup(x => x.CheckIfRequestExistAsync(cmd.UserId, ct))
-            .ReturnsAsync(true); 
+            .ReturnsAsync(true);
 
         var handler = CreateHandler();
 

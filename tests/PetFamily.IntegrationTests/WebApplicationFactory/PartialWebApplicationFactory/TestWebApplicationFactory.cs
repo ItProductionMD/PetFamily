@@ -1,18 +1,11 @@
 ﻿using FileStorage.Public.Contracts;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Npgsql;
-using PetFamily.Auth.Infrastructure.Contexts;
-using PetFamily.Auth.Public.Contracts;
+using Account.Public.Contracts;
 using PetFamily.SharedApplication.IUserContext;
-using PetFamily.SharedInfrastructure.Constants;
-using PetFamily.VolunteerRequests.Infrastructure.Contexts;
-using PetSpecies.Infrastructure.Contexts;
 using Respawn;
 using Testcontainers.PostgreSql;
-using Volunteers.Infrastructure.Contexts;
 
 namespace PetFamily.IntegrationTests.WebApplicationFactory;
 

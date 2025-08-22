@@ -1,5 +1,4 @@
-﻿using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.Tools;
+﻿using PetFamily.Tools;
 using PetFamily.Tools.DatabaseManagement;
 using PetFamily.Tools.DependencyProjectView;
 using PetFamily.Tools.Seeders;
@@ -18,7 +17,7 @@ class Program
                 "--pets=<petsOnVolunteersCount>," +
                 "\n\tclear --<tableName>," +
                 "\n\tusing --<operation> --usings:<old_using>%<new_using>" +
-                "\n\tusing --<operation> --usings:<static:old_using>|<static:new_using>"+
+                "\n\tusing --<operation> --usings:<static:old_using>|<static:new_using>" +
                 "\n\tdiagram" +
                 "\n\tdrop_and_reset_database");
 
@@ -60,7 +59,7 @@ class Program
                 var solutionPath = GetPathToSolution();
                 var graphGenerator = new SolutionDependencyGraphGenerator(
                     solutionPath,
-                    ["Test","Tools"]);
+                    ["Test", "Tools"]);
                 graphGenerator.GenerateDependencyGraph();
                 break;
 
@@ -81,7 +80,7 @@ class Program
     {
         string parent1 = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
         string parent2 = Directory.GetParent(parent1)!.FullName;
-        string pathSolutoion = Path.Combine(parent2,"PetFamily.sln");
+        string pathSolutoion = Path.Combine(parent2, "PetFamily.sln");
 
         Console.WriteLine("#######################################################");
         Console.WriteLine($"\tSolution = {pathSolutoion}");

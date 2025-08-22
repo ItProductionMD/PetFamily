@@ -9,26 +9,22 @@ namespace PetSpecies.Application.Commands.DeleteSpecies;
 
 public class DeleteSpeciesHandler(
     IPetExistenceContract petExistenceChecker,
-    ISpeciesWriteRepository speciesWriteRepository,
+    ISpeciesWriteRepository speciesWriteRepo,
     ILogger<DeleteSpeciesHandler> logger) : ICommandHandler<DeleteSpeciesCommand>
 {
-    private readonly ILogger<DeleteSpeciesHandler> _logger = logger;
-    private readonly IPetExistenceContract _petExistenceChecker = petExistenceChecker;
-    private readonly ISpeciesWriteRepository _speciesWriteRepository = speciesWriteRepository;
-
     public async Task<UnitResult> Handle(DeleteSpeciesCommand cmd, CancellationToken ct)
     {
         if (cmd.SpeciesId == Guid.Empty)
         {
-            _logger.LogWarning("SpeciesId cannot be empty");
+            logger.LogWarning("SpeciesId cannot be empty");
             return UnitResult.Fail(Error.GuidIsEmpty("SpeciesId"));
         }
 
-        var isPetExists = await _petExistenceChecker.ExistsWithSpeciesAsync(cmd.SpeciesId, ct);
+        var isPetExists = await petExistenceChecker.ExistsWithSpeciesAsync(cmd.SpeciesId, ct);
         if (isPetExists)
             return UnitResult.Fail(Error.Conflict("Cant delete species because it is used by a pet"));
 
-        var deleteResult = await _speciesWriteRepository.DeleteAndSaveAsync(cmd.SpeciesId, ct);
+        var deleteResult = await speciesWriteRepo.DeleteAndSaveAsync(cmd.SpeciesId, ct);
 
         return deleteResult;
     }

@@ -23,11 +23,9 @@ namespace Volunteers.Infrastructure.Repositories;
 public class VolunteerReadRepository(
     IDbConnectionFactory dbConnectionFactory,
     IOptions<DapperOptions> options,
-    ILogger<VolunteerReadRepository> logger) : IVolunteerReadRepository 
+    ILogger<VolunteerReadRepository> logger) : IVolunteerReadRepository
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
     private readonly DapperOptions _options = options.Value;
-    private readonly ILogger<VolunteerReadRepository> _logger = logger;
 
     public async Task<UnitResult> CheckUniqueFields(
         Guid volunteerId,
@@ -43,11 +41,11 @@ public class VolunteerReadRepository(
                 AND {VolunteersTable.Id} <> @Id) 
                 THEN 'Phone' ELSE NULL END AS PhoneTaken;";
 
-        _logger.LogInformation("EXECUTING QUERY(CheckUniqueFields) SQL Query: {sql} with Parameters:" +
+        logger.LogInformation("EXECUTING QUERY(CheckUniqueFields) SQL Query: {sql} with Parameters:" +
             " {volunteerId}, {phone}",
             sql, volunteerId, phone);
 
-        await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var dbConnection = await dbConnectionFactory.CreateOpenConnectionAsync();
 
         var result = await dbConnection.QuerySingleAsync<string>(
             sql,
@@ -60,12 +58,12 @@ public class VolunteerReadRepository(
 
         if (string.IsNullOrWhiteSpace(result) == false)
         {
-            _logger.LogWarning("Volunteer with phone {phone} already exists!", result);
+            logger.LogWarning("Volunteer with phone {phone} already exists!", result);
 
             return UnitResult.Fail(Error.ValueIsAlreadyExist("Phone"));
         }
-       
-        _logger.LogInformation("Volunteer {phone} is unique!", result);
+
+        logger.LogInformation("Volunteer {phone} is unique!", result);
 
         return UnitResult.Ok();
     }
@@ -105,11 +103,11 @@ public class VolunteerReadRepository(
             GROUP BY v.{VolunteersTable.Id}  -- Group by volunteer to aggregate pets into a JSONB array
             LIMIT 1";
 
-        _logger.LogInformation("Executing(GetByIdAsync for volunteerDTO) SQL Query: " +
+        logger.LogInformation("Executing(GetByIdAsync for volunteerDTO) SQL Query: " +
             "{sql} with Parameters: {volunteerId}",
             sql, volunteerId);
 
-        await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var dbConnection = await dbConnectionFactory.CreateOpenConnectionAsync();
 
         var volunteer = await dbConnection.QuerySingleOrDefaultAsync<VolunteerDto>(
             sql,
@@ -117,10 +115,10 @@ public class VolunteerReadRepository(
 
         if (volunteer == null)
         {
-            _logger.LogWarning("Volunteer with id: {Id} not found!", volunteerId);
+            logger.LogWarning("Volunteer with id: {Id} not found!", volunteerId);
             return Result.Fail(Error.NotFound($"Volunteer with id:{volunteerId}"));
         }
-        _logger.LogInformation("Get volunteer with id: {Id} successful!", volunteerId);
+        logger.LogInformation("Get volunteer with id: {Id} successful!", volunteerId);
 
         return Result.Ok(volunteer);
     }
@@ -129,7 +127,7 @@ public class VolunteerReadRepository(
      GetVolunteersQuery query,
      CancellationToken cancelToken = default)
     {
-        using var dbConnection = _dbConnectionFactory.CreateConnection();
+        using var dbConnection = dbConnectionFactory.CreateConnection();
 
         var orderBy = query.orderBy switch
         {
@@ -153,7 +151,7 @@ public class VolunteerReadRepository(
         var pageNumber = query.pageNumber;
         if (pageNumber > totalPages || pageNumber <= 0)
         {
-            _logger.LogWarning("Page number {pageNumber} exceeds total pages {totalPages}. " +
+            logger.LogWarning("Page number {pageNumber} exceeds total pages {totalPages}. " +
                 "Returning empty result.", pageNumber, totalPages);
             return new GetVolunteersResponse(totalVolunteersCount, []);
         }
@@ -176,7 +174,7 @@ public class VolunteerReadRepository(
 
         var limit = query.pageSize;
 
-        _logger.LogInformation("Executing(GetVolunteers) SQL Query: {sql} with Parameters: {limit}, {offset}",
+        logger.LogInformation("Executing(GetVolunteers) SQL Query: {sql} with Parameters: {limit}, {offset}",
             sql, limit, offset);
 
         var volunteers = await dbConnection.QueryAsync<VolunteerMainInfoDto>(
@@ -186,7 +184,7 @@ public class VolunteerReadRepository(
 
         var volunteersList = volunteers.ToList();
 
-        _logger.LogInformation("GetVolunteers successful! Total count: {totalCount}", totalVolunteersCount);
+        logger.LogInformation("GetVolunteers successful! Total count: {totalCount}", totalVolunteersCount);
 
         return new GetVolunteersResponse(totalVolunteersCount, volunteersList);
     }
@@ -236,12 +234,12 @@ public class VolunteerReadRepository(
         string sqlQuery = sqlBuilder.ToString();
         string countQuery = countBuilder.ToString();
 
-        _logger.LogInformation("Executing(GetPets) SQL Query: {sql} with Parameters:", sqlQuery);
-        _logger.LogInformation("Executing(GetPets) COUNT Query: {count} with Parameters:", countQuery);
-        _logger.LogInformation("Parameters: {@Parameters}", parameters.ToDictionary());
+        logger.LogInformation("Executing(GetPets) SQL Query: {sql} with Parameters:", sqlQuery);
+        logger.LogInformation("Executing(GetPets) COUNT Query: {count} with Parameters:", countQuery);
+        logger.LogInformation("Parameters: {@Parameters}", parameters.ToDictionary());
 
-        await using var connection1 = await _dbConnectionFactory.CreateOpenConnectionAsync();
-        await using var connection2 = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var connection1 = await dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var connection2 = await dbConnectionFactory.CreateOpenConnectionAsync();
 
         var petsTask = connection1.QueryAsync<PetWithVolunteerDto>(sqlQuery, parameters);
         var totalCountTask = connection2.ExecuteScalarAsync<int>(countQuery, parameters);
@@ -252,5 +250,5 @@ public class VolunteerReadRepository(
         var totalCount = await totalCountTask;
 
         return Result.Ok<GetPetsResponse>(new(totalCount, pets));
-    }  
+    }
 }

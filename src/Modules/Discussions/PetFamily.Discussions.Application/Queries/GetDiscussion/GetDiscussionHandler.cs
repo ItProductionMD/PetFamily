@@ -1,36 +1,32 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions.CQRS;
-using PetFamily.Auth.Public.Contracts;
+using Account.Public.Contracts;
 using PetFamily.Discussions.Application.Dtos;
 using PetFamily.Discussions.Application.IRepositories;
-using PetFamily.SharedApplication.IUserContext;
+using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedApplication.PaginationUtils;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 
 namespace PetFamily.Discussions.Application.Queries.GetDiscussion;
 
-public class GetDiscussionHandler (
-    IDiscussionReadRepository discussionReadRepo,
-    ILogger<GetDiscussionHandler> logger,
-    IParticipantContract participantContract): IQueryHandler<GetDiscussionResponse, GetDiscussionQuery>
+public class GetDiscussionHandler(
+    IDiscussionReadRepository _discussionReadRepo,
+    IParticipantContract _participantContract,
+    ILogger<GetDiscussionHandler> _logger) : IQueryHandler<GetDiscussionResponse, GetDiscussionQuery>
 {
-    private readonly IDiscussionReadRepository _discussionReadRepo = discussionReadRepo;
-    private readonly ILogger<GetDiscussionHandler> _logger = logger;
-    private readonly IParticipantContract _participantContract = participantContract;
 
     public async Task<Result<GetDiscussionResponse>> Handle(GetDiscussionQuery cmd, CancellationToken ct)
     {
         var contextUserId = cmd.UserId;
 
-        var paginationParams = new PaginationParams (cmd.Page, cmd.PageSize);
-        
+        var paginationParams = new PaginationParams(cmd.Page, cmd.PageSize);
+
         var getDiscussionDto = await _discussionReadRepo.GetById(cmd.DiscussionId, paginationParams, ct);
-        if(getDiscussionDto.IsFailure)
+        if (getDiscussionDto.IsFailure)
             return Result.Fail(getDiscussionDto.Error);
-        
+
         var discussionDto = getDiscussionDto.Data!;
-        if(discussionDto.ParticipantIds.Contains(contextUserId) == false)
+        if (discussionDto.ParticipantIds.Contains(contextUserId) == false)
         {
             _logger.LogError("Authorization Forbidden. User with id: {contextUserId} does not have" +
                 " the access  to discussion with id: {DiscussionId}!", contextUserId, cmd.DiscussionId);
@@ -41,9 +37,9 @@ public class GetDiscussionHandler (
         try
         {
             var getParticipantDtos = await _participantContract.GetByIds(discussionDto.ParticipantIds, ct);
-            if(getParticipantDtos.IsFailure)
+            if (getParticipantDtos.IsFailure)
                 return Result.Fail(Error.InternalServerError("Error while getting info about participants "));
-            
+
             _logger.LogInformation("User with id: {contextUserId} has got discussion with Id:{DiscussionId} successful",
             contextUserId, cmd.DiscussionId);
 
@@ -52,12 +48,12 @@ public class GetDiscussionHandler (
             return Result.Ok(response);
 
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogCritical("Exception while getting info about participants! Error:{error}",
                     ex.Message);
 
             return Result.Fail(Error.InternalServerError("Error while getting info about participants "));
-        }   
+        }
     }
 }

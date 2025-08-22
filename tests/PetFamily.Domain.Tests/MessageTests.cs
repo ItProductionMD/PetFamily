@@ -1,6 +1,4 @@
 ﻿using PetFamily.Discussions.Domain.Entities;
-using Xunit;
-using System;
 
 namespace TestPetFamilyDomain;
 
@@ -94,7 +92,7 @@ public class MessageTests
         // Arrange
         var authorId = Guid.NewGuid();
         var discussionId = Guid.NewGuid(); // Assuming discussionId is needed
-        var message = Message.Create(authorId, discussionId,  "Initial valid").Data!;
+        var message = Message.Create(authorId, discussionId, "Initial valid").Data!;
 
         // Act
         var result = message.Edit(""); // invalid empty text

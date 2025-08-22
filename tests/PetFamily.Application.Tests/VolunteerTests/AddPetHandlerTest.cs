@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using PetFamily.SharedApplication.Exceptions;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
@@ -30,9 +31,9 @@ public class AddPetHandlerTests
 
 
         _handler = new AddPetHandler(
-            _loggerMock.Object,
             _volunteerRepositoryMock.Object,
-            _petTypeCheckerMock.Object);
+            _petTypeCheckerMock.Object,
+            _loggerMock.Object);
 
         _token = CancellationToken.None;
     }
@@ -51,7 +52,7 @@ public class AddPetHandlerTests
     [InlineData("healthInfoLength", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 5000, 0, "Trento", "jrfoe", "ehbhb", "21a")]//Health info size is too big
     [InlineData("helpStatusNumber", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 50, 100, "Trento", "jrfoe", "ehbhb", "21a")]//Help status doesnt exist
     [InlineData("cityPattern", true, "Lesy", 50, 0, 0, "red", true, true, "+373", "69961151", 50, 0, "Trento%!331", "jrfoe", "ehbhb", "21a")]//City doesnt mutch its pattern
-    public async Task Handle_ShouldReturn_Validation_Error_WhenCommand_IsInvalid(
+    public async Task Handle_Should_ThrowException_When_Validation_Fails(
         string invalidField,
         bool volunteerId,
         string nickName,
@@ -97,13 +98,9 @@ public class AddPetHandlerTests
             HomeNumber: homeNumber,
             []);
 
-        // ACT
-        var result = await _handler.Handle(invalidCommand, _token);
-
-        // ASSERT
-        Assert.False(result.IsSuccess);
-        Assert.Equal(ErrorType.Validation, result.Error.Type);
-        Assert.Single(result.Error.ValidationErrors);
+        // ACT AND ASSERT
+        await Assert.ThrowsAsync<ValidationException>(() =>
+             _handler.Handle(invalidCommand, _token));
     }
 
     [Fact]

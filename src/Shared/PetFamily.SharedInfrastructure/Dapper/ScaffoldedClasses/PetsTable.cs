@@ -1,5 +1,3 @@
-using PetFamily.SharedInfrastructure.Constants;
-
 namespace PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 
 public static class PetsTable

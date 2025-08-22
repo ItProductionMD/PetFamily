@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using PetFamily.Auth.Public.Contracts;
+﻿using Moq;
 using PetFamily.Discussions.Application.Dtos;
 using PetFamily.Discussions.Application.Queries.GetDiscussion;
 using PetFamily.Discussions.Domain.Entities;
@@ -14,20 +12,23 @@ namespace PetFamily.IntegrationTests.DiscussionFeatures;
 
 public class GetDiscussionQueryTest : QueryHandlerTest<GetDiscussionResponse, GetDiscussionQuery>
 {
+    private DiscussionTestDataCreator discussionCreator ;
+    private Guid adminId;
+    private Guid userId;
+    private Guid discussionId;
+
     public GetDiscussionQueryTest(TestWebApplicationFactory factory) : base(factory)
     {
+        discussionCreator = new DiscussionTestDataCreator();
+        adminId = discussionCreator.AdminId;
+        userId = discussionCreator.UserId;
     }
 
     [Fact]
     public async Task Should_GetDiscussion_Successfully()
     {
         //ARRANGE
-        var requestId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var adminId = Guid.NewGuid();
-
-
-        var discussion = Discussion.Create(requestId,adminId,userId).Data!;
+        var discussion = discussionCreator.CreateDiscussion();
 
         await SeedAsync(typeof(DiscussionWriteDbContext), discussion);
 

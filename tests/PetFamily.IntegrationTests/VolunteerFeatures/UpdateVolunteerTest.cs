@@ -1,10 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.Discussions.Domain.Entities;
+using PetFamily.Discussions.Infrastructure.Contexts;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
+using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.SharedKernel.ValueObjects.Ids;
 using Volunteers.Application.Commands.VolunteerManagement.UpdateVolunteer;
 using Volunteers.Domain;
+using Volunteers.Domain.ValueObjects;
+using Volunteers.Infrastructure.Contexts;
 
 namespace PetFamily.IntegrationTests.VolunteerFeatures;
 
@@ -16,12 +21,22 @@ public class UpdateVolunteerTest(TestWebApplicationFactory factory)
     {
         //ARRANGE
         var userId = Guid.NewGuid();
-        var seedVolunteer = new VolunteerTestBuilder().Volunteer;
-        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, seedVolunteer);
+        var volunteerId = Guid.NewGuid();
+
+        var volunteer = Volunteer.Create(
+            VolunteerID.Create(volunteerId),
+            UserId.Create(userId).Data!,
+            FullName.Create("FirstName", "LastName").Data!,
+            1,
+            "description",
+            Phone.CreateNotEmpty("2000111", "+383").Data!,
+            []).Data!;
+
+        await SeedAsync(typeof(VolunteerWriteDbContext), volunteer);
 
         var command = new UpdateVolunteerCommand(
-            userId,
-            seedVolunteer.Id,
+            volunteer.UserId.Value,
+            volunteer.Id,
             "updatedFirstName",
             "updatedLastName",
             "updated description",
@@ -32,7 +47,7 @@ public class UpdateVolunteerTest(TestWebApplicationFactory factory)
         Assert.True(updateResult.IsSuccess);
 
         var updatedVolunteer = await _volunteerDbContext.Volunteers
-            .FirstOrDefaultAsync(v => v.Id == seedVolunteer.Id);
+            .FirstOrDefaultAsync(v => v.Id == volunteer.Id);
 
         AssertCustom.AreEqualData(command, updatedVolunteer);
     }

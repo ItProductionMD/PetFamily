@@ -1,8 +1,7 @@
+using Authorization.Application.DefaultSeeder;
 using FileStorage.Infrastructure;
-using Microsoft.AspNetCore.Authorization;
-using PetFamily.Auth.Application.DefaultSeeder;
-using PetFamily.Auth.Infrastructure.AuthInjector;
-using PetFamily.Auth.Presentation;
+using Account.Application.DefaultSeeder;
+using Account.Presentation;
 using PetFamily.Discussions.Infrastructure;
 using PetFamily.Framework.Middlewares;
 using PetFamily.Framework.SharedAuthorization;
@@ -13,6 +12,12 @@ using PetSpecies.Infrastructure;
 using Serilog;
 using Volunteers.Infrastructure;
 using static PetFamily.Host.Api.Configurations.LoggingConfigurator;
+using Account.Infrastructure;
+using PetFamily.Framework.HTTPContext.User;
+using PetFamily.SharedInfrastructure.HttpContext;
+using PetFamily.Framework.HTTPContext.Cookie;
+using Authorization.Infrastructure;
+
 
 DotNetEnv.Env.Load();
 
@@ -28,22 +33,31 @@ builder
     .ConfigureKestrel()
     .ConfigureSwagger();
 
+builder.Services.Configure<RefreshTokenCookieOptions>(builder.Configuration.GetSection(RefreshTokenCookieOptions.SECTION_NAME));
+
+builder.Services
+    .AddScoped<IUserContext, UserContext>()
+    .AddScoped<ICookieService, CookieService>();
+    
+
 builder.Services
     .AddEndpointsApiExplorer()
     .AddHttpContextAccessor();
 
-builder.Services
-    .InjectSharedInfrastructure(builder.Configuration)
-    .InjectFileStorage(builder.Configuration)
-    .InjectAuthPresentation()
-    .InjectAuth(builder.Configuration)
-    .InjectPermissionPoliciesAuthorization();
 
 builder.Services
     .InjectVolunteerModule(builder.Configuration)
     .InjectSpeciesModule(builder.Configuration)
     .InjectDiscussionModule(builder.Configuration)
     .InjectVolunteerRequestModule(builder.Configuration);
+
+builder.Services
+    .InjectAuthorization(builder.Configuration)
+    .InjectSharedInfrastructure(builder.Configuration)
+    .InjectFileStorage(builder.Configuration)
+    .InjectPermissionPoliciesAuthorization()
+    
+    .InjectUserAccount(builder.Configuration);
 
 
 builder.Services

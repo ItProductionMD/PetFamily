@@ -1,5 +1,4 @@
 ﻿using PetFamily.SharedKernel.Abstractions;
-using System.Runtime.InteropServices;
 
 namespace PetFamily.SharedKernel.ValueObjects;
 

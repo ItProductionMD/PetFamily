@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Auth.Public.Contracts;
-using PetFamily.Auth.Public.Dtos;
-using PetFamily.SharedApplication.Exceptions;
-using PetFamily.SharedApplication.IUserContext;
+using Account.Public.Contracts;
+using Account.Public.Dtos;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
@@ -41,7 +39,7 @@ public class ApproveVolunteerRequestHandlerTests
             firstName: "John",
             description: "desc",
             experienceYears: 2,
-            requisites: Array.Empty<RequisitesInfo>() 
+            requisites: Array.Empty<RequisitesInfo>()
         );
         var req = create.Data!;
 
@@ -192,8 +190,8 @@ public class ApproveVolunteerRequestHandlerTests
 
         // assert
         Assert.True(result.IsFailure);
-  
+
         _requestRepo.Verify(r => r.SaveAsync(ct), Times.AtLeast(2));
-        Assert.Equal(RequestStatus.Created, request.RequestStatus); 
+        Assert.Equal(RequestStatus.Created, request.RequestStatus);
     }
 }

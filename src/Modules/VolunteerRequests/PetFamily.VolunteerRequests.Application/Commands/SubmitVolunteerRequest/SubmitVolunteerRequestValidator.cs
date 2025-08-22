@@ -10,7 +10,7 @@ namespace PetFamily.VolunteerRequests.Application.Commands.SubmitVolunteerReques
 
 public static class SubmitVolunteerRequestValidator
 {
-    public static void Validate(SubmitVolunteerRequestCommand cmd)
+    public static void Validate(this SubmitVolunteerRequestCommand cmd)
     {
         var result = UnitResult.FromValidationResults(
             () => VolunteerRequest.Validate(

@@ -14,22 +14,11 @@ public class HardDeletePetHandler(
     IFileService fileService,
     ILogger<HardDeletePetHandler> logger) : ICommandHandler<HardDeletePetCommand>
 {
-    private readonly IVolunteerWriteRepository _repository = repository;
-    private readonly ILogger<HardDeletePetHandler> _logger = logger;
-    private readonly IFileService _fileService = fileService;
-
     public async Task<UnitResult> Handle(HardDeletePetCommand cmd, CancellationToken ct)
     {
-        var validation = DeletePetCommandValidator.Validate(cmd);
-        if (validation.IsFailure)
-        {
-            _logger.LogWarning("HardDelete pet with id:{Id} validation errors:{Errors}",
-                cmd.PetId, validation.ValidationMessagesToString());
+        cmd.Validate();
 
-            return validation;
-        }
-
-        var getVolunteer = await _repository.GetByIdAsync(cmd.VolunteerId, ct);
+        var getVolunteer = await repository.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return UnitResult.Fail(getVolunteer.Error);
 
@@ -38,7 +27,7 @@ public class HardDeletePetHandler(
         var pet = volunteer.Pets.FirstOrDefault(p => p.Id == cmd.PetId);
         if (pet == null)
         {
-            _logger.LogError("Pet with id:{petId}  for volunteer with id:{volunteerId} not found!",
+            logger.LogError("Pet with id:{petId}  for volunteer with id:{volunteerId} not found!",
                 cmd.PetId, cmd.VolunteerId);
 
             return UnitResult.Fail(Error.NotFound($"Pet with id:{cmd.PetId}"));
@@ -46,7 +35,7 @@ public class HardDeletePetHandler(
 
         volunteer.HardDeletePet(pet);
 
-        var result = await _repository.SaveAsync(volunteer, ct);
+        var result = await repository.SaveAsync(volunteer, ct);
         if (result.IsFailure)
             return result;
 
@@ -56,10 +45,10 @@ public class HardDeletePetHandler(
                 .Select(i => new FileDto(i.Name, Constants.BUCKET_FOR_PET_IMAGES))
                 .ToList();
 
-            await _fileService.DeleteFilesUsingMessageQueue(filesToDelete, ct);
+            await fileService.DeleteFilesUsingMessageQueue(filesToDelete, ct);
         }
 
-        _logger.LogInformation("Pet with id:{petId} from volunteer with id:{volunteerId} was deleted" +
+        logger.LogInformation("Pet with id:{petId} from volunteer with id:{volunteerId} was deleted" +
             "(hard) successful!", cmd.PetId, cmd.VolunteerId);
 
         return UnitResult.Ok();

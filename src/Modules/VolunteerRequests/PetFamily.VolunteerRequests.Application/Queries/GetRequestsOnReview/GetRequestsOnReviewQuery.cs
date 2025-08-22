@@ -3,6 +3,7 @@
 namespace PetFamily.VolunteerRequests.Application.Queries.GetRequestsOnReview;
 
 public record GetRequestsOnReviewQuery(
-    int Page, 
+    Guid AdminId,
+    int Page,
     int PageSize,
     VolunteerRequestsFilter Filter) : IQuery;

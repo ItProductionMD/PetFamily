@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using PetFamily.SharedApplication.Abstractions;
 using PetFamily.Discussions.Application.Dtos;
 using PetFamily.Discussions.Application.IRepositories;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedApplication.PaginationUtils;
 using PetFamily.SharedInfrastructure.Dapper.Extensions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
@@ -10,6 +10,7 @@ using PetFamily.SharedInfrastructure.Shared.Dapper.ScaffoldedClassesPreview;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using static PetFamily.SharedInfrastructure.Dapper.Extensions.DapperLoggerExtensions;
+using DiscussionsTable = PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses.DiscussionsTable;
 
 namespace PetFamily.Discussions.Infrastructure.Repositories;
 
@@ -17,9 +18,6 @@ public class DiscussionReadRepository(
     IDbConnectionFactory dbConnectionFactory,
     ILogger<DiscussionReadRepository> logger) : IDiscussionReadRepository
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
-    private readonly ILogger<DiscussionReadRepository> _logger = logger;
-
     public async Task<Result<DiscussionDto>> GetById(
         Guid discussionId,
         PaginationParams paginationParams,
@@ -39,14 +37,14 @@ public class DiscussionReadRepository(
             cancellationToken: ct
         );
 
-        await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var connection = await dbConnectionFactory.CreateOpenConnectionAsync();
 
-        _logger.DapperLogSqlQuery(discussionCmd.CommandText, discussionCmd.Parameters);
+        logger.DapperLogSqlQuery(discussionCmd.CommandText, discussionCmd.Parameters);
 
         var discussion = await connection.QuerySingleOrDefaultAsync<DiscussionDto>(discussionCmd);
         if (discussion == null)
         {
-            _logger.LogWarning("Discussion with id:{DiscussionId} not found", discussionId);
+            logger.LogWarning("Discussion with id:{DiscussionId} not found", discussionId);
             return Result.Fail(Error.NotFound($"Discussion with id:{discussionId}"));
         }
 
@@ -72,11 +70,11 @@ public class DiscussionReadRepository(
         );
 
         var (totalCount, messages) = await connection
-            .GetPagedQuery<DiscussionMessageDto, DiscussionReadRepository>(pagedQueryCmd, _logger);
+            .GetPagedQuery<DiscussionMessageDto, DiscussionReadRepository>(pagedQueryCmd, logger);
 
         discussion.Messages = messages.ToList();
 
-        _logger.LogInformation("Discussion with id:{DiscussionId} found with {MessageCount} messages " +
+        logger.LogInformation("Discussion with id:{DiscussionId} found with {MessageCount} messages " +
             "(Total messages: {TotalCount})",
             discussionId, messages.Count, totalCount);
 

@@ -1,0 +1,268 @@
+digraph solution_dependencies {
+rankdir=TD;
+    graph[
+   fontname="Helvetica",
+  fontsize=14, 
+ 
+  overlap=false,
+  nodesep=0.7, 
+  ranksep=1.0];
+  node [
+      shape=box, 
+      style=filled, 
+      fillcolor=lightblue,
+      fontname="Helvetica",
+      fontsize=18,
+      width=3.0,
+      height=1.0,
+      fixedsize=true];
+    subgraph cluster_Host_Host {
+        label = "Host_Host";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "PetFamily.Host.Api" [style=filled, fillcolor="#581C87", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_PetFamily {
+        label = "PetFamily";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "PetFamily.Framework" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+        "PetFamily.SharedApplication" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "PetFamily.SharedInfrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+        "PetFamily.SharedKernel" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_Account {
+        label = "Account";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "Account.Application" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "Account.Domain" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "Account.Infrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+        "Account.Presentation" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_PetFamily_Public {
+        label = "PetFamily_Public";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+             rank=same;
+        "Account.Public" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "Authorization.Public" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "FileStorage.Public" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "PetFamily.Discussions.Public" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "PetSpecies.Public" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "Volunteers.Public" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "PetFamily.VolunteerRequests.Public" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_Authorization {
+        label = "Authorization";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "Authorization.Application" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "Authorization.Domain" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "Authorization.Infrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+        "Authorization.Presentation" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_FileStorage {
+        label = "FileStorage";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "FileStorage.Application" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "FileStorage.Infrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+        "FileStorage.Presentation" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+        "FileStorage.SharedFramework" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_Discussions {
+        label = "Discussions";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "PetFamily.Discussions.Presentation" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+        "PetFamily.Discussions.Application" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "PetFamily.Discussions.Infrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+        "PetFamily.Discussions.Domain" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_PetSpecies {
+        label = "PetSpecies";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "PetSpecies.Application" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "PetSpecies.Domain" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "PetSpecies.Infrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+        "PetSpecies.Presentation" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_Volunteers {
+        label = "Volunteers";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "Volunteers.Application" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "Volunteers.Domain" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "Volunteers.Infrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+        "Volunteers.Presentation" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+         }
+    }
+    subgraph cluster_VolunteerRequests {
+        label = "VolunteerRequests";
+        style=filled;
+        fillcolor=lightblue;
+        fontname="Helvetica";
+        color = lightblue;
+        {
+        "PetFamily.VolunteerRequests.Presentation" [style=filled, fillcolor="#3F1F0F", fontcolor="white", shape=box];
+        "PetFamily.VolunteerRequests.Application" [style=filled, fillcolor="blue", fontcolor="white", shape=box];
+        "PetFamily.VolunteerRequests.Domain" [style=filled, fillcolor="red", fontcolor="white", shape=box];
+        "PetFamily.VolunteerRequests.Infrastructure" [style=filled, fillcolor="green", fontcolor="white", shape=box];
+         }
+    }
+    "PetFamily.Host.Api" -> "Account.Infrastructure" [color="#581C87"];
+    "PetFamily.Host.Api" -> "Account.Presentation" [color="#581C87"];
+    "PetFamily.Host.Api" -> "Authorization.Application" [color="#581C87"];
+    "PetFamily.Host.Api" -> "Authorization.Infrastructure" [color="#581C87"];
+    "PetFamily.Host.Api" -> "Authorization.Presentation" [color="#581C87"];
+    "PetFamily.Host.Api" -> "FileStorage.Infrastructure" [color="#581C87"];
+    "PetFamily.Host.Api" -> "FileStorage.Presentation" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetFamily.Discussions.Presentation" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetFamily.Discussions.Infrastructure" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetSpecies.Infrastructure" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetSpecies.Presentation" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetFamily.VolunteerRequests.Presentation" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetFamily.VolunteerRequests.Infrastructure" [color="#581C87"];
+    "PetFamily.Host.Api" -> "Volunteers.Infrastructure" [color="#581C87"];
+    "PetFamily.Host.Api" -> "Volunteers.Presentation" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetFamily.Framework" [color="#581C87"];
+    "PetFamily.Host.Api" -> "PetFamily.SharedInfrastructure" [color="#581C87"];
+    "PetFamily.Framework" -> "Authorization.Public" [color="#3F1F0F"];
+    "PetFamily.Framework" -> "PetFamily.SharedApplication" [color="#3F1F0F"];
+    "PetFamily.Framework" -> "PetFamily.SharedKernel" [color="#3F1F0F"];
+    "PetFamily.SharedApplication" -> "PetFamily.SharedKernel" [color="blue"];
+    "PetFamily.SharedInfrastructure" -> "PetSpecies.Public" [color="green"];
+    "PetFamily.SharedInfrastructure" -> "PetFamily.SharedApplication" [color="green"];
+    "Account.Application" -> "Volunteers.Public" [color="blue"];
+    "Account.Application" -> "PetFamily.Framework" [color="blue"];
+    "Account.Application" -> "PetFamily.SharedApplication" [color="blue"];
+    "Account.Application" -> "PetFamily.SharedKernel" [color="blue"];
+    "Account.Application" -> "Authorization.Public" [color="blue"];
+    "Account.Application" -> "Account.Domain" [color="blue"];
+    "Account.Application" -> "Account.Public" [color="blue"];
+    "Account.Domain" -> "PetFamily.SharedKernel" [color="red"];
+    "Account.Infrastructure" -> "PetFamily.Framework" [color="green"];
+    "Account.Infrastructure" -> "PetFamily.SharedInfrastructure" [color="green"];
+    "Account.Infrastructure" -> "Account.Application" [color="green"];
+    "Account.Infrastructure" -> "Account.Domain" [color="green"];
+    "Account.Presentation" -> "PetFamily.Framework" [color="#3F1F0F"];
+    "Account.Presentation" -> "PetFamily.SharedKernel" [color="#3F1F0F"];
+    "Account.Presentation" -> "Account.Application" [color="#3F1F0F"];
+    "Account.Public" -> "PetFamily.Discussions.Public" [color="red"];
+    "Account.Public" -> "PetFamily.SharedKernel" [color="red"];
+    "Authorization.Public" -> "PetFamily.SharedKernel" [color="red"];
+    "FileStorage.Public" -> "PetFamily.SharedKernel" [color="red"];
+    "PetFamily.Discussions.Public" -> "PetFamily.SharedKernel" [color="red"];
+    "PetSpecies.Public" -> "PetFamily.SharedKernel" [color="red"];
+    "Volunteers.Public" -> "PetFamily.SharedKernel" [color="red"];
+    "PetFamily.VolunteerRequests.Public" -> "PetFamily.SharedKernel" [color="red"];
+    "Authorization.Application" -> "PetFamily.SharedApplication" [color="blue"];
+    "Authorization.Application" -> "PetFamily.SharedKernel" [color="blue"];
+    "Authorization.Application" -> "Account.Public" [color="blue"];
+    "Authorization.Application" -> "Authorization.Domain" [color="blue"];
+    "Authorization.Application" -> "Authorization.Public" [color="blue"];
+    "Authorization.Domain" -> "PetFamily.SharedKernel" [color="red"];
+    "Authorization.Infrastructure" -> "PetFamily.SharedInfrastructure" [color="green"];
+    "Authorization.Infrastructure" -> "Authorization.Application" [color="green"];
+    "Authorization.Infrastructure" -> "Authorization.Domain" [color="green"];
+    "Authorization.Presentation" -> "PetFamily.Framework" [color="#3F1F0F"];
+    "Authorization.Presentation" -> "PetFamily.SharedKernel" [color="#3F1F0F"];
+    "Authorization.Presentation" -> "Authorization.Application" [color="#3F1F0F"];
+    "FileStorage.Application" -> "PetFamily.SharedKernel" [color="blue"];
+    "FileStorage.Application" -> "FileStorage.Public" [color="blue"];
+    "FileStorage.Infrastructure" -> "PetFamily.SharedKernel" [color="green"];
+    "FileStorage.Infrastructure" -> "FileStorage.Application" [color="green"];
+    "FileStorage.Presentation" -> "PetFamily.SharedKernel" [color="#3F1F0F"];
+    "FileStorage.Presentation" -> "FileStorage.Application" [color="#3F1F0F"];
+    "FileStorage.Presentation" -> "FileStorage.SharedFramework" [color="#3F1F0F"];
+    "FileStorage.SharedFramework" -> "FileStorage.Public" [color="#3F1F0F"];
+    "PetFamily.Discussions.Presentation" -> "PetFamily.Framework" [color="#3F1F0F"];
+    "PetFamily.Discussions.Presentation" -> "PetFamily.Discussions.Application" [color="#3F1F0F"];
+    "PetFamily.Discussions.Application" -> "Account.Public" [color="blue"];
+    "PetFamily.Discussions.Application" -> "Account.Public" [color="blue"];
+    "PetFamily.Discussions.Application" -> "PetFamily.SharedApplication" [color="blue"];
+    "PetFamily.Discussions.Application" -> "PetFamily.Discussions.Domain" [color="blue"];
+    "PetFamily.Discussions.Infrastructure" -> "PetFamily.SharedInfrastructure" [color="green"];
+    "PetFamily.Discussions.Infrastructure" -> "PetFamily.SharedKernel" [color="green"];
+    "PetFamily.Discussions.Infrastructure" -> "PetFamily.Discussions.Application" [color="green"];
+    "PetFamily.Discussions.Infrastructure" -> "PetFamily.Discussions.Public" [color="green"];
+    "PetFamily.Discussions.Infrastructure" -> "PetFamily.Discussions.Domain" [color="green"];
+    "PetFamily.Discussions.Domain" -> "PetFamily.SharedKernel" [color="red"];
+    "PetSpecies.Application" -> "PetFamily.SharedApplication" [color="blue"];
+    "PetSpecies.Application" -> "Volunteers.Public" [color="blue"];
+    "PetSpecies.Application" -> "PetSpecies.Domain" [color="blue"];
+    "PetSpecies.Application" -> "PetSpecies.Public" [color="blue"];
+    "PetSpecies.Domain" -> "PetFamily.SharedKernel" [color="red"];
+    "PetSpecies.Infrastructure" -> "PetFamily.SharedInfrastructure" [color="green"];
+    "PetSpecies.Infrastructure" -> "PetSpecies.Application" [color="green"];
+    "PetSpecies.Infrastructure" -> "PetSpecies.Domain" [color="green"];
+    "PetSpecies.Presentation" -> "Account.Public" [color="#3F1F0F"];
+    "PetSpecies.Presentation" -> "PetFamily.Framework" [color="#3F1F0F"];
+    "PetSpecies.Presentation" -> "PetFamily.SharedApplication" [color="#3F1F0F"];
+    "PetSpecies.Presentation" -> "PetSpecies.Application" [color="#3F1F0F"];
+    "Volunteers.Application" -> "Account.Public" [color="blue"];
+    "Volunteers.Application" -> "Authorization.Public" [color="blue"];
+    "Volunteers.Application" -> "FileStorage.Public" [color="blue"];
+    "Volunteers.Application" -> "PetFamily.SharedApplication" [color="blue"];
+    "Volunteers.Application" -> "PetSpecies.Public" [color="blue"];
+    "Volunteers.Application" -> "Volunteers.Domain" [color="blue"];
+    "Volunteers.Application" -> "Volunteers.Public" [color="blue"];
+    "Volunteers.Domain" -> "PetFamily.SharedKernel" [color="red"];
+    "Volunteers.Infrastructure" -> "PetFamily.SharedInfrastructure" [color="green"];
+    "Volunteers.Infrastructure" -> "Volunteers.Application" [color="green"];
+    "Volunteers.Infrastructure" -> "Volunteers.Domain" [color="green"];
+    "Volunteers.Infrastructure" -> "Volunteers.Public" [color="green"];
+    "Volunteers.Presentation" -> "FileStorage.SharedFramework" [color="#3F1F0F"];
+    "Volunteers.Presentation" -> "PetFamily.Framework" [color="#3F1F0F"];
+    "Volunteers.Presentation" -> "Volunteers.Application" [color="#3F1F0F"];
+    "PetFamily.VolunteerRequests.Presentation" -> "PetFamily.Framework" [color="#3F1F0F"];
+    "PetFamily.VolunteerRequests.Presentation" -> "PetFamily.VolunteerRequests.Application" [color="#3F1F0F"];
+    "PetFamily.VolunteerRequests.Application" -> "Account.Public" [color="blue"];
+    "PetFamily.VolunteerRequests.Application" -> "PetFamily.SharedApplication" [color="blue"];
+    "PetFamily.VolunteerRequests.Application" -> "PetFamily.SharedKernel" [color="blue"];
+    "PetFamily.VolunteerRequests.Application" -> "PetFamily.Discussions.Public" [color="blue"];
+    "PetFamily.VolunteerRequests.Application" -> "Volunteers.Public" [color="blue"];
+    "PetFamily.VolunteerRequests.Application" -> "PetFamily.VolunteerRequests.Domain" [color="blue"];
+    "PetFamily.VolunteerRequests.Application" -> "PetFamily.VolunteerRequests.Public" [color="blue"];
+    "PetFamily.VolunteerRequests.Domain" -> "PetFamily.SharedKernel" [color="red"];
+    "PetFamily.VolunteerRequests.Infrastructure" -> "PetFamily.SharedInfrastructure" [color="green"];
+    "PetFamily.VolunteerRequests.Infrastructure" -> "PetFamily.VolunteerRequests.Application" [color="green"];
+    "PetFamily.VolunteerRequests.Infrastructure" -> "PetFamily.VolunteerRequests.Domain" [color="green"];
+}

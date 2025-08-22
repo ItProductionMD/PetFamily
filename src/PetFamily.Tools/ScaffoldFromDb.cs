@@ -40,7 +40,7 @@ public class ScaffoldFromDb
             string schemaName = table.Select(c => c.SchemaName).FirstOrDefault()!;
             string className = ToPascalCase(table.Key);
             string filePath = Path.Combine(outputPath, className + "Table" + ".cs");
-           
+
             var newProperties = table.Select(c => (Name: ToPascalCase(c.ColumnName), Value: c.ColumnName)).ToList();
 
             if (File.Exists(filePath))
@@ -55,13 +55,13 @@ public class ScaffoldFromDb
                     if (added.Any()) Console.WriteLine(" + Added: " + string.Join(", ", added.Select(p => p.Name)));
                     if (removed.Any()) Console.WriteLine(" - Deleted: " + string.Join(", ", removed.Select(p => p.Name)));
 
-                    File.WriteAllText(filePath, GenerateClassContent(className,schemaName ,table.Key, newProperties));
+                    File.WriteAllText(filePath, GenerateClassContent(className, schemaName, table.Key, newProperties));
                 }
             }
             else
             {
                 Console.WriteLine($"Created new class: {className}");
-                File.WriteAllText(filePath, GenerateClassContent(className, schemaName ,table.Key, newProperties));
+                File.WriteAllText(filePath, GenerateClassContent(className, schemaName, table.Key, newProperties));
             }
         }
 

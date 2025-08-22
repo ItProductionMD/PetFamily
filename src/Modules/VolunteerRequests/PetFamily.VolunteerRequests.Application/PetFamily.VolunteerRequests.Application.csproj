@@ -7,17 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Auth\PetFamily.Auth.Public\PetFamily.Auth.Public.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Account\Account.Public\Account.Public.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedApplication\PetFamily.SharedApplication.csproj" />
     <ProjectReference Include="..\..\..\Shared\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj" />
     <ProjectReference Include="..\..\Discussions\PetFamily.Discussions.Public\PetFamily.Discussions.Public.csproj" />
     <ProjectReference Include="..\..\Volunteer\Volunteers.Public\Volunteers.Public.csproj" />
     <ProjectReference Include="..\PetFamily.VolunteerRequests.Domain\PetFamily.VolunteerRequests.Domain.csproj" />
     <ProjectReference Include="..\PetFamily.VolunteerRequests.Public\PetFamily.VolunteerRequests.Public.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Abstractions\" />
   </ItemGroup>
 
   <ItemGroup>

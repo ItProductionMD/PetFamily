@@ -2,5 +2,5 @@
 
 namespace PetFamily.Discussions.Application.Commands.CreateDiscussion;
 
-public record CreateDiscussionCommand(Guid AdminId, Guid UserId, Guid VolunteerRequestId): ICommand;
+public record CreateDiscussionCommand(Guid AdminId, Guid UserId, Guid VolunteerRequestId) : ICommand;
 

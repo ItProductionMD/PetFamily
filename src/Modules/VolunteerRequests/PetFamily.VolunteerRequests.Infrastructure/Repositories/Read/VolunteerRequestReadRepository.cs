@@ -9,9 +9,7 @@ using PetFamily.SharedKernel.Results;
 using PetFamily.VolunteerRequests.Application.Dtos;
 using PetFamily.VolunteerRequests.Application.IRepositories;
 using PetFamily.VolunteerRequests.Application.Queries.GetRequestsOnReview;
-using PetFamily.VolunteerRequests.Domain.Entities;
 using PetFamily.VolunteerRequests.Domain.Enums;
-using System.Net.Http.Headers;
 
 namespace PetFamily.VolunteerRequests.Infrastructure.Repositories.Read;
 
@@ -19,12 +17,9 @@ public class VolunteerRequestReadRepository(
     IDbConnectionFactory dbConnectionFactory,
     ILogger<VolunteerRequestReadRepository> logger) : IVolunteerRequestReadRepository
 {
-    private readonly IDbConnectionFactory _dbConnectionFactory = dbConnectionFactory;
-    private readonly ILogger<VolunteerRequestReadRepository> _logger = logger;
-
     public async Task<bool> CheckIfRequestExistAsync(Guid userId, CancellationToken ct)
     {
-        await using var connection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var connection = await dbConnectionFactory.CreateOpenConnectionAsync();
 
         const string sql = $@"
             SELECT COUNT(1) FROM {VolunteerRequestsTable.TableFullName}
@@ -52,11 +47,11 @@ public class VolunteerRequestReadRepository(
                 WHERE {VolunteerRequestsTable.UserId} = @UserId 
                 LIMIT 1";
 
-        await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var dbConnection = await dbConnectionFactory.CreateOpenConnectionAsync();
 
         var sqlParameters = new { UserId = userId };
 
-        _logger.DapperLogSqlQuery(sql, sqlParameters);
+        logger.DapperLogSqlQuery(sql, sqlParameters);
 
         var volunteerRequestDto = await dbConnection.QuerySingleOrDefaultAsync<VolunteerRequestDto>(
             sql,
@@ -64,11 +59,11 @@ public class VolunteerRequestReadRepository(
 
         if (volunteerRequestDto == null)
         {
-            _logger.LogWarning("Volunteer request with userId: {UserId} not found", userId);
+            logger.LogWarning("Volunteer request with userId: {UserId} not found", userId);
             return Result.Fail(Error.NotFound($"VolunteerRequest request with userI: {userId}"));
         }
 
-        _logger.LogInformation("Volunteer request with userId: {UserId} found successful!", userId);
+        logger.LogInformation("Volunteer request with userId: {UserId} found successful!", userId);
 
         return Result.Ok(volunteerRequestDto);
     }
@@ -123,15 +118,15 @@ public class VolunteerRequestReadRepository(
             Limit = pageSize
         };
 
-        await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var dbConnection = await dbConnectionFactory.CreateOpenConnectionAsync();
 
-        _logger.DapperLogSqlQuery(sqlCount, sqlCountParameters);
+        logger.DapperLogSqlQuery(sqlCount, sqlCountParameters);
 
         var count = await dbConnection.ExecuteScalarAsync<int>(
             sqlCount,
             sqlCountParameters);
 
-        _logger.DapperLogSqlQuery(sqlVolunteerRequest, sqlVolunteerRequestParameters);
+        logger.DapperLogSqlQuery(sqlVolunteerRequest, sqlVolunteerRequestParameters);
 
         var items = await dbConnection.QueryAsync<VolunteerRequestDto>(
              sqlVolunteerRequest,
@@ -177,9 +172,9 @@ public class VolunteerRequestReadRepository(
 
         var sqlCountParameters = new { Count = sqlCount };
 
-        await using var dbConnection = await _dbConnectionFactory.CreateOpenConnectionAsync();
+        await using var dbConnection = await dbConnectionFactory.CreateOpenConnectionAsync();
 
-        _logger.DapperLogSqlQuery(sqlCount, sqlCountParameters);
+        logger.DapperLogSqlQuery(sqlCount, sqlCountParameters);
 
         var count = await dbConnection.ExecuteScalarAsync<int>(sqlCount, new { Status = status });
 
@@ -190,7 +185,7 @@ public class VolunteerRequestReadRepository(
             Limit = pageSize
         };
 
-        _logger.DapperLogSqlQuery(sqlVolunteerRequest, sqlVolunteerRequestParameters);
+        logger.DapperLogSqlQuery(sqlVolunteerRequest, sqlVolunteerRequestParameters);
 
         var volunteerRequests = await dbConnection.QueryAsync<VolunteerRequestDto>(
              sqlVolunteerRequest,
@@ -199,7 +194,7 @@ public class VolunteerRequestReadRepository(
 
         var pageResult = new PagedResult<VolunteerRequestDto>(
             volunteerRequests.ToList(),
-            count, 
+            count,
             pageSize);
 
         return Result.Ok(pageResult);

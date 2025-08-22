@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.IntegrationTests.DbContextExtensions;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetSpecies.Domain;
@@ -55,10 +55,10 @@ public class ChangePetsOrderTest(TestWebApplicationFactory factory)
 
         SeedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["breedOne", "breedTwo"]).Species;
-        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, SeedSpecies);
+        await DbContextSeeder.SeedAsync(_speciesDbContext, SeedSpecies);
 
         SeedVolunteer = new VolunteerTestBuilder()
             .WithPets(10, SeedSpecies).Volunteer;
-        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, SeedVolunteer);
+        await DbContextSeeder.SeedAsync(_volunteerDbContext, SeedVolunteer);
     }
 }

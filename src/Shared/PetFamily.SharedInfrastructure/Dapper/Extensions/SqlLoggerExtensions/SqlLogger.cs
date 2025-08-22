@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
-using Microsoft.Extensions.Hosting;
 
 namespace PetFamily.SharedInfrastructure.Dapper.Extensions.SqlLoggerExtensions;
 public class SqlLogger

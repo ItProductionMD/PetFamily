@@ -8,6 +8,6 @@ public interface IDiscussionMessageSender
     Task<Result<Guid>> Send(
         Guid relationId,
         Guid fromUserId,
-        string message, 
+        string message,
         CancellationToken ct);
 }

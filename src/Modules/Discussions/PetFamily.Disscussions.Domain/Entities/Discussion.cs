@@ -27,7 +27,7 @@ public class Discussion : SoftDeletable, IEntity<Guid>
     public static Result<Discussion> Create(Guid relationId, Guid AdminId, Guid UserId)
     {
         var participantIds = new List<Guid>() { AdminId, UserId };
-        return Result.Ok(new Discussion (relationId, participantIds));     
+        return Result.Ok(new Discussion(relationId, participantIds));
     }
 
     public Result<Message> LeaveMessage(Guid authorId, string text)
@@ -39,7 +39,7 @@ public class Discussion : SoftDeletable, IEntity<Guid>
             return Result.Fail(Error.InternalServerError("User is not a participant of the discussion."));
 
         var messageResult = Entities.Message.Create(authorId, Id, text);
-        if(messageResult.IsFailure)
+        if (messageResult.IsFailure)
             return messageResult;
 
         var message = messageResult.Data!;
@@ -58,7 +58,7 @@ public class Discussion : SoftDeletable, IEntity<Guid>
             return Result.Fail(Error.InternalServerError("User can only edit their own messages."));
 
         var editResult = message.Edit(newText);
-        if(editResult.IsFailure)
+        if (editResult.IsFailure)
             return editResult;
 
         return UnitResult.Ok();
@@ -87,7 +87,7 @@ public class Discussion : SoftDeletable, IEntity<Guid>
             return UnitResult.Fail(Error.Conflict($"Discussion with Id:{Id} is already has been closed!"));
 
         IsClosed = true;
-            return UnitResult.Ok();
+        return UnitResult.Ok();
     }
 }
 

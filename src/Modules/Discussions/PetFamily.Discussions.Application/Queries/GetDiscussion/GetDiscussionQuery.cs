@@ -3,7 +3,7 @@
 namespace PetFamily.Discussions.Application.Queries.GetDiscussion;
 
 public record GetDiscussionQuery(
-    Guid UserId, 
+    Guid UserId,
     Guid DiscussionId,
     int Page,
     int PageSize) : IQuery;

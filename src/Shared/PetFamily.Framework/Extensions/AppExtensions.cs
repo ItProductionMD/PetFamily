@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace PetFamily.Framework.Extensions;
+﻿namespace PetFamily.Framework.Extensions;
 
 public static class AppExtensions
 {

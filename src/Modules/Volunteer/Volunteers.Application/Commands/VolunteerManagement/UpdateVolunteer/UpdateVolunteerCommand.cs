@@ -7,7 +7,7 @@ public record UpdateVolunteerCommand
     Guid UserId,
     Guid VolunteerId,
     string FirstName,
-    string LastName, 
+    string LastName,
     string Description,
     int ExperienceYears
 ) : ICommand;

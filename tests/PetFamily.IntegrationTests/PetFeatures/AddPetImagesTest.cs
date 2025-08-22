@@ -1,8 +1,8 @@
 ﻿using FileStorage.Public.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using PetFamily.IntegrationTests.DbContextExtensions;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetFamily.SharedKernel.Errors;
@@ -147,11 +147,11 @@ public class AddPetImagesTest(TestWebApplicationFactory factory)
 
         SeedSpecies = new SpeciesTestBuilder()
             .WithBreeds(["breedOne"]).Species;
-        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, SeedSpecies);
+        await DbContextSeeder.SeedAsync(_speciesDbContext, SeedSpecies);
 
         SeedVolunteer = new VolunteerTestBuilder()
             .WithPets(1, SeedSpecies).Volunteer;
 
-        await DbContextSeedExtensions.SeedAsync(_volunteerDbContext, SeedVolunteer);
+        await DbContextSeeder.SeedAsync(_volunteerDbContext, SeedVolunteer);
     }
 }

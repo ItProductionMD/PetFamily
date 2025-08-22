@@ -4,7 +4,6 @@ using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedInfrastructure.Dapper.ScaffoldedClasses;
 using PetSpecies.Public.Dtos;
 using PetSpecies.Public.IContracts;
-using System.Collections.Generic;
 
 namespace PetSpecies.Infrastructure.Contracts;
 
@@ -36,7 +35,7 @@ public class SpeciesQueryContract(
             LEFT JOIN {BreedsTable.TableFullName} b ON b.{BreedsTable.SpeciesId} = s.{SpeciesTable.Id}
             GROUP BY s.{SpeciesTable.Id}, s.{SpeciesTable.Name}
             ORDER BY s.{SpeciesTable.Name}";
-          
+
         _logger.LogInformation("EXECUTE(GetAllSpecies) SQL: {sql}", sql);
 
         var speciesList = await dbConnection.QueryAsync<SpeciesDto>(sql);

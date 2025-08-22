@@ -29,7 +29,7 @@ public static class WebApplicationFactoryExtensions
             services.AddScoped(dbContextType, _ =>
                 Activator.CreateInstance(dbContextType, connectionString)!);
         }
-        
+
         return writeDbContexts;
     }
 }

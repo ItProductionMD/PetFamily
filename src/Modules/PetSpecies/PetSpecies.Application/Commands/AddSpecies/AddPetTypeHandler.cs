@@ -7,7 +7,6 @@ using PetSpecies.Application.Commands.AddSpecies;
 using PetSpecies.Application.Commands.CommandsDtos;
 using PetSpecies.Application.IRepositories;
 using PetSpecies.Domain;
-using PetSpecies.Public.Dtos;
 
 
 namespace PetFamily.SharedApplication.Commands.PetTypeManagement.AddPetType;
@@ -16,27 +15,19 @@ public class AddPetTypeHandler(
     ISpeciesWriteRepository speciesWriteRepo,
     ILogger<AddPetTypeHandler> logger) : ICommandHandler<Species, AddPetTypeComand>
 {
-    private ILogger<AddPetTypeHandler> _logger = logger;
-    private readonly ISpeciesWriteRepository _speciesWriteRepo = speciesWriteRepo;
-    public async Task<Result<Species>> Handle(
-        AddPetTypeComand cmd,
-        CancellationToken ct)
+    public async Task<Result<Species>> Handle(AddPetTypeComand cmd, CancellationToken ct)
     {
-        AddPetTypeCommandValidator.Validate(cmd);
-        
-        var createSpecies = Species.Create(SpeciesID.NewGuid(), cmd.SpeciesName);
-        if (createSpecies.IsFailure)
-            throw new ValidationException(createSpecies.Error);
+        cmd.Validate();
 
-        var species = createSpecies.Data!;
+        var species = Species.Create(SpeciesID.NewGuid(), cmd.SpeciesName).Data!;
 
         var breeds = CreateBreedsProcess(cmd.BreedList);
-        
+
         species.AddBreeds(breeds);
 
-        await _speciesWriteRepo.AddAndSaveAsync(species, ct);
+        await speciesWriteRepo.AddAndSaveAsync(species, ct);
 
-        _logger.LogInformation("PetType with id:{Id} added successfully!", species.Id);
+        logger.LogInformation("PetType with id:{Id} added successfully!", species.Id);
 
         return Result.Ok(species);
     }

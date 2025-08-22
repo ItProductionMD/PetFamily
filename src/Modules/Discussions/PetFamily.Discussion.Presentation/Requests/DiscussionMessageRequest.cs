@@ -5,9 +5,9 @@ namespace PetFamily.Discussions.Presentation.Requests;
 
 public class DiscussionMessageRequest
 {
-    public string Message { get; set; } 
+    public string Message { get; set; }
 
-    public LeaveDiscussionMessageCommand ToLeaveCommand(Guid userId,Guid discussionId)
+    public LeaveDiscussionMessageCommand ToLeaveCommand(Guid userId, Guid discussionId)
     {
         return new LeaveDiscussionMessageCommand(userId, discussionId, Message);
     }

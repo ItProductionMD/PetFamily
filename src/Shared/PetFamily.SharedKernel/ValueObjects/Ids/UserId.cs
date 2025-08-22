@@ -10,12 +10,12 @@ public record struct UserId
     {
         Value = value;
     }
-    public static Result<UserId> Create(Guid value) 
+    public static Result<UserId> Create(Guid value)
     {
         if (value == Guid.Empty)
             return Result.Fail(Error.GuidIsEmpty("user id"));
-        return Result.Ok(new UserId (value));
-    } 
+        return Result.Ok(new UserId(value));
+    }
     public static UserId NewGuid() => new(Guid.NewGuid());
     public static UserId Empty() => new(Guid.Empty);
 }

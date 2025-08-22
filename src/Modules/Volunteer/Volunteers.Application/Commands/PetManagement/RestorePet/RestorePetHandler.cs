@@ -9,26 +9,15 @@ using Volunteers.Domain;
 namespace Volunteers.Application.Commands.PetManagement.RestorePet;
 
 public class RestorePetHandler(
-    IVolunteerWriteRepository repository,
+    IVolunteerWriteRepository volunteerWriteRepo,
     IFileService fileService,
     ILogger<RestorePetHandler> logger) : ICommandHandler<RestorePetCommand>
 {
-    private readonly IVolunteerWriteRepository _repository = repository;
-    private readonly ILogger<RestorePetHandler> _logger = logger;
-    private readonly IFileService _fileService = fileService;
-
     public async Task<UnitResult> Handle(RestorePetCommand cmd, CancellationToken ct)
     {
-        var validate = RestorePetCommandValidation.Validate(cmd);
-        if (validate.IsFailure)
-        {
-            _logger.LogWarning("Restore pet with id:{Id},Validate petCommand Errors:{Errors}",
-                cmd.PetId, validate.ValidationMessagesToString());
+        cmd.Validate();
 
-            return validate;
-        }
-
-        var getVolunteer = await _repository.GetByIdAsync(cmd.VolunteerId, ct);
+        var getVolunteer = await volunteerWriteRepo.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return UnitResult.Fail(getVolunteer.Error);
 
@@ -38,7 +27,7 @@ public class RestorePetHandler(
         if (restoredPet.IsFailure)
             return restoredPet;
 
-        var saveResult = await _repository.SaveAsync(volunteer, ct);
+        var saveResult = await volunteerWriteRepo.SaveAsync(volunteer, ct);
         if (saveResult.IsFailure)
             return saveResult;
 
@@ -50,16 +39,16 @@ public class RestorePetHandler(
                 .Select(i => new FileDto(i.Name, Constants.BUCKET_FOR_PET_IMAGES))
                 .ToList();
 
-            var restoreFiles = await _fileService.RestoreFilesAsync(filesToRestore);
+            var restoreFiles = await fileService.RestoreFilesAsync(filesToRestore);
             if (restoreFiles.IsFailure)
             {
-                _logger.LogError("Images for pet with Id:{petId} cannot be restored!", pet.Id);
+                logger.LogError("Images for pet with Id:{petId} cannot be restored!", pet.Id);
                 return UnitResult.Fail(restoreFiles.Error);
             }
             if (restoreFiles.Data!.Count != pet.Images.Count)
-                _logger.LogError("Some images for pet with Id:{petId} cannot be restored!", pet.Id);
+                logger.LogError("Some images for pet with Id:{petId} cannot be restored!", pet.Id);
             else
-                _logger.LogInformation("Restore Pet with id:{Id} successfully!", pet.Id);
+                logger.LogInformation("Restore Pet with id:{Id} successfully!", pet.Id);
         }
         return UnitResult.Ok();
     }

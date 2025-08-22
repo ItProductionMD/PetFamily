@@ -1,4 +1,4 @@
-﻿using PetFamily.Auth.Public.Contracts;
+﻿using Account.Public.Contracts;
 using PetFamily.Discussions.Public.Dtos;
 using PetFamily.SharedKernel.Results;
 

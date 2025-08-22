@@ -2,5 +2,5 @@
 
 namespace Volunteers.Application.IRepositories;
 
-public interface IVolunteerUnitOfWork : IUnitOfWork {}
+public interface IVolunteerUnitOfWork : IUnitOfWork { }
 

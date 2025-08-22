@@ -28,7 +28,7 @@ public class VolunteerRequestWriteDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .HasDefaultSchema(SchemaNames.VOLUNTEER_REQUESTS)
+            .HasDefaultSchema(SchemaNames.VOLUNTEER_REQUEST)
             .ApplyConfigurationsFromAssembly(typeof(VolunteerRequestWriteDbContext).Assembly);
 
         base.OnModelCreating(modelBuilder);

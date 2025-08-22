@@ -1,13 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.SharedApplication.Abstractions.CQRS;
-using Scrutor;
+using PetFamily.SharedApplication.IJWTProvider;
+
 
 namespace PetFamily.SharedApplication.Extensions;
 
 public static class ServicesExtensions
 {
-    public static void CheckSectionsExistence(this IConfiguration configuration, List<string> sectionNames)
+    public static void CheckSectionsExistence(
+        this IConfiguration configuration,
+        List<string> sectionNames)
     {
         foreach (var sectionName in sectionNames)
         {
@@ -21,8 +24,11 @@ public static class ServicesExtensions
                     "Please ensure it is defined in your configuration file.");
         }
     }
+    
 
-    public static string TryGetConnectionString(this IConfiguration configuration, string connectionString) 
+    public static string TryGetConnectionString(
+        this IConfiguration configuration, 
+        string connectionString)
     {
         var postgresConnection = configuration.GetConnectionString(connectionString);
         if (string.IsNullOrEmpty(postgresConnection))
@@ -30,7 +36,6 @@ public static class ServicesExtensions
 
         return postgresConnection;
     }
-
 
     public static IServiceCollection AddCommandsAndQueries<TInjector>(this IServiceCollection services) =>
         services.Scan(scan => scan.FromAssemblies(typeof(TInjector).Assembly)
@@ -43,4 +48,6 @@ public static class ServicesExtensions
                         typeof(IQueryHandler<>)))
                     .AsSelfWithInterfaces()
                     .WithScopedLifetime());
+
+
 }

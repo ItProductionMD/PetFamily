@@ -2,5 +2,5 @@
 
 namespace PetFamily.Discussions.Application.Commands.UpdateMessage;
 
-public record UpdateDiscussionMessageCommand(Guid UserId, Guid DiscussionId, Guid MessageId, string NewMessage) :ICommand;
+public record UpdateDiscussionMessageCommand(Guid UserId, Guid DiscussionId, Guid MessageId, string NewMessage) : ICommand;
 

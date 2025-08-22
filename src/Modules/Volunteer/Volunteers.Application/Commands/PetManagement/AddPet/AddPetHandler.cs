@@ -11,48 +11,35 @@ using Volunteers.Domain.Enums;
 namespace Volunteers.Application.Commands.PetManagement.AddPet;
 
 public class AddPetHandler(
-    ILogger<AddPetHandler> logger,
-    IVolunteerWriteRepository repository,
-    ISpeciesExistenceContract petTypeChecker) : ICommandHandler<AddPetResponse, AddPetCommand>
+    IVolunteerWriteRepository volunteerWriteRepo,
+    ISpeciesExistenceContract petTypeChecker,
+    ILogger<AddPetHandler> logger) : ICommandHandler<AddPetResponse, AddPetCommand>
 {
-    private readonly ILogger<AddPetHandler> _logger = logger;
-    private readonly IVolunteerWriteRepository _repository = repository;
-    private readonly ISpeciesExistenceContract _petTypeChecker = petTypeChecker;
-
-    public async Task<Result<AddPetResponse>> Handle(
-        AddPetCommand command,
-        CancellationToken cancelToken = default)
+    public async Task<Result<AddPetResponse>> Handle(AddPetCommand cmd, CancellationToken ct = default)
     {
-        var validate = AddPetCommandValidator.Validate(command);
-        if (validate.IsFailure)
-        {
-            _logger.LogWarning("Validate add pet command errors:{Errors}",
-                validate.ValidationMessagesToString());
+        cmd.Validate();
 
-            return validate;
-        }
-
-        var checkPetType = await _petTypeChecker.VerifySpeciesAndBreedExist(
-            command.SpeciesId,
-            command.BreedId,
-            cancelToken);
+        var checkPetType = await petTypeChecker.VerifySpeciesAndBreedExist(
+            cmd.SpeciesId,
+            cmd.BreedId,
+            ct);
         if (checkPetType.IsFailure)
             return checkPetType;
 
-        var getVolunteer = await _repository.GetByIdAsync(command.VolunteerId, cancelToken);
+        var getVolunteer = await volunteerWriteRepo.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return UnitResult.Fail(getVolunteer.Error);
 
         var volunteer = getVolunteer.Data!;
 
-        var newPet = CreatePetProcess(command, volunteer);
+        var newPet = CreatePetProcess(cmd, volunteer);
 
-        var result = await _repository.SaveAsync(volunteer, cancelToken);
+        var result = await volunteerWriteRepo.SaveAsync(volunteer, ct);
         if (result.IsFailure)
             return result;
 
-        _logger.LogInformation("Pet with id:{petId} was added to volunteer with id:{Id} successful!",
-            newPet.Id, command.VolunteerId);
+        logger.LogInformation("Pet with id:{petId} was added to volunteer with id:{Id} successful!",
+            newPet.Id, cmd.VolunteerId);
 
         return Result.Ok(new AddPetResponse(newPet.Id, newPet.SerialNumber.Value));
     }

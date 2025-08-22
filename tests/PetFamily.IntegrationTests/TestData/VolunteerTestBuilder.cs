@@ -4,7 +4,6 @@ using PetSpecies.Domain;
 using Volunteers.Domain;
 using Volunteers.Domain.Enums;
 using Volunteers.Domain.ValueObjects;
-using static PetFamily.IntegrationTests.TestData.RandomAddressGenerator;
 using static PetFamily.IntegrationTests.TestData.RandomEnumGenerator;
 
 namespace PetFamily.IntegrationTests.TestData;
@@ -211,7 +210,7 @@ public class VolunteerTestBuilder
             throw new Exception($"Cant create volunteer with builder!Error:" +
                 $"{phoneResult.ValidationMessagesToString()}");
 
-        var phone = phoneResult.Data!;  
+        var phone = phoneResult.Data!;
 
         var volunteerResult = Volunteer.Create(
             VolunteerID.NewGuid(),

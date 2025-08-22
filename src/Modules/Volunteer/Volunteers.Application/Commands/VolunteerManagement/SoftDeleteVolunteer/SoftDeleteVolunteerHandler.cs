@@ -8,17 +8,13 @@ using Volunteers.Application.IRepositories;
 namespace Volunteers.Application.Commands.VolunteerManagement.SoftDeleteVolunteer;
 
 public class SoftDeleteVolunteerHandler(
-    ILogger<SoftDeleteVolunteerHandler> logger,
-    IVolunteerWriteRepository volunteerRepository,
-    IFileService fileService) : ICommandHandler<Guid, SoftDeleteVolunteerCommand>
+    IVolunteerWriteRepository VolunteerWriteRepo,
+    IFileService fileService,
+    ILogger<SoftDeleteVolunteerHandler> logger) : ICommandHandler<Guid, SoftDeleteVolunteerCommand>
 {
-    private readonly IVolunteerWriteRepository _volunteerRepository = volunteerRepository;
-    private readonly ILogger<SoftDeleteVolunteerHandler> _logger = logger;
-    private readonly IFileService _fileService = fileService;
-
     public async Task<Result<Guid>> Handle(SoftDeleteVolunteerCommand cmd, CancellationToken ct)
     {
-        var getVolunteer = await _volunteerRepository.GetByIdAsync(cmd.VolunteerId, ct);
+        var getVolunteer = await VolunteerWriteRepo.GetByIdAsync(cmd.VolunteerId, ct);
         if (getVolunteer.IsFailure)
             return Result.Fail(getVolunteer.Error);
 
@@ -32,14 +28,14 @@ public class SoftDeleteVolunteerHandler(
 
         volunteer.SoftDelete();
 
-        var result = await _volunteerRepository.SaveAsync(volunteer, ct);
+        var result = await VolunteerWriteRepo.SaveAsync(volunteer, ct);
         if (result.IsFailure)
             return result;
 
         if (imagesToDelete.Count > 0)
-            await _fileService.DeleteFilesUsingMessageQueue(imagesToDelete);
+            await fileService.DeleteFilesUsingMessageQueue(imagesToDelete);
 
-        _logger.LogInformation("Soft delete volunteer with id:{volunteerId} successful !", cmd.VolunteerId);
+        logger.LogInformation("Soft delete volunteer with id:{volunteerId} successful !", cmd.VolunteerId);
 
         return Result.Ok(volunteer.Id);
     }

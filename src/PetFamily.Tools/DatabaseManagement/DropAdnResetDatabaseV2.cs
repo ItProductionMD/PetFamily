@@ -1,11 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
-using System;
-using System.IO;
-using System.Linq;
-using Microsoft.CodeAnalysis;
-using Microsoft.Build.Evaluation;
 namespace PetFamily.Tools.DatabaseManagement;
 
 public static class DropAndResetDatabaseV2
@@ -20,7 +16,7 @@ public static class DropAndResetDatabaseV2
         var solution = await workspace.OpenSolutionAsync(solutionPath);
         Console.WriteLine($"solution opened!Path:{solution.FilePath}");
 
-        var startupProjectPath = Path.Combine(Path.GetDirectoryName(solutionPath)!,"src" ,"PetFamily.Host.Api", "PetFamily.Host.Api.csproj");
+        var startupProjectPath = Path.Combine(Path.GetDirectoryName(solutionPath)!, "src", "PetFamily.Host.Api", "PetFamily.Host.Api.csproj");
 
         var projects = solution.Projects
             .Where(p => p.Name.Contains("Infrastructure") && !p.Name.Contains("Shared"))

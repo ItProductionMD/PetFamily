@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
-using PetFamily.Framework.HTTPContext.Interfaces;
+using PetFamily.Framework.HTTPContext.User;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.Utilities;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.SharedApplication.IUserContext;
 using PetFamily.SharedKernel.Errors;
 using PetFamily.SharedKernel.Results;
 using PetFamily.VolunteerRequests.Application.Commands.RejectVolunteerRequest;

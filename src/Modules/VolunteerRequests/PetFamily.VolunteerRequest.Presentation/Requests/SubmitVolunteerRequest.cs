@@ -1,5 +1,4 @@
 ﻿using PetFamily.SharedApplication.Dtos;
-using PetFamily.VolunteerRequests.Application.Commands.SendVolunteerRequestToRevision;
 using PetFamily.VolunteerRequests.Application.Commands.SubmitVolunteerRequest;
 
 namespace PetFamily.VolunteerRequests.Presentation.Requests;
@@ -12,7 +11,7 @@ public class SubmitVolunteerRequest
     public string Description { get; set; }
     public int ExperienceYears { get; set; }
     public IEnumerable<RequisitesDto> Requisites { get; set; } = [];
-    
+
     public SubmitVolunteerRequestCommand ToCommand(Guid UserId)
     {
         return new SubmitVolunteerRequestCommand(

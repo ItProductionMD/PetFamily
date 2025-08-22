@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Authorization.Public.Contracts;
+using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.SharedApplication.Validations;
 using PetFamily.SharedApplication.Exceptions;
-using PetFamily.SharedApplication.IUserContext;
-using PetFamily.SharedKernel.Errors;
+using PetFamily.SharedKernel.Authorization;
 using PetFamily.SharedKernel.Results;
+using System.Security.Cryptography;
 using Volunteers.Application.Commands.VolunteerManagement.CreateVolunteer;
 using Volunteers.Application.IRepositories;
 using Volunteers.Domain;
@@ -15,18 +15,20 @@ public class CreateVolunteerHandlerTests
 {
     private readonly Mock<IVolunteerWriteRepository> _volunteerRepositoryMock;
     private readonly Mock<IVolunteerReadRepository> _volunteerReadRepositoryMock;
+    private readonly Mock<IRoleContract> _roleContractMock;
     private readonly Mock<ILogger<CreateVolunteerHandler>> _loggerMock;
     private readonly CreateVolunteerHandler _handler;
     private readonly CreateVolunteerFluentValidator _validator;
-
     public CreateVolunteerHandlerTests()
     {
+        _roleContractMock = new Mock<IRoleContract>();
         _volunteerRepositoryMock = new Mock<IVolunteerWriteRepository>();
         _loggerMock = new Mock<ILogger<CreateVolunteerHandler>>();
         _validator = new CreateVolunteerFluentValidator();
         _volunteerReadRepositoryMock = new Mock<IVolunteerReadRepository>();
         _handler = new CreateVolunteerHandler(
             _volunteerRepositoryMock.Object,
+            _roleContractMock.Object,
             _loggerMock.Object);
     }
 
@@ -41,14 +43,14 @@ public class CreateVolunteerHandlerTests
             userId,
             "invalidName!@",
             "invalidLastName!@",
-            "Description",         
+            "Description",
             0,
             "+39",
             "000000",
             []);
 
         //ACT and ASSERT
-        await Assert.ThrowsAsync<ValidationException>(async () => 
+        await Assert.ThrowsAsync<ValidationException>(async () =>
             await _handler.Handle(command, CancellationToken.None));
     }
 
@@ -63,7 +65,7 @@ public class CreateVolunteerHandlerTests
             userId,
             "firstName",
             "lastName",
-            "Description",           
+            "Description",
             0,
             "+39",
             "0000000",
@@ -75,6 +77,10 @@ public class CreateVolunteerHandlerTests
         _volunteerRepositoryMock
             .Setup(x => x.AddAndSaveAsync(It.IsAny<Volunteer>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(addResult);
+
+        _roleContractMock
+            .Setup(x => x.AssignRole(command.UserId, RoleCodes.VOLUNTEER, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(UnitResult.Ok());
 
         //ACT
         var result = await _handler.Handle(command, CancellationToken.None);

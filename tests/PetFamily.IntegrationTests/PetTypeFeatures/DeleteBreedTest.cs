@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.IntegrationTests.DbContextExtensions;
 using PetFamily.IntegrationTests.IClassFixtures;
-using PetFamily.IntegrationTests.Seeds;
 using PetFamily.IntegrationTests.TestData;
 using PetFamily.IntegrationTests.WebApplicationFactory;
 using PetSpecies.Application.Commands.DeleteBreed;
@@ -17,7 +17,7 @@ public class DeleteBreedTest(TestWebApplicationFactory factory)
         var breedName = "testBreed";
         var seedSpecies = new SpeciesTestBuilder()
             .WithBreeds([breedName]).Species;
-        await DbContextSeedExtensions.SeedAsync(_speciesDbContext, seedSpecies);
+        await DbContextSeeder.SeedAsync(_speciesDbContext, seedSpecies);
 
         var seededBreed = seedSpecies.Breeds[0];
 

@@ -12,22 +12,18 @@ public class DeleteBreedHandler(
     ISpeciesWriteRepository speciesWriteRepo,
     ILogger<DeleteBreedHandler> logger) : ICommandHandler<DeleteBreedCommand>
 {
-    private readonly ILogger<DeleteBreedHandler> _logger = logger;
-    private readonly IPetExistenceContract _petExistenceChecker = petExistenceChecker;
-    private readonly ISpeciesWriteRepository _speciesWriteRepo = speciesWriteRepo;
-
     public async Task<UnitResult> Handle(DeleteBreedCommand cmd, CancellationToken ct)
     {
         if (cmd.BreedId == Guid.Empty)
         {
-            _logger.LogWarning("BreedId cannot be empty");
+            logger.LogWarning("BreedId cannot be empty");
             return UnitResult.Fail(Error.GuidIsEmpty("BreedId"));
         }
-        var isPetExist = await _petExistenceChecker.ExistsWithBreedAsync(cmd.BreedId);
+        var isPetExist = await petExistenceChecker.ExistsWithBreedAsync(cmd.BreedId);
         if (isPetExist)
             return UnitResult.Fail(Error.Conflict("Breed can't be deleted because it is used by a pet!"));
 
-        var getSpecies = await _speciesWriteRepo.GetByBreedIdAsync(cmd.BreedId, ct);
+        var getSpecies = await speciesWriteRepo.GetByBreedIdAsync(cmd.BreedId, ct);
         if (getSpecies.IsFailure)
             return UnitResult.Fail(getSpecies.Error);
 
@@ -37,7 +33,7 @@ public class DeleteBreedHandler(
         if (deleteResult.IsFailure)
             return UnitResult.Fail(deleteResult.Error);
 
-        await _speciesWriteRepo.SaveAsync(species, ct);
+        await speciesWriteRepo.SaveAsync(species, ct);
 
         return UnitResult.Ok();
     }

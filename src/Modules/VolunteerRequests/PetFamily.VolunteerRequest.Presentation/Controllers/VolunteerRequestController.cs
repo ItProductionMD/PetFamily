@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Framework;
-using PetFamily.Framework.HTTPContext.Interfaces;
+using PetFamily.Framework.HTTPContext.User;
 using PetFamily.VolunteerRequests.Application.Commands.ApproveVolunteerRequest;
 using PetFamily.VolunteerRequests.Application.Commands.RejectVolunteerRequest;
 using PetFamily.VolunteerRequests.Application.Commands.SendVolunteerRequestToRevision;
@@ -22,7 +22,6 @@ namespace PetFamily.VolunteerRequests.Presentation.Controllers;
 [ApiController]
 public class VolunteerRequestController(IUserContext userContext) : ControllerBase
 {
-    private readonly IUserContext _userContext = userContext;
 
     /// <summary>
     /// Creates a new volunteer request.
@@ -38,7 +37,7 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         [FromBody] SubmitVolunteerRequest request,
         CancellationToken ct = default)
     {
-        var userId = _userContext.GetUserId();
+        var userId = userContext.GetUserId();
         var command = request.ToCommand(userId);
 
         return (await handler.Handle(command, ct)).ToActionResult();
@@ -58,7 +57,7 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         Guid id,
         CancellationToken ct = default)
     {
-        var adminId = _userContext.GetUserId();
+        var adminId = userContext.GetUserId();
         var command = new TakeVolunteerRequestForReviewCommand(adminId, id);
         var result = await handler.Handle(command, ct);
 
@@ -79,7 +78,7 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         Guid id,
         CancellationToken ct = default)
     {
-        var adminId = _userContext.GetUserId();
+        var adminId = userContext.GetUserId();
         var command = new ApproveVolunteerRequestCommand(adminId, id);
 
         return (await handler.Handle(command, ct)).ToActionResult();
@@ -101,7 +100,7 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         [FromBody] RejectVolunteerRequest request,
         CancellationToken ct = default)
     {
-        var adminId = _userContext.GetUserId();
+        var adminId = userContext.GetUserId();
         var command = request.ToCommand(adminId, id);
 
         return (await handler.Handle(command, ct)).ToActionResult();
@@ -123,7 +122,7 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         [FromBody] SendRequestToRevisionRequest request,
         CancellationToken ct = default)
     {
-        var adminId = _userContext.GetUserId();
+        var adminId = userContext.GetUserId();
         var command = request.ToCommand(adminId, id);
 
         return (await handler.Handle(command, ct)).ToActionResult();
@@ -145,7 +144,7 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         [FromBody] UpdateVolunteerRequestRequest request,
         CancellationToken ct = default)
     {
-        var userId = _userContext.GetUserId();
+        var userId = userContext.GetUserId();
 
         var command = request.ToCommand(userId, id);
 
@@ -171,9 +170,10 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         [FromQuery] int pageSize = 10,
         CancellationToken ct = default)
     {
-        var adminId = _userContext.GetUserId();
+        var adminId = userContext.GetUserId();
 
         var query = new GetRequestsOnReviewQuery(
+            adminId,
             page,
             pageSize,
             new VolunteerRequestsFilter(statuses));
@@ -215,7 +215,7 @@ public class VolunteerRequestController(IUserContext userContext) : ControllerBa
         [FromServices] GetOwnVolunteerRequestHandler handler,
         CancellationToken ct = default)
     {
-        var userId = _userContext.GetUserId();
+        var userId = userContext.GetUserId();
         var query = new GetOwnVolunteerRequestQuery(userId);
 
         return (await handler.Handle(query, ct)).ToActionResult(); ;

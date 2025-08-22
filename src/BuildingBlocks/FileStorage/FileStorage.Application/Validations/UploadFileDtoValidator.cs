@@ -58,7 +58,7 @@ public class UploadFileDtoValidator : IUploadFileDtoValidator
         return UnitResult.Ok();
     }
 
-    public  UnitResult ValidateFiles(
+    public UnitResult ValidateFiles(
         List<UploadFileDto> fileDtos,
         IFileValidatorOptions fileValidatorOptions)
     {
