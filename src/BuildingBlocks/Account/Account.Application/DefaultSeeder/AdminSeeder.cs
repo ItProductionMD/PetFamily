@@ -1,12 +1,12 @@
-﻿using Authorization.Public.Contracts;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Account.Application.IRepositories;
+﻿using Account.Application.IRepositories;
 using Account.Application.IServices;
 using Account.Application.Options;
 using Account.Domain.Entities.UserAggregate;
 using Account.Domain.Enums;
 using Account.Domain.Options;
+using Authorization.Public.Contracts;
+using Microsoft.Extensions.Logging;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedKernel.Results;
 using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.SharedKernel.ValueObjects.Ids;
@@ -20,7 +20,7 @@ public class AdminSeeder(
     IPasswordHasher _passwordHasher,
     IUserWriteRepository _userWriteRepository,
     IUserReadRepository _userReadRepository,
-    ILogger<AdminSeeder> logger)
+    ILogger<AdminSeeder> logger): ISeeder
 {
     private readonly AdminIdentity _adminOptions = adminOptions;
 

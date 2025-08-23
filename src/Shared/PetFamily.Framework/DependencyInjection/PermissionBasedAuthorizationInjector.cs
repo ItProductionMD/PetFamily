@@ -2,11 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.SharedKernel.Authorization;
 
-namespace PetFamily.Framework.SharedAuthorization;
+namespace PetFamily.Framework.HTTPContext.AuthorizationHandler;
 
-public static class PermissionsPolicesAuthorizationInjector
+public static class PermissionBasedAuthorizationInjector
 {
-    public static IServiceCollection InjectPermissionPoliciesAuthorization(
+    public static IServiceCollection AddPermissionBasedAuthorizationHandler(
         this IServiceCollection services)
     {
         var permissionCodes = PermissionCodes.GetAllPermissionCodes();

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.SharedApplication.Extensions;
+using PetFamily.SharedApplication.DependencyInjection;
 
 namespace PetFamily.Discussions.Application;
 

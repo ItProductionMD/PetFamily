@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using PetFamily.SharedApplication.Abstractions;
 using System.ComponentModel.DataAnnotations;
 
-namespace PetFamily.SharedApplication.Extensions;
+namespace PetFamily.SharedApplication.DependencyInjection;
 
 public static class OptionsExtensions
 {

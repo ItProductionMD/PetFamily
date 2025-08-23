@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Account.Application.DefaultSeeder;
 using Account.Application.Options;
-using PetFamily.SharedApplication.Extensions;
 
 using static Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions;
+using PetFamily.SharedApplication.DependencyInjection;
 
 namespace Account.Application;
 
