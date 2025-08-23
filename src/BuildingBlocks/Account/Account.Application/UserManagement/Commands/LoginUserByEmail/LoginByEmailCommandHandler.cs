@@ -13,7 +13,6 @@ using PetFamily.SharedKernel.ValueObjects.Ids;
 using PetFamily.SharedKernel.ValueObjects;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using PetFamily.Framework.SharedAuthorization;
 using Account.Domain.Entities.UserAggregate;
 using Account.Application.Extensions;
 

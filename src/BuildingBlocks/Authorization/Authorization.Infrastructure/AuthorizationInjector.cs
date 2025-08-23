@@ -12,14 +12,14 @@ using Authorization.Infrastructure.Repositories.RefreshTokenSessionRepo;
 using Authorization.Public.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.SharedApplication.Extensions;
+using PetFamily.SharedApplication.DependencyInjection;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 
 namespace Authorization.Infrastructure;
 
 public static class AuthorizationInjector
 {
-    public static IServiceCollection InjectAuthorization(
+    public static IServiceCollection AddAuthorization(
         this IServiceCollection services,
         IConfiguration configuration)
     {

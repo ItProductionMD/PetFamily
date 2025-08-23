@@ -4,7 +4,7 @@ using PetFamily.SharedApplication.Abstractions.CQRS;
 using PetFamily.SharedApplication.IJWTProvider;
 
 
-namespace PetFamily.SharedApplication.Extensions;
+namespace PetFamily.SharedApplication.DependencyInjection;
 
 public static class ServicesExtensions
 {

@@ -9,7 +9,7 @@ using PetFamily.Discussions.Application.Queries.GetDiscussion;
 using PetFamily.Discussions.Presentation.Requests;
 using PetFamily.Framework;
 using PetFamily.Framework.Extensions;
-using PetFamily.SharedApplication.IUserContext;
+using PetFamily.Framework.HTTPContext.User;
 using static PetFamily.SharedKernel.Authorization.PermissionCodes.DiscussionManagement;
 
 namespace PetFamily.Discussions.Presentation.Controllers;

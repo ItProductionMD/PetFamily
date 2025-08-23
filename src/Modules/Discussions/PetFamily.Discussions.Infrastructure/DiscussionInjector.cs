@@ -7,14 +7,14 @@ using PetFamily.Discussions.Infrastructure.Contracts;
 using PetFamily.Discussions.Infrastructure.Dapper;
 using PetFamily.Discussions.Infrastructure.Repositories;
 using PetFamily.Discussions.Public.Contracts;
-using PetFamily.SharedApplication.Extensions;
+using PetFamily.SharedApplication.DependencyInjection;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 
 namespace PetFamily.Discussions.Infrastructure;
 
 public static class DiscussionInjector
 {
-    public static IServiceCollection InjectDiscussionModule(
+    public static IServiceCollection AddDiscussionModule(
         this IServiceCollection services,
         IConfiguration configuration)
     {

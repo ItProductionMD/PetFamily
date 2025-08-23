@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.SharedApplication.Extensions;
+using PetFamily.SharedApplication.DependencyInjection;
 using PetFamily.VolunteerRequests.Application.ContractsImplementation;
 using PetFamily.VolunteerRequests.Public.Contracts;
 

@@ -15,7 +15,7 @@ namespace PetSpecies.Infrastructure;
 
 public static class SpeciesModuleInjector
 {
-    public static IServiceCollection InjectSpeciesModule(
+    public static IServiceCollection AddSpeciesModule(
         this IServiceCollection services,
         IConfiguration configuration)
     {

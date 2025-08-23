@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.SharedApplication.Extensions;
+using PetFamily.SharedApplication.DependencyInjection;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using PetFamily.SharedInfrastructure.Shared.Dapper;
 using PetFamily.VolunteerRequests.Application.Dtos;
@@ -16,7 +16,7 @@ namespace PetFamily.VolunteerRequests.Infrastructure;
 
 public static class VolunteerRequestInjector
 {
-    public static IServiceCollection InjectVolunteerRequestModule(
+    public static IServiceCollection AddVolunteerRequestModule(
         this IServiceCollection services,
         IConfiguration configuration)
     {

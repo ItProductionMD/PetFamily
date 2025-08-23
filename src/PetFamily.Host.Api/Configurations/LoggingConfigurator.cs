@@ -22,7 +22,5 @@ public static class LoggingConfigurator
         builder.Host.UseSerilog();
 
         return builder;
-
-        return builder;
     }
 }

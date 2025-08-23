@@ -1,9 +1,9 @@
-﻿using FileStorage.Public.Contracts;
+﻿using Account.Public.Contracts;
+using FileStorage.Public.Contracts;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Moq;
 using Npgsql;
-using Account.Public.Contracts;
-using PetFamily.SharedApplication.IUserContext;
+using PetFamily.Framework.HTTPContext.User;
 using Respawn;
 using Testcontainers.PostgreSql;
 

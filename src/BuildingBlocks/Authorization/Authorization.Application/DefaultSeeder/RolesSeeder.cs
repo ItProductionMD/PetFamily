@@ -2,6 +2,7 @@
 using Authorization.Domain.Entities;
 using Authorization.Domain.Entities.RoleAggregate;
 using Microsoft.Extensions.Logging;
+using PetFamily.SharedApplication.Abstractions;
 using PetFamily.SharedKernel.Authorization;
 
 namespace Authorization.Application.DefaultSeeder;
@@ -11,7 +12,7 @@ public class RolesSeeder(
     IRoleReadRepo _roleReadRepo,
     IPermissionWriteRepo _permissionWriteRepo,
     IPermissionReadRepo _permissionReadRepo,
-    ILogger<RolesSeeder> logger)
+    ILogger<RolesSeeder> logger):ISeeder
 {
     
     private readonly ILogger<RolesSeeder> _logger = logger;

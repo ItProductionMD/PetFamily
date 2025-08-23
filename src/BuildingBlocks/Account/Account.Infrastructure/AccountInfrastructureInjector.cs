@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using static Account.Application.AccountCommandsAndQueriesInjector;
-using Account.Application;
+﻿using Account.Application;
 using Account.Application.DefaultSeeder;
 using Account.Application.IRepositories;
 using Account.Application.IServices;
@@ -14,17 +11,18 @@ using Account.Infrastructure.Repository;
 using Account.Infrastructure.Services.EmailService;
 using Account.Infrastructure.Services.PasswordHasher;
 using Account.Public.Contracts;
-using PetFamily.SharedApplication.Extensions;
-using PetFamily.SharedInfrastructure.JWTProvider;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using PetFamily.SharedApplication.DependencyInjection;
 using PetFamily.SharedInfrastructure.Shared.Constants;
-using PetFamily.SharedInfrastructure.Shared.Dapper;
+using static Account.Application.AccountCommandsAndQueriesInjector;
 
 
 namespace Account.Infrastructure;
 
-public static class UserAccountInfrastructureInjector
+public static class AccountInfrastructureInjector
 {
-    public static IServiceCollection InjectUserAccount(
+    public static IServiceCollection AddAccount(
         this IServiceCollection services,
         IConfiguration configuration)
     {

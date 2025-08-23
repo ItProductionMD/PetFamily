@@ -13,7 +13,7 @@ namespace FileStorage.Infrastructure;
 
 public static class Injector
 {
-    public static IServiceCollection InjectFileStorage(
+    public static IServiceCollection AddFileStorage(
         this IServiceCollection services,
         IConfiguration configuration)
     {

@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Security;
 using Account.Application.Dtos;
 using Account.Application.IServices.Email;
-using PetFamily.Framework.SharedAuthorization;
 using PetFamily.SharedApplication.IJWTProvider;
 using PetFamily.SharedInfrastructure.JWTProvider;
 using PetFamily.SharedKernel.Errors;

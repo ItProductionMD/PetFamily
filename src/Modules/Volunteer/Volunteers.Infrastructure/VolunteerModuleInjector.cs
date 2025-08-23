@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.SharedApplication.Extensions;
+using PetFamily.SharedApplication.DependencyInjection;
 using PetFamily.SharedInfrastructure.Shared.Constants;
 using Volunteers.Application;
 using Volunteers.Application.IRepositories;
@@ -15,7 +15,7 @@ namespace Volunteers.Infrastructure;
 
 public static class VolunteerModuleInjector
 {
-    public static IServiceCollection InjectVolunteerModule(
+    public static IServiceCollection AddVolunteerModule(
         this IServiceCollection services,
         IConfiguration configuration)
     {

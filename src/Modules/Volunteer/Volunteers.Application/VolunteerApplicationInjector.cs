@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Account.Public.Contracts;
-using PetFamily.SharedApplication.Extensions;
 using Volunteers.Application.Contracts;
 using Volunteers.Public.IContracts;
+using PetFamily.SharedApplication.DependencyInjection;
 
 namespace Volunteers.Application;
 
